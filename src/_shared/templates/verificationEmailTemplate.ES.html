@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Etiquetas meta para SEO y descripción -->
+    <meta name="description" content="Correo de verificación con URL" />
+    <title>Verificación de Cuenta</title>
+    <style>
+      /* Estilos básicos y mejores prácticas */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        background-color: #ffffff;
+        margin: 20px auto; /* Margen reducido */
+        padding: 20px;
+        width: 95%; /* Abarca más espacio en pantalla */
+        max-width: 700px; /* Se aumenta ligeramente el ancho máximo */
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      .logo {
+        max-width: 150px;
+        margin-bottom: 20px;
+      }
+
+      h2 {
+        color: #333333;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: #555555;
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 0.5rem 0;
+      }
+
+      /* Botón optimizado en verde */
+      .verification-link {
+        display: inline-block;
+        margin: 1.5rem 0;
+        padding: 12px 36px;
+        background-color: #28a745; /* Color verde */
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 50px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition:
+          background-color 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .verification-link:hover {
+        background-color: #218838; /* Verde más oscuro al pasar el ratón */
+        transform: translateY(-3px);
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: #aaaaaa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Para incrustar el logo como adjunto con cid: -->
+      <img src="cid:companyLogo" alt="Logo de la Empresa" class="logo" />
+
+      <h2>Verificación de Cuenta</h2>
+      <p>Hola,</p>
+      <p>
+        Por favor, haz clic en el siguiente botón para completar tu
+        verificación:
+      </p>
+      <a href="{{VERIFICATION_URL}}" class="verification-link"> Unirme </a>
+      <p>Si no solicitaste este enlace, por favor ignora este mensaje.</p>
+      <div class="footer">
+        &copy; {{YEAR}} JUUZ Company. Todos los derechos reservados.
+      </div>
+    </div>
+  </body>
+</html>

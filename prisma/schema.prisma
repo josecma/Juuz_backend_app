@@ -1,0 +1,1241 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  seed            = "prisma/seed.ts"
+  binaryTargets   = "native"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis()]
+}
+
+model Request {
+  id        String   @id @default(uuid())
+  source    Json?
+  target    Json
+  channel   Json
+  type      String
+  createdAt DateTime @default(now())
+
+  @@map("requests")
+}
+
+// model OutboxRequestEvent {
+//   id          String   @id @default(uuid())
+//   topic       String // "request.created" | "request.deleted"
+//   payload     Json
+//   attempts    Int      @default(0)
+//   maxAttempts Int      @default(3) @map("max_attempts")
+//   status      String   @default("PENDING") // "PENDING" | "PROCESSED" | "FAILED"
+//   createdAt   DateTime @default(now()) @map("created_at")
+//   updatedAt   DateTime @updatedAt
+
+//   @@index([status, createdAt])
+//   @@map("outbox_request_events")
+// }
+
+model JoinCompanyRequest {
+  id        String @id @default(uuid())
+  requestId String @unique @map("request_id")
+  companyId String @map("company_id")
+  as        String // [ DRIVER ] 
+  status    String @default("PENDING") // [ PENDING, ACCEPTED, REJECTED ] 
+
+  @@unique([requestId, companyId])
+  @@map("join_company_requests")
+}
+
+// model OutboxJoinCompanyRequestEvent {
+//   id          String   @id @default(uuid())
+//   topic       String // "request.created" | "request.deleted"
+//   payload     Json
+//   attempts    Int      @default(0)
+//   maxAttempts Int      @default(3) @map("max_attempts")
+//   status      String   @default("PENDING") // "PENDING" | "PROCESSED" | "FAILED"
+//   createdAt   DateTime @default(now()) @map("created_at")
+//   updatedAt   DateTime @updatedAt
+
+//   @@index([status, createdAt])
+//   @@map("outbox_join_company_request_events")
+// }
+
+model UserIdentity {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String
+  value     String
+  metadata  Json?
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([type, value])
+  @@index([userId, verified])
+  @@map("user_identities")
+}
+
+model UserCredential {
+  id         String    @id @default(uuid())
+  identityId String    @unique @map("identity_id")
+  password   String
+  expiresAt  DateTime? @map("expires_at")
+  version    Int       @default(1)
+
+  @@index([identityId, expiresAt])
+  @@map("user_credentials")
+}
+
+model UserIdentityVerification {
+  id         String    @id @default(uuid())
+  identityId String    @map("identity_id")
+  requestId  String    @unique @map("request_id")
+  keyId      String    @unique @map("key_id")
+  status     String    @default("PENDING")
+  attempts   Int       @default(0)
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@unique([identityId, requestId])
+  @@index([identityId, status, requestId])
+  @@map("user_identity_verifications")
+}
+
+model Source {
+  id    String @id @default(uuid())
+  type  String
+  value String
+
+  @@unique([type, value])
+  @@map("sources")
+}
+
+model Key {
+  id    String @id @default(uuid())
+  type  String
+  value String
+
+  @@map("keys")
+}
+
+model UserAuthenticationProcess {
+  id         String   @id @default(uuid())
+  identityId String   @map("identity_id")
+  userId     String   @map("user_id")
+  status     String // [ PENDING, FAILED, SUCCESS ] 
+  method     String // [ BASIC, TOTP, OAUTH, MAGIC_LINK ]
+  attempts   Int      @default(0)
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([identityId, status])
+  @@index([userId, createdAt])
+  @@map("user_authentication_processes")
+}
+
+model UserOtpSecret {
+  id        String   @id() @default(uuid())
+  userId    String   @unique @map("user_id")
+  secret    String   @map("secret")
+  algorithm String?
+  isActive  Boolean  @default(false) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("user_otp_secrets")
+}
+
+model UserHotpCounter {
+  id              String   @id @default(uuid())
+  userOtpSecretId String   @unique @map("user_otp_secret_id")
+  counter         Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@unique([counter, userOtpSecretId])
+  @@index([userOtpSecretId])
+  @@map("user_hotp_counters")
+}
+
+model Channel {
+  id    Int           @id @default(autoincrement())
+  name  String        @unique()
+  users UserChannel[]
+
+  @@index([name])
+  @@map("channels")
+}
+
+model UserChannel {
+  channelId   Int      @map("channel_id")
+  channel     Channel  @relation(fields: [channelId], references: [id])
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  permissions String[]
+  items       Json
+
+  @@id([channelId, userId])
+  @@map("user_channels")
+}
+
+model TrackingChannel {
+  channelId     String   @map("channel_id")
+  stakeholderId String   @map("stakeholder_id")
+  permissions   String[]
+
+  @@id([channelId, stakeholderId])
+  @@map("tracking_channels")
+}
+
+model Business {
+  id     String @id @default(uuid())
+  status String
+
+  @@map("businesses")
+}
+
+model Item {
+  itemId     String @map("item_id")
+  businessId String @map("business_id")
+  type       String @map("type")
+
+  @@id([businessId, itemId])
+  @@index([itemId])
+  @@index([businessId])
+  @@map("items")
+}
+
+model BusinessStakeholder {
+  role       String
+  businessId String @map("business_id")
+  userId     String @map("user_id")
+
+  @@id([businessId, userId])
+  @@map("business_stakeholders")
+}
+
+model Bid {
+  id         String @id @default(uuid())
+  bidderId   String @map("bidder_id")
+  itemId     String @map("item_id")
+  businessId String @map("business_id")
+  price      Json
+
+  @@index([itemId, businessId])
+  @@index([bidderId])
+  @@map("bids")
+}
+
+model Criterion {
+  id                   Int                   @id @default(autoincrement())
+  name                 String                @unique()
+  description          String?
+  max                  Int                   @default(5)
+  criterionMemberships CriterionMembership[]
+  scores               Score[]
+
+  @@index([name])
+  @@map("criteria")
+}
+
+model CriterionSet {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  version     Int     @default(1)
+
+  criteria    CriterionMembership[]
+  evaluations Evaluation[]
+
+  @@unique([name, version])
+  @@map("criterion_sets")
+}
+
+model DefaultSetOfCriteriaPerUserRole {
+  criterionSetId Int    @unique()
+  userRole       String @unique()
+
+  @@unique([criterionSetId, userRole])
+  @@map("default_set_of_criteria_per_user_roles")
+}
+
+model CriterionMembership {
+  setId       Int          @map("set_Id")
+  set         CriterionSet @relation(fields: [setId], references: [id])
+  criterionId Int          @map("criterion_Id")
+  criterion   Criterion    @relation(fields: [criterionId], references: [id])
+  order       Int?
+
+  @@id([setId, criterionId])
+  @@map("criterion_set_memberships")
+}
+
+model Evaluation {
+  id             Int          @id @default(autoincrement())
+  evaluated      User         @relation(name: "evaluations_received", fields: [evaluatedId], references: [id])
+  evaluatedId    Int          @map("evaluated_Id")
+  criterionSet   CriterionSet @relation(fields: [criterionSetId], references: [id])
+  criterionSetId Int          @map("criterionSet_Id")
+  evaluator      User         @relation(name: "evaluations_made", fields: [evaluatorId], references: [id])
+  evaluatorId    Int          @map("evaluator_Id")
+  role           String       @map("role")
+  scores         Score[]
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@map("evaluations")
+}
+
+model Score {
+  id           Int        @id @default(autoincrement())
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+  evaluationId Int        @map("evaluation_Id")
+  criterion    Criterion  @relation(fields: [criterionId], references: [id])
+  criterionId  Int        @map("criterion_Id")
+  value        Int
+  comment      String?
+
+  @@map("scores")
+}
+
+model File {
+  id                 Int                 @id @default(autoincrement())
+  key                String              @unique() @db.VarChar()
+  size               String
+  mimeType           String
+  metadata           Json
+  uploadedAt         DateTime            @default(now()) @map("uploaded_at")
+  evidenceFiles      EvidenceFile[]
+  userProfilePicture UserProfilePicture?
+
+  @@index([key])
+  @@map("files")
+}
+
+model UserProfilePicture {
+  userId Int  @unique() @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+  fileId Int  @unique() @map("file_id")
+  file   File @relation(fields: [fileId], references: [id])
+
+  @@id([userId, fileId])
+  @@map("user_profile_pictures")
+}
+
+model EvidenceFile {
+  id         Int      @id @default(autoincrement())
+  evidenceId Int
+  evidence   Evidence @relation(fields: [evidenceId], references: [id])
+  fileId     Int
+  file       File     @relation(fields: [fileId], references: [id])
+
+  @@unique([fileId])
+  @@map("evidence_files")
+}
+
+// model Dispute {
+//   id          Int       @id @default(autoincrement())
+//   userId      Int       @map("user_id")
+//   orderId     Int       @map("order_id")
+//   description String    @db.VarChar(255)
+//   status      String
+//   user        User      @relation(name: "user_otm_dispute", fields: [userId], references: [id])
+//   order       Order     @relation(name: "order_otm_dispute", fields: [orderId], references: [id])
+//   startedAt   DateTime  @default(now()) @map("started_at")
+//   endedAt     DateTime? @map("ended_at")
+
+//   @@map("disputes")
+// }
+
+model Evidence {
+  id            Int            @id @default(autoincrement())
+  description   String         @db.VarChar(255)
+  status        Boolean
+  coordinates   Json
+  type          String
+  userId        Int            @map("user_id")
+  orderId       Int            @map("order_id")
+  user          User           @relation(name: "evidence_otm_user", fields: [userId], references: [id])
+  order         Order          @relation(name: "evidence_otm_order", fields: [orderId], references: [id])
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @default(now()) @updatedAt @map("updated_at")
+  evidenceFiles EvidenceFile[]
+
+  @@map("evidences")
+}
+
+model Category {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  path       String     @unique
+  categoryId Int?       @map("category_id")
+  category   Category?  @relation("category_otm_category", fields: [categoryId], references: [id], onDelete: Cascade)
+  categories Category[] @relation("category_otm_category")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @default(now()) @updatedAt() @map("updated_at")
+
+  @@index([path])
+  @@map("categories")
+}
+
+model Vehicle {
+  id           Int      @id @default(autoincrement())
+  vin          String   @unique
+  categoryPath String   @map("category_path")
+  year         Int
+  color        String
+  licensePlate String   @map("license_plate")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([vin, licensePlate])
+  @@map("vehicles")
+}
+
+model Company {
+  id                 Int               @id @default(autoincrement())
+  carrierIdentifier  String?
+  usdot              String?
+  mc                 String?
+  primaryAdminEmail  String?
+  countryCode        String?
+  phoneNumber        String?
+  extension          String?
+  addressLine1       String?
+  addressLine2       String?
+  city               String?
+  state              String?
+  zipCode            String?
+  country            String?
+  rating             Int               @default(0)
+  dotNumber          String?           @unique
+  stripeAccountId    String?           @map("stripe_account_id")
+  expMonth           String?           @map("exp_month")
+  expYear            String?           @map("exp_year")
+  cardNumber         String?           @unique @map("card_number")
+  phone              String?
+  infoUrl            String?
+  hours              String?
+  companyName        String?           @unique
+  insuranceDetailsId Int?              @unique
+  insuranceDetails   Photo?            @relation("InsuranceDetails", fields: [insuranceDetailsId], references: [id]) // Relación nombrada
+  companyStatus      CompanyStatus?    @default(NON_VERIFIED)
+  companyType        CompanyType?      @default(SHIPPER) @map("company_type")
+  licenseType        String?
+  roles              Role[]            @relation("company_to_roles")
+  photos             Photo[]           @relation("CompanyPhotos")
+  transfers          Transfer[]
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  createdBy          String?           @map("created_by")
+  updatedBy          String?           @map("updated_by")
+  deletedAt          DateTime?         @map("deleted_at")
+  deletedBy          String?           @map("deleted_by")
+  version            Int               @default(0)
+  ownerId            Int?              @unique @map("owner_id")
+  userCompanyRoles   UserCompanyRole[]
+  payments           Payment[]
+  paymentMethod      PaymentMethod[]
+  drivers            Driver[]
+  score              Json?
+}
+
+model Payment {
+  id              Int           @id @default(autoincrement())
+  amount          Float
+  finalAmount     Float?
+  status          PaymentStatus @default(PENDING)
+  paymentDate     DateTime
+  depositDate     DateTime
+  paymentMethodId Int
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  companyId       Int
+  company         Company       @relation(fields: [companyId], references: [id])
+  account         Account[]
+  transfer        Transfer?     @relation
+  orderId         Int?          @unique
+  order           Order?        @relation(fields: [orderId], references: [id])
+  user            User?         @relation(fields: [userId], references: [id])
+  userId          Int?
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  createdBy       String?       @map("created_by")
+  updatedBy       String?       @map("updated_by")
+  deletedAt       DateTime?     @map("deleted_at")
+  deletedBy       String?       @map("deleted_by")
+  version         Int           @default(0)
+  ownerId         Int?          @map("owner_id")
+}
+
+model Transfer {
+  id          Int       @id @default(autoincrement())
+  amount      Float
+  currency    String
+  description String?
+  payment     Payment?  @relation(fields: [paymentId], references: [id])
+  paymentId   Int?      @unique
+  company     Company?  @relation(fields: [companyId], references: [id])
+  companyId   Int?
+  account     Account?  @relation(fields: [accountId], references: [id])
+  accountId   Int?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdBy   String?   @map("created_by")
+  updatedBy   String?   @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at")
+  deletedBy   String?   @map("deleted_by")
+  version     Int?      @default(0)
+}
+
+model PaymentMethod {
+  id                 Int               @id @default(autoincrement())
+  name               String
+  type               PaymentMethodType // Enum para el tipo de método de pago
+  date               DateTime // Fecha para hacer la transferencia
+  discountPercentage Float // Porcentaje de descuento a aplicar
+  payments           Payment[]
+  company            Company?          @relation(fields: [companyId], references: [id])
+  companyId          Int?
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  createdBy          String?           @map("created_by")
+  updatedBy          String?           @map("updated_by")
+  deletedAt          DateTime?         @map("deleted_at")
+  deletedBy          String?           @map("deleted_by")
+  version            Int               @default(0)
+
+  @@unique([name, companyId])
+}
+
+model Account {
+  id          Int             @id @default(autoincrement())
+  stripeId    String // Identificador de Stripe para el pago
+  totalAmount Float           @default(0) // Total acumulado de los pagos
+  bankCard    String // Información de la tarjeta bancaria 
+  ytdGross    Float // Total bruto de ingresos hasta la fecha actual en el año.
+  netBalance  Float // Saldo total después de deducir gastos y deudas.
+  paymentId   Int?
+  payment     Payment?        @relation(fields: [paymentId], references: [id])
+  transfers   Transfer[]
+  accountType TransactionType // Tipo de cuenta: entrada o salida de dinero
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  createdBy   String?         @map("created_by")
+  updatedBy   String?         @map("updated_by")
+  deletedAt   DateTime?       @map("deleted_at")
+  deletedBy   String?         @map("deleted_by")
+  version     Int             @default(0)
+}
+
+model Message {
+  id            Int                    @id @default(autoincrement())
+  negotiationId Int?
+  description   DescriptionMessageEnum
+  negotiation   Negotiation?           @relation(fields: [negotiationId], references: [id])
+  userId        Int?
+  user          User?                  @relation(fields: [userId], references: [id])
+  orderId       Int?
+  order         Order?                 @relation(fields: [orderId], references: [id])
+  unread        Boolean?               @default(true) @map("is_active")
+  createdAt     DateTime               @default(now()) @map("created_at")
+  updatedAt     DateTime               @updatedAt @map("updated_at")
+  createdBy     String?                @map("created_by")
+  updatedBy     String?                @map("updated_by")
+  deletedAt     DateTime?              @map("deleted_at")
+  deletedBy     String?                @map("deleted_by")
+  version       Int                    @default(0)
+  ownerId       Int                    @map("owner_id")
+  companyId     Int                    @map("company_id")
+}
+
+model User {
+  id                  Int                  @id @default(autoincrement())
+  email               String?              @unique
+  phone               String?              @unique
+  firstName           String?
+  password            String?
+  lastName            String?
+  isActive            Boolean?             @default(true) @map("is_active")
+  session             Session[]
+  order               Order[]
+  photos              Photo[]
+  driver              Driver[]
+  ablyChannel         AblyChannel?
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  createdBy           String?              @map("created_by")
+  updatedBy           String?              @map("updated_by")
+  deletedAt           DateTime?            @map("deleted_at")
+  deletedBy           String?              @map("deleted_by")
+  version             Int                  @default(0)
+  ownerId             Int?                 @map("owner_id")
+  carrierPerformance  CarrierPerformance[]
+  shipperPerformance  ShipperPerformance[]
+  userNegotiations    Negotiation[]        @relation("user_negotiations")
+  driverNegotiations  Negotiation[]        @relation("driver_negotiations")
+  trips               Trip[]
+  Payment             Payment[]
+  messenge            Message[]
+  logType             RolesEnum            @default(SHIPPER)
+  userCompanyRoles    UserCompanyRole[]
+  evidences           Evidence[]           @relation(name: "evidence_otm_user")
+  //disputes           Dispute[]            @relation(name: "user_otm_dispute")
+  // pointId            Int?                 @unique() @map("point_id")
+  // point              Point?               @relation(name: "user_oto_point", fields: [pointId], references: [id])
+  userPoint           UserPoint?
+  evaluationsReceived Evaluation[]         @relation("evaluations_received")
+  evaluationsMade     Evaluation[]         @relation("evaluations_made")
+  userProfilePicture  UserProfilePicture?
+  channels            UserChannel[]
+}
+
+model UserPoint {
+  id      Int     @id @default(autoincrement())
+  pointId Int     @unique()
+  point   Point   @relation(fields: [pointId], references: [id])
+  userId  Int     @unique()
+  user    User    @relation(fields: [userId], references: [id])
+  share   Boolean
+
+  @@unique([pointId, userId])
+  @@map("user_points")
+}
+
+model Role {
+  id              Int               @id @default(autoincrement())
+  type            RolesEnum
+  name            String            @unique()
+  description     String
+  companies       Company[]         @relation("company_to_roles")
+  permission      Permission[]
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  createdBy       String?           @map("created_by")
+  updatedBy       String?           @map("updated_by")
+  deletedAt       DateTime?         @map("deleted_at")
+  deletedBy       String?           @map("deleted_by")
+  ownerId         Int?              @map("owner_id")
+  version         Int               @default(0)
+  companyId       Int?              @map("company_id")
+  UserCompanyRole UserCompanyRole[]
+}
+
+model UserCompanyRole {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  companyId Int?      @map("company_id")
+  roleId    Int       @map("role_id")
+  user      User      @relation(fields: [userId], references: [id])
+  company   Company?  @relation(fields: [companyId], references: [id])
+  role      Role      @relation(fields: [roleId], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdBy String?   @map("created_by")
+  updatedBy String?   @map("updated_by")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+  version   Int       @default(0)
+
+  @@unique([userId, companyId])
+}
+
+model Session {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  hash      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+}
+
+model Permission {
+  id          Int     @id @default(autoincrement())
+  name        String
+  action      String
+  description String
+  active      Boolean @default(true)
+  role        Role[]
+
+  @@unique([action, name])
+}
+
+model Driver {
+  id            Int            @id @default(autoincrement())
+  vinNumber     String         @unique
+  year          Int
+  insuranceDoc  String?
+  faceId        String?
+  vehicleType   String?
+  serviceId     Int?           @map("service_id")
+  service       Service?       @relation(fields: [serviceId], references: [id])
+  vehicleOrder  VehicleOrder[]
+  photos        Photo[]
+  capacity      Int?
+  vehicleInfoId Int?
+  vehicleInfo   VehicleInfo?   @relation(fields: [vehicleInfoId], references: [id])
+  userId        Int?           @map("user_id")
+  user          User?          @relation(fields: [userId], references: [id])
+  point         Point?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  createdBy     String?        @map("created_by")
+  updatedBy     String?        @map("updated_by")
+  deletedAt     DateTime?      @map("deleted_at")
+  deletedBy     String?        @map("deleted_by")
+  version       Int            @default(0)
+  ownerId       Int            @map("owner_id")
+  companyId     Int?           @map("company_id")
+  Company       Company?       @relation(fields: [companyId], references: [id])
+}
+
+model VehicleInfo {
+  id        Int       @id @default(autoincrement())
+  model     Model     @relation(fields: [modelId], references: [id])
+  modelId   Int
+  driver    Driver[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdBy String?   @map("created_by")
+  updatedBy String?   @map("updated_by")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+  version   Int       @default(0)
+  ownerId   Int       @map("owner_id")
+  companyId Int?      @map("company_id")
+}
+
+model Model {
+  id           Int            @id @default(autoincrement())
+  name         String
+  year         Int?
+  brand        Brand          @relation(fields: [brandId], references: [id])
+  brandId      Int            @map("brand_id")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  createdBy    String?        @map("created_by")
+  updatedBy    String?        @map("updated_by")
+  deletedAt    DateTime?      @map("deleted_at")
+  deletedBy    String?        @map("deleted_by")
+  version      Int            @default(0)
+  VehicleInfo  VehicleInfo[]
+  VehicleOrder VehicleOrder[]
+
+  @@unique([name, brandId, year])
+}
+
+model Brand {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  models    Model[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdBy String?   @map("created_by")
+  updatedBy String?   @map("updated_by")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+  version   Int       @default(0)
+}
+
+model VehicleOrder {
+  id                           Int                    @id @default(autoincrement())
+  qty                          Int?
+  year                         Int?                   @default(2000)
+  vehicleType                  VehicleType            @default(PASSENGER_CAR) @map("vehicle_type")
+  state                        VihecleOrderStatusEnum @default(RUNNING)
+  vehicleColor                 String?                @map("vehicle_color")
+  licensePlate                 String?                @map("license_plate")
+  lastNumber                   String?                @map("last_number")
+  vehicleProblem               String?                @map("vehicle_Problem")
+  additionalDetail             String?                @map("additional_detail")
+  isTheKeysWithTheVehicle      Boolean?               @map("is_the_keys_with_the_vehicle")
+  stateProvince                String?                @map("state_province")
+  additionalVehicleInformation String?                @map("additional_vehicle_information")
+  trailerType                  String?                @map("trailer_type")
+  wideLoad                     Boolean                @default(false) @map("wide_load")
+  orderId                      Int?                   @map("order_id")
+  order                        Order?                 @relation(fields: [orderId], references: [id])
+  modelId                      Int?                   @map("model_id")
+  model                        Model?                 @relation(fields: [modelId], references: [id])
+  driverId                     Int?
+  driver                       Driver?                @relation(fields: [driverId], references: [id])
+  createdAt                    DateTime               @default(now()) @map("created_at")
+  updatedAt                    DateTime               @updatedAt @map("updated_at")
+  createdBy                    String?                @map("created_by")
+  updatedBy                    String?                @map("updated_by")
+  deletedAt                    DateTime?              @map("deleted_at")
+  deletedBy                    String?                @map("deleted_by")
+  version                      Int                    @default(0)
+  ownerId                      Int                    @map("owner_id")
+  companyId                    Int?                   @map("company_id")
+}
+
+model Photo {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  orderId   Int?      @map("order_id")
+  order     Order?    @relation(fields: [orderId], references: [id])
+  driverId  Int?
+  driver    Driver?   @relation(fields: [driverId], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  createdBy String?   @map("created_by")
+  updatedBy String?   @map("updated_by")
+  deletedAt DateTime? @map("deleted_at")
+  deletedBy String?   @map("deleted_by")
+  version   Int       @default(0)
+  ownerId   Int       @map("owner_id")
+  companyId Int?      @map("company_id")
+  Company   Company?  @relation("CompanyPhotos", fields: [companyId], references: [id])
+  Insurance Company?  @relation("InsuranceDetails")
+  userId    Int?      @map("user_id")
+  user      User?     @relation(fields: [userId], references: [id])
+}
+
+model FleetRecord {
+  id            Int         @id @default(autoincrement())
+  vinNumber     String
+  vehicleType   VehicleType @default(TRUCK)
+  vehicleInfoId Int?
+  orderId       Int?        @unique @map("order_id")
+  order         Order?      @relation(fields: [orderId], references: [id])
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  createdBy     String?     @map("created_by")
+  updatedBy     String?     @map("updated_by")
+  deletedAt     DateTime?   @map("deleted_at")
+  deletedBy     String?     @map("deleted_by")
+  version       Int         @default(0)
+  ownerId       Int         @map("owner_id")
+  companyId     Int?        @map("company_id")
+}
+
+model Order {
+  id                        Int               @id @default(autoincrement())
+  userId                    Int               @map("user_id")
+  serviceId                 Int               @map("service_id")
+  driverId                  Int?              @map("driver_id")
+  referredId                Int?              @map("referred_id")
+  isAssistanceRequestForNow Boolean           @default(false) @map("is_assistance_request_for_now")
+  user                      User?             @relation(fields: [userId], references: [id])
+  expirationTime            DateTime          @map("expiration_time")
+  pickUpDate                String?           @map("pick_up_date")
+  pricePerMile              Decimal           @default(0) @map("price_per_mile")
+  aditionalInfo             String            @default("") @map("aditional_info")
+  deliveryDate              String?           @map("delivery_date")
+  paymentMethod             PaymentMethodEnum @default(UNKNOWN) @map("payment_method")
+  price                     Int?
+  milles                    Int               @default(0)
+  note                      String?           @default("")
+  email                     String?
+  reason                    String?
+  photos                    Photo[]
+  phone                     String?
+  firstName                 String?           @map("first_name")
+  lastName                  String?           @map("last_name")
+  emailSecond               String?           @map("email_second")
+  phoneSecond               String?           @map("phone_second")
+  firstNameSecond           String?           @map("first_name_second")
+  lastNameSecond            String?           @map("last_name_second")
+  status                    OrderStatusEnum
+  subStatus                 OrderSubStatus    @map("sub_status")
+  subServiceId              Int?              @map("sub_service_id")
+  subService                SubService?       @relation(fields: [subServiceId], references: [id])
+  departure                 Point?            @relation(name: "DeparturePoint", fields: [departureId], references: [id])
+  departureId               Int?              @map("departure_id")
+  destination               Point?            @relation(name: "DestinationPoint", fields: [destinationId], references: [id])
+  destinationId             Int?              @map("destination_id")
+  carCount                  Int               @map("car_count")
+  information               Information?
+  rute                      Point[]
+  createdAt                 DateTime          @default(now()) @map("created_at")
+  updatedAt                 DateTime          @updatedAt @map("updated_at")
+  createdBy                 String?           @map("created_by")
+  updatedBy                 String?           @map("updated_by")
+  deletedAt                 DateTime?         @map("deleted_at")
+  deletedBy                 String?           @map("deleted_by")
+  version                   Int               @default(0)
+  ownerId                   Int               @map("owner_id")
+  companyId                 Int?              @map("company_id")
+  ablyChannel               AblyChannel[]     @relation("AblyChannelToOrder")
+  Comunication              Comunication?
+  VehicleOrder              VehicleOrder[]
+  Negotiation               Negotiation[]
+  messenge                  Message[]
+  payment                   Payment?          @relation
+  isActive                  Boolean?          @default(true) @map("is_active")
+  FleetRecord               FleetRecord?
+  evidences                 Evidence[]        @relation(name: "evidence_otm_order")
+  //disputes                  Dispute[]         @relation(name: "order_otm_dispute")
+}
+
+model Negotiation {
+  id                  Int                 @id @default(autoincrement())
+  userId              Int                 @map("user_id")
+  driverId            Int                 @map("driver_id")
+  orderId             Int                 @map("order_id")
+  offerCarrier        Int
+  lastNegotiaton      LastNegotiatonEnums @default(SHIEPER)
+  status              NegotiationStatus   @default(OPEN)
+  counterOfferShipper Int?                @default(0)
+  user                User                @relation(name: "user_negotiations", fields: [userId], references: [id])
+  driver              User                @relation(name: "driver_negotiations", fields: [driverId], references: [id])
+  order               Order               @relation(fields: [orderId], references: [id])
+  companyId           Int?                @map("company_id")
+  messenge            Message[]
+
+  @@unique([driverId, orderId])
+}
+
+model Point {
+  id                Int                                  @id @default(autoincrement())
+  userId            Int?                                 @map("user_id")
+  coords            Unsupported("geometry(Point, 4326)")
+  longitude         String?
+  latitude          String?
+  type              TypePointEnum?                       @default(COMPANY)
+  pointName         String                               @default("") @map("point_name")
+  address           String?                              @default("")
+  city              String?                              @default("")
+  state             String?                              @default("")
+  information       Information?
+  isActive          Boolean                              @default(true) @map("is_active")
+  departureOrders   Order[]                              @relation("DeparturePoint")
+  destinationOrders Order[]                              @relation("DestinationPoint")
+  orderId           Int?                                 @map("order_id")
+  order             Order?                               @relation(fields: [orderId], references: [id])
+  driver            Driver?                              @relation(fields: [driverId], references: [id])
+  driverId          Int?                                 @unique @map("driver_id")
+  createdAt         DateTime                             @default(now()) @map("created_at")
+  updatedAt         DateTime?                            @updatedAt @map("updated_at")
+  createdBy         String?                              @map("created_by")
+  updatedBy         String?                              @map("updated_by")
+  deletedAt         DateTime?                            @map("deleted_at")
+  deletedBy         String?                              @map("deleted_by")
+  version           Int                                  @default(0)
+  ownerId           Int?                                 @map("owner_id")
+  companyId         Int?                                 @map("company_id")
+  // User              User?                                @relation(name: "user_oto_point", fields: [userId], references: [id])
+  userPoint         UserPoint?
+
+  @@index([coords], name: "location_idx", type: Gist)
+}
+
+model MiniPoint {
+  id        Int                                  @id @default(autoincrement())
+  coords    Unsupported("geometry(Point, 4326)")
+  createdAt DateTime                             @default(now()) @map("created_at")
+  updatedAt DateTime                             @updatedAt @map("updated_at")
+  createdBy String?                              @map("created_by")
+  updatedBy String?                              @map("updated_by")
+  deletedAt DateTime?                            @map("deleted_at")
+  deletedBy String?                              @map("deleted_by")
+
+  @@index([coords], name: "location1_idx", type: Gist)
+}
+
+model Information {
+  id          Int       @id @default(autoincrement())
+  description String
+  order       Order?    @relation(fields: [orderId], references: [id])
+  orderId     Int?      @unique
+  point       Point?    @relation(fields: [pointId], references: [id])
+  pointId     Int?      @unique
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdBy   String?   @map("created_by")
+  updatedBy   String?   @map("updated_by")
+  deletedAt   DateTime? @map("deleted_at")
+  deletedBy   String?   @map("deleted_by")
+  version     Int       @default(0)
+  ownerId     Int       @map("owner_id")
+  companyId   Int?      @map("company_id")
+}
+
+model Service {
+  id          Int          @id @default(autoincrement())
+  name        ServiceEnum  @unique()
+  description String?
+  driver      Driver[]
+  subService  SubService[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  createdBy   String?      @map("created_by")
+  updatedBy   String?      @map("updated_by")
+  deletedAt   DateTime?    @map("deleted_at")
+  deletedBy   String?      @map("deleted_by")
+  version     Int          @default(0)
+  ownerId     Int          @map("owner_id")
+  companyId   Int?         @map("company_id")
+}
+
+model SubService {
+  id          Int            @id @default(autoincrement())
+  name        SubServiceEnum
+  description String?
+  serviceId   Int?           @map("service_id")
+  Service     Service?       @relation(fields: [serviceId], references: [id])
+  order       Order[]
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  createdBy   String?        @map("created_by")
+  updatedBy   String?        @map("updated_by")
+  deletedAt   DateTime?      @map("deleted_at")
+  deletedBy   String?        @map("deleted_by")
+  version     Int            @default(0)
+  ownerId     Int            @map("owner_id")
+  companyId   Int?           @map("company_id")
+
+  @@unique([name, serviceId])
+}
+
+model AblyChannel {
+  id           Int            @id @default(autoincrement())
+  channelName  String         @unique
+  ablyUser     String         @unique
+  user         User           @relation(fields: [userId], references: [id])
+  userId       Int            @unique @map("user_id")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  createdBy    String?        @map("created_by")
+  updatedBy    String?        @map("updated_by")
+  deletedAt    DateTime?      @map("deleted_at")
+  deletedBy    String?        @map("deleted_by")
+  version      Int            @default(0)
+  ownerId      Int            @map("owner_id")
+  companyId    Int?           @map("company_id")
+  order        Order[]        @relation("AblyChannelToOrder")
+  driverChanel Comunication[] @relation("DriverChanel")
+  riderChanel  Comunication[] @relation("RiderChanel")
+}
+
+model Comunication {
+  id                    Int              @id @default(autoincrement())
+  order                 Order            @relation(fields: [orderId], references: [id])
+  orderId               Int              @unique
+  driverChanel          AblyChannel      @relation(name: "DriverChanel", fields: [driverChanelId], references: [id])
+  driverChanelId        Int
+  riderChanel           AblyChannel      @relation(name: "RiderChanel", fields: [riderChanelId], references: [id])
+  riderChanelId         Int
+  numberOfComunications Int              @default(0)
+  status                ComunicationEnum @default(OPEN)
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
+  createdBy             String?          @map("created_by")
+  updatedBy             String?          @map("updated_by")
+  deletedAt             DateTime?        @map("deleted_at")
+  deletedBy             String?          @map("deleted_by")
+  version               Int              @default(0)
+  ownerId               Int              @map("owner_id")
+  companyId             Int?             @map("company_id")
+
+  @@unique([orderId, driverChanelId])
+  @@unique([orderId, riderChanelId])
+}
+
+model CarrierPerformance {
+  id                 Int       @id @default(autoincrement())
+  user               User      @relation(fields: [userId], references: [id])
+  userId             Int
+  punctuality        Int
+  cargoCare          Int
+  friendliness       Int
+  additionalComments String?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  createdBy          String?   @map("created_by")
+  updatedBy          String?   @map("updated_by")
+  deletedAt          DateTime? @map("deleted_at")
+  deletedBy          String?   @map("deleted_by")
+  version            Int       @default(0)
+  ownerId            Int?      @map("owner_id")
+  companyId          Int?      @map("company_id")
+}
+
+model ShipperPerformance {
+  id                   Int       @id @default(autoincrement())
+  user                 User      @relation(fields: [userId], references: [id])
+  userId               Int
+  receptionPunctuality Int
+  instructionClarity   Int
+  friendliness         Int
+  accessibility        Int
+  onTimePayment        Int
+  additionalComments   String?
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  createdBy            String?   @map("created_by")
+  updatedBy            String?   @map("updated_by")
+  deletedAt            DateTime? @map("deleted_at")
+  deletedBy            String?   @map("deleted_by")
+  version              Int       @default(0)
+  ownerId              Int?      @map("owner_id")
+  companyId            Int?      @map("company_id")
+}
+
+model Trip {
+  id        Int             @id @default(autoincrement())
+  name      OrderStatusEnum
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+  createdBy String?         @map("created_by")
+  updatedBy String?         @map("updated_by")
+  deletedAt DateTime?       @map("deleted_at")
+  deletedBy String?         @map("deleted_by")
+  version   Int             @default(0)
+  ownerId   Int?            @map("owner_id")
+  companyId Int?            @map("company_id")
+  User      User?           @relation(fields: [userId], references: [id])
+  userId    Int?
+}
+
+enum PaymentEnum {
+  MASTERCARD
+  VISA
+  PAYPAL
+  DISCOVER
+  AMERICANEXPRESS
+}
+
+enum ServiceEnum {
+  TOWING
+  QUICK_ASSISTANCE
+  OTHERS
+}
+
+enum SubServiceEnum {
+  PICKUP
+  IRON
+  PULL
+  MULTIPLE_CARS
+  AIR
+  JUMP
+  PICKUP_DELIVERY
+  RUBBISH
+  MOVING
+}
+
+enum Status {
+  LOADING
+  LOADED
+  UPCOMING
+  DELIVERED
+  RETURNING
+  DOWNLOADING
+  BROKEN
+  CANCELLED
+}
+
+enum VihecleOrderStatusEnum {
+  RUNNING
+  NOT_RUNNING
+}
+
+enum ComunicationEnum {
+  OPEN
+  CLOSE
+}
+
+enum RolesEnum {
+  SHIPPER
+  COMPANY
+  DRIVER
+  ANOTHER
+  ADMIN
+}
+
+enum TypePointEnum {
+  COMPANY
+  DEPARTURE
+  VEHICLE
+  DESTANATION
+  DESTINATION
+}
+
+enum DescriptionMessageEnum {
+  CARRIER_OFERT
+  SHIPPER_OFERT
+  ACCEPT_ORDER
+  FINISH_ORDER
+  REFER_ORDER
+}
+
+enum NegotiationStatus {
+  OPEN
+  CLOSE
+}
+
+enum LastNegotiatonEnums {
+  CARRIER
+  SHIEPER
+}
+
+enum PaymentMethodEnum {
+  CASH
+  CREDIT_CARD
+  UNKNOWN
+}
+
+enum OrderStatusEnum {
+  PENDING
+  ASSIGNED
+  IN_TRANSIT
+  HISTORY
+  COMPLETED
+  END
+}
+
+enum OrderSubStatus {
+  UPCOMING
+  ASSIGNED
+  OUT_OF_TIME
+  LATE_ORDER
+  CANCELLED
+  COMPLETE
+  STARTED
+  PICKUP
+  REPORT
+  DELIVERED
+}
+
+enum VehicleType {
+  PASSENGER_CAR // Automóvil de pasajeros
+  MULTIPURPOSE_VEHICLE // Vehículo multipropósito (SUV, camionetas)
+  TRUCK // Camión
+  BUS // Autobús
+  MOTORCYCLE // Motocicleta
+  TRAILER // Remolque
+  LOW_SPEED_VEHICLE // Vehículo de baja velocidad
+  VAN // Furgoneta
+  MULTIPURPOSE_PASSENGER_VEHICLE
+}
+
+enum TransactionType {
+  INCOME // Entrada de dinero
+  EXPENSE // Salida de dinero
+}
+
+enum PaymentStatus {
+  COMPLETED
+  PENDING
+}
+
+enum PaymentMethodType {
+  CASH // Método de pago en efectivo
+  CARD // Método de pago con tarjeta
+  QUICK_DEPOSIT // Método de depósito rápido
+  WEEKLY_DEPOSIT // Método de depósito semanal
+}
+
+enum CompanyStatus {
+  NON_VERIFIED
+  VERIFIED
+  HOLD
+}
+
+enum CompanyType {
+  SHIPPER
+  COMPANY
+  SHIPPER_AND_COMPANY
+}

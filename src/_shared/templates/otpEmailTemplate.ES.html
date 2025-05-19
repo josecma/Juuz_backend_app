@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Etiquetas meta para SEO y descripción -->
+    <meta name="description" content="Correo de verificación con código OTP" />
+    <title>Código de Verificación</title>
+    <style>
+      /* Estilos básicos y mejores prácticas */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        background-color: #ffffff;
+        margin: 40px auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 600px;
+        border: 1px solid #dddddd;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      .logo {
+        max-width: 150px;
+        margin-bottom: 20px;
+      }
+
+      h2 {
+        color: #333333;
+      }
+
+      p {
+        color: #555555;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .otp-code {
+        font-size: 24px;
+        font-weight: bold;
+        color: #000000;
+        margin: 20px 0;
+        letter-spacing: 4px;
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: #aaaaaa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Para incrustar el logo como adjunto con cid: -->
+      <img src="cid:companyLogo" alt="Logo de la Empresa" class="logo" />
+
+      <h2>Código de Verificación</h2>
+      <p>Hola,</p>
+      <p>
+        Por favor, utiliza el siguiente código para completar tu verificación:
+      </p>
+      <div class="otp-code">{{OTP_CODE}}</div>
+      <p>Este código es válido por <strong>10 minutos</strong>.</p>
+      <p>Si no solicitaste este código, por favor ignora este mensaje.</p>
+      <div class="footer">
+        &copy; {{YEAR}} JUUZ Company. Todos los derechos reservados.
+      </div>
+    </div>
+  </body>
+</html>
