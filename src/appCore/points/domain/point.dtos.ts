@@ -87,7 +87,7 @@ export class PointDto implements PointWithoutId {
   })
   @IsInt()
   @IsOptional()
-  orderId: number;
+  orderId: string;
 
   @ApiProperty({
     example: '123',
@@ -95,7 +95,7 @@ export class PointDto implements PointWithoutId {
   })
   @IsInt()
   @IsOptional()
-  driverId: number;
+  driverId: string;
 
   @ApiProperty({
     example: '123',
@@ -116,7 +116,7 @@ export class PointDto implements PointWithoutId {
   coords: Coords;
 }
 
-export class UpdatePointDto extends PartialType(PointDto) {}
+export class UpdatePointDto extends PartialType(PointDto) { }
 
 export class UpdatePointWhitIdDto extends PartialType(PointDto) {
   @ApiProperty({
@@ -128,7 +128,7 @@ export class UpdatePointWhitIdDto extends PartialType(PointDto) {
   @Min(1, { message: 'id must be a positive integer' })
   @IsNotEmpty({ message: 'id is required' })
   @IsNotEmpty()
-  id: number;
+  id: string;
 }
 
 export class UpdateUserPointDto {

@@ -32,7 +32,7 @@ type CompanyWithoutId = Omit<
   | 'rating'
   | 'infoUrl'
   | 'stripeAccountId'
-  | 'companyStatus'
+  | 'status'
   | 'companyType'
 >;
 export class CompanyDto implements CompanyWithoutId {
@@ -44,7 +44,7 @@ export class CompanyDto implements CompanyWithoutId {
   })
   @IsString()
   @IsNotEmpty()
-  companyName: string;
+  name: string;
 
   @ApiProperty({
     description: 'Unique identifier for the carrier',
@@ -224,7 +224,7 @@ export class CompanyDto implements CompanyWithoutId {
   })
   @IsNumber()
   @IsNotEmpty({ message: 'The insurance details are required.' })
-  insuranceDetailsId: number;
+  insuranceDetailsId: string;
 
   @ApiProperty({
     example: 'insurance_details.pdf',
@@ -260,5 +260,5 @@ export class UpdateStatusCompanyDto {
     example: $Enums.CompanyStatus.NON_VERIFIED,
   })
   @IsOptional()
-  companyStatus: $Enums.CompanyStatus;
+  status: $Enums.CompanyStatus;
 }

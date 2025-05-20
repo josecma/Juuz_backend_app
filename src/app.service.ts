@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { AblyService } from './_shared/providers/ably/application/ably.service';
+// import { AblyService } from './_shared/providers/ably/application/ably.service';
 import { WebCrawlerService } from './_shared/providers/webCrawler/aplication/webCrawler.service';
 import { DownloadService } from './_shared/providers/download/aplication/download.service';
 import { SendmailService } from './_shared/application/sendEmail.service';
-import { UsersService } from './appCore/users/application/users.service';
+// import { UsersService } from './appCore/users/application/users.service';
 
 @Injectable()
 export class AppService {
   constructor(
-    private readonly ablyService: AblyService,
+    // private readonly ablyService: AblyService,
     private readonly webCrawlerService: WebCrawlerService,
     private readonly downloadService: DownloadService,
     private readonly sendmailService: SendmailService,
-    private readonly userService: UsersService
-  ) {}
+    // private readonly userService: UsersService
+  ) { }
   async getHello() {
     const sd = {
       to: 'recipient@example.com',
@@ -50,32 +50,32 @@ export class AppService {
     // );
   }
 
-  async tokens(userId: string) {
-    const user: any = await this.userService.findOne({
-      ...this.userService.filter(userId),
-      select: { ablyChannel: true },
-    });
-    // return {
-    //   tokens: await this.ablyService.generateTokenForUser(
-    //     user.ablyChannel.ablyUserId,
-    //     user.ablyChannel.name,
-    //   ),
-    //   channel: user.ablyChannel.name,
-    // };
-  }
-
-  async sendText(userId: string) {
-    // const user: any = await this.userService.findOne({
-    //   ...this.userService.filter(userId),
-    //   select: { ablyChannel: true },
-    // });
-    // console.log(user);
-    // // const channel = await this.ablyService.createChannel(user.ablyChannel);
-    // const asd = await this.ablyService.publishMessage(
-    //   user.ablyChannel.name,
-    //   '2323',
-    //   '2323',
-    // );
-    // console.log(asd);
-  }
+  // async tokens(userId: string) {
+  //   const user: any = await this.userService.findOne({
+  //     ...this.userService.filter(userId),
+  //     select: { ablyChannel: true },
+  //   });
+  // return {
+  //   tokens: await this.ablyService.generateTokenForUser(
+  //     user.ablyChannel.ablyUserId,
+  //     user.ablyChannel.name,
+  //   ),
+  //   channel: user.ablyChannel.name,
+  // };
 }
+
+// async sendText(userId: string) {
+// const user: any = await this.userService.findOne({
+//   ...this.userService.filter(userId),
+//   select: { ablyChannel: true },
+// });
+// console.log(user);
+// // const channel = await this.ablyService.createChannel(user.ablyChannel);
+// const asd = await this.ablyService.publishMessage(
+//   user.ablyChannel.name,
+//   '2323',
+//   '2323',
+// );
+// console.log(asd);
+// }
+// }

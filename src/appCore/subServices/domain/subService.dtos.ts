@@ -45,7 +45,7 @@ export class SubServiceDto implements SubServiceWithoutId {
   @Min(1, { message: 'serviceId must be a positive integer' })
   @IsNotEmpty({ message: 'serviceId is required' })
   @IsNotEmpty()
-  serviceId: number;
+  serviceId: string;
 }
 
-export class UpdateSubServiceDto extends PartialType(SubServiceDto) {}
+export class UpdateSubServiceDto extends PartialType(SubServiceDto) { }

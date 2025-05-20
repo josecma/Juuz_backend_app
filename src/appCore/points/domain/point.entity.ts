@@ -23,12 +23,12 @@ export class PointEntity implements Point {
     example: 1,
     description: 'The unique identifier of the user Id',
   })
-  userId: number;
+  userId: string;
   @ApiProperty({
     example: 1,
     description: 'The unique identifier of the point',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     example: 'Doe',
@@ -52,13 +52,13 @@ export class PointEntity implements Point {
     example: 1,
     description: 'The unique identifier of the order associated with the point',
   })
-  orderId: number;
+  orderId: string;
 
   @ApiProperty({
     example: 1,
     description: 'The unique identifier of the rider associated with the point',
   })
-  driverId: number;
+  driverId: string;
 
   @ApiProperty({
     example: '2024-04-07T10:00:00Z',
@@ -114,14 +114,14 @@ export class PointEntity implements Point {
     example: 1,
     description: 'The unique identifier of the owner of the point',
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     example: 1,
     description:
       'The unique identifier of the company associated with the point',
   })
-  companyId: number;
+  companyId: string;
 
   @ApiProperty({
     description: 'Indicates if the point is actively',

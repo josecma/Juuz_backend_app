@@ -7,7 +7,7 @@ export default interface EvidenceRepositoryContract {
             keys: Array<string>;
         }
     ): Promise<Array<{
-        id: number;
+        id: string;
         description: string;
         status: boolean;
         type: string;
@@ -33,7 +33,7 @@ export default interface EvidenceRepositoryContract {
             }>;
         }
     ): Promise<Array<{
-        id: number;
+        id: string;
         description: string;
         status: boolean;
         type: string;

@@ -22,6 +22,8 @@ import { UserCompanyRolesModule } from 'src/appCore/userCompanyRoles/userCompany
     AuthModule,
     UserCompanyRolesModule,
   ],
-  providers: [PopulateDBService, PrismaService, MailerService],
+  providers: [
+    PopulateDBService,
+    PrismaService, MailerService],
 })
-export class InitializerModule {}
+export class InitializerModule { }

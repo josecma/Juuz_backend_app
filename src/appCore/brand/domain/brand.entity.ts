@@ -4,7 +4,7 @@ import { ModelEntity } from './model.entity';
 
 export class BrandEntity implements Brand {
   @ApiProperty({ description: 'The ID of the brand', example: 1 })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'The name of the brand', example: 'Tesla' })
   name: string;

@@ -4,7 +4,7 @@ export class PaymentEntity implements Payment {
   @ApiProperty({
     description: 'The unique identifier for the carrier performance record',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'Monto total del pago',
@@ -46,13 +46,13 @@ export class PaymentEntity implements Payment {
     description: 'ID del método de pago utilizado',
     type: Number,
   })
-  paymentMethodId: number;
+  paymentMethodId: string;
 
   @ApiProperty({
     description: 'ID de la orden asociada al pago',
     type: Number,
   })
-  orderId: number;
+  orderId: string;
 
   @ApiProperty({
     description: 'Year-To-Date Gross income',
@@ -67,7 +67,7 @@ export class PaymentEntity implements Payment {
   netBalance: number;
 
   @ApiProperty({ description: 'The unique identifier for the associated user' })
-  userId: number;
+  userId: string;
 
   @ApiProperty({ description: 'Record creation timestamp' })
   createdAt: Date;
@@ -99,10 +99,10 @@ export class PaymentEntity implements Payment {
   @ApiProperty({
     description: 'The unique identifier for the owner of the record',
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     description: 'The unique identifier for the associated company',
   })
-  companyId: number;
+  companyId: string;
 }

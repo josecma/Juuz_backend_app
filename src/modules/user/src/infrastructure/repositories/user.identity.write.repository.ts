@@ -31,7 +31,7 @@ export default class UserIdentityWriteRepository {
 
         try {
 
-            const res = await this.client.userIdentity.create(
+            const res = await this.client.identity.create(
                 {
                     data: {
                         userId,
@@ -67,7 +67,7 @@ export default class UserIdentityWriteRepository {
 
         try {
 
-            const res = await this.client.userIdentity.update(
+            const res = await this.client.identity.update(
                 {
                     where: {
                         id

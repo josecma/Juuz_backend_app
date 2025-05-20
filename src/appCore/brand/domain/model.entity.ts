@@ -2,13 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Model } from '@prisma/client';
 export class ModelEntity implements Model {
   @ApiProperty({ description: 'The ID of the model', example: 1 })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'The name of the model', example: 'Model X' })
   name: string;
 
   @ApiProperty({ description: 'The ID of the related brand', example: 1 })
-  brandId: number;
+  brandId: string;
 
   @ApiProperty({ description: 'The year of the model', example: 1 })
   year: number;

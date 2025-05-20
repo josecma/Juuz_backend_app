@@ -1,9 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import RequestWriteRepository from "src/modules/shared/src/infrastructure/repositories/request.write.repository";
-import RequestPort from "../../application/ports/request.port";
 
 @Injectable({})
-export default class RequestAdapter implements RequestPort {
+export default class RequestAdapter {
 
     public constructor(
         @Inject(RequestWriteRepository)
@@ -18,11 +17,11 @@ export default class RequestAdapter implements RequestPort {
                     type: string;
                     id: string;
                 };
-                target: {
+                target?: {
                     type: string;
                     id: string;
                 };
-                channel: {
+                channel?: {
                     method: string;
                     target: string;
                 }

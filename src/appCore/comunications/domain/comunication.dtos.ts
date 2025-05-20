@@ -22,19 +22,19 @@ export class ComunicationDto implements ComunicationWithoutId {
   @IsInt({ message: 'orderId must be an integer' })
   @Min(1, { message: 'orderId must be at least 1' })
   @IsNotEmpty()
-  orderId: number;
+  orderId: string;
 
   @ApiProperty({ description: 'Driver channel identifier', example: 200 })
   @IsInt({ message: 'driverChanelId must be an integer' })
   @Min(1, { message: 'driverChanelId must be at least 1' })
   @IsNotEmpty()
-  driverChanelId: number;
+  driverChanelId: string;
 
   @ApiProperty({ description: 'Rider channel identifier', example: 300 })
   @IsInt({ message: 'riderChanelId must be an integer' })
   @Min(1, { message: 'riderChanelId must be at least 1' })
   @IsOptional()
-  riderChanelId: number;
+  riderChanelId: string;
 
   @ApiProperty({ description: 'Number of communications', example: 5 })
   @IsInt({ message: 'numberOfComunications must be an integer' })

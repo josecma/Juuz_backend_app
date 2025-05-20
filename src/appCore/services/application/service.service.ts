@@ -19,13 +19,13 @@ export class ServicesService extends PrismaGenericService<
     super(prismaService.service);
   }
 
-  async createService(body: ServiceDto, ownerId: number) {
+  async createService(body: ServiceDto, ownerId: string) {
     const { subServices, ...data } = body;
     const subServiceCreateNested: Prisma.SubServiceCreateNestedManyWithoutServiceInput =
       subServices
         ? {
-            connect: subServices.map((subServiceId) => ({ id: subServiceId })),
-          }
+          connect: subServices.map((subServiceId) => ({ id: subServiceId })),
+        }
         : undefined;
     const serviceCreateArgs: Prisma.ServiceCreateArgs = {
       data: {
@@ -40,7 +40,7 @@ export class ServicesService extends PrismaGenericService<
   async updateService(
     id: string,
     updateServiceDto: UpdateServiceDto,
-    userID: number
+    userID: string
   ) {
     const { subServicesToRemove, subServicesToAdd, ...data } = updateServiceDto;
     const serviceUpdateInput: Prisma.ServiceUpdateInput = {
@@ -56,7 +56,7 @@ export class ServicesService extends PrismaGenericService<
     };
     return this.update(this.filter(id), {
       data: serviceUpdateInput,
-      where: { id: +id },
+      where: { id: id },
     });
   }
 }

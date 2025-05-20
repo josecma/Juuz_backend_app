@@ -26,7 +26,7 @@ export class DriversService extends PrismaGenericService<
     super(prismaService.driver);
   }
 
-  async createDriver(body, ownerId: number, companyId: number) {
+  async createDriver(body, ownerId: string, companyId: string) {
     if (!body.userId) body['userId'] = ownerId;
     await this.validateService.vinValidations(body.vinNumber);
 
@@ -68,7 +68,7 @@ export class DriversService extends PrismaGenericService<
     });
     const point: PointDto = {
       pointName: '',
-      orderId: 0,
+      orderId: '',
       driverId: driver.id,
       comunicationId: 0,
       coords: {
@@ -81,7 +81,7 @@ export class DriversService extends PrismaGenericService<
     };
     await this.pointsService.create(
       point,
-      ownerId,
+      '' + ownerId,
       TypePointEnum.VEHICLE,
       false
     );
@@ -91,7 +91,7 @@ export class DriversService extends PrismaGenericService<
   async updateCreate(
     id: string,
     updateDriverDto: UpdateDriverDto,
-    companyId: number
+    companyId: string
   ) {
     // if (updateDriverDto.vinNumber)
     // await this.validateService.vinValidations(updateDriverDto.vinNumber);
@@ -103,10 +103,10 @@ export class DriversService extends PrismaGenericService<
         ...data,
         ...(vehicleInfo
           ? {
-              vehicleInfo: {
-                update: vehicleInfo,
-              },
-            }
+            vehicleInfo: {
+              update: vehicleInfo,
+            },
+          }
           : {}),
         photos: {
           connect: photoIds ? photoIds.map((id) => ({ id })) : undefined,
@@ -120,7 +120,7 @@ export class DriversService extends PrismaGenericService<
           ? { service: { connect: { id: serviceId } } }
           : undefined),
       },
-      where: { id: +id, companyId },
+      where: { id: id, companyId },
     };
 
     return this.update(this.filter(id), update);

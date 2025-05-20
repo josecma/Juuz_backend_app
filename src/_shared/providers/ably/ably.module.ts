@@ -8,7 +8,12 @@ import UserModule from 'src/modules/user/user.module';
 @Module({
   imports: [SharedModule, UserModule],
   controllers: [AblyController],
-  providers: [AblyService],
-  exports: [AblyService],
+  providers: [
+    AblyService
+
+  ],
+  exports: [
+    AblyService
+  ],
 })
 export class AblyModule { }

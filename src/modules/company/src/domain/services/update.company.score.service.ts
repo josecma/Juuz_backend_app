@@ -47,10 +47,8 @@ export default class UpdateCompanyScoreService {
                 );
             };
 
-            const company = await this.companyReadRepository.findOneBy(
-                {
-                    companyId,
-                }
+            const company = await this.companyReadRepository.findOneById(
+                companyId
             );
 
             if (!company) {

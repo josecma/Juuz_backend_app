@@ -9,7 +9,7 @@ export class VehicleOrderEntity implements VehicleOrder {
     description: 'Unique identifier for the vehicle order',
     example: 1,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'The last number associated with the vehicle',
@@ -101,19 +101,19 @@ export class VehicleOrderEntity implements VehicleOrder {
     description: 'ID of the related order',
     example: 1,
   })
-  orderId: number;
+  orderId: string;
 
   @ApiPropertyOptional({
     description: 'ID of the related model',
     example: 1,
   })
-  modelId: number;
+  modelId: string;
 
   @ApiPropertyOptional({
     description: 'ID of the related driver',
     example: 1,
   })
-  driverId: number;
+  driverId: string;
 
   @ApiProperty({
     description: 'Date and time when the vehicle order was created',
@@ -161,11 +161,11 @@ export class VehicleOrderEntity implements VehicleOrder {
     description: 'ID of the owner of the vehicle order',
     example: 1,
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiPropertyOptional({
     description: 'ID of the related company',
     example: 1,
   })
-  companyId: number;
+  companyId: string;
 }

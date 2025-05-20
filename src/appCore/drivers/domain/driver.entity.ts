@@ -5,13 +5,13 @@ export class DriverEntity implements Driver {
     example: 1,
     description: 'The unique identifier of the vehicle',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     example: 1,
     description: 'The unique identifier of the user who owns the vehicle',
   })
-  userId: number;
+  userId: string;
 
   @ApiProperty({
     example: 'ABC123',
@@ -49,7 +49,7 @@ export class DriverEntity implements Driver {
     description:
       'The unique identifier of the vehicle information associated with the vehicle',
   })
-  vehicleInfoId: number;
+  vehicleInfoId: string;
 
   @ApiProperty({
     example: '2024-04-07T10:00:00Z',
@@ -99,18 +99,18 @@ export class DriverEntity implements Driver {
     example: 42,
     type: Number,
   })
-  serviceId: number;
+  serviceId: string;
 
   @ApiProperty({
     example: 1,
     description: 'The unique identifier of the owner of the vehicle',
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     example: 1,
     description:
       'The unique identifier of the company associated with the vehicle',
   })
-  companyId: number;
+  companyId: string;
 }

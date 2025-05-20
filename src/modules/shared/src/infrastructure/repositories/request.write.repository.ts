@@ -17,11 +17,11 @@ export default class RequestWriteRepository {
                     type: string;
                     id: string;
                 };
-                target: {
+                target?: {
                     type: string;
                     id: string;
                 };
-                channel: {
+                channel?: {
                     method: string;
                     target: string;
                 }

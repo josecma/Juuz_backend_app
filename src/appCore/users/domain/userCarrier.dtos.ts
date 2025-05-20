@@ -25,7 +25,7 @@ class DriverWithoutUserIdDto implements ComunicationWithoutDriverIdType {
   @IsInt({ each: true })
   @Type(() => Number)
   @IsOptional()
-  photoIds: number[];
+  photoIds: string[];
 
   @ApiProperty({
     description: 'The year of vehicles',
@@ -60,7 +60,7 @@ class DriverWithoutUserIdDto implements ComunicationWithoutDriverIdType {
   })
   @IsInt({ message: 'vehicleInfoId must be an integer' })
   @Min(1, { message: 'vehicleInfoId must be a positive integer' })
-  vehicleInfoId: number;
+  vehicleInfoId: string;
 
   @ApiProperty({
     description: 'The ID of the service registering the vehicle',
@@ -69,7 +69,7 @@ class DriverWithoutUserIdDto implements ComunicationWithoutDriverIdType {
   })
   @IsInt({ message: 'serviceId must be an integer' })
   @Min(1, { message: 'serviceId must be a positive integer' })
-  serviceId: number;
+  serviceId: string;
 
   @ApiProperty({
     description: "A unique identifier for the user's facial recognition data",

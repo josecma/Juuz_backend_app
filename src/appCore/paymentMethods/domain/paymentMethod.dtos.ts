@@ -65,7 +65,7 @@ export class PaymentMethodDto implements PaymentMethodWithoutId {
   })
   @IsNumber()
   @IsPositive()
-  companyId: number;
+  companyId: string;
 
   @ApiProperty({
     description: 'The unique identifier of the credit card',
@@ -73,7 +73,7 @@ export class PaymentMethodDto implements PaymentMethodWithoutId {
     type: Number,
   })
   @IsInt({ message: 'ID must be an integer' })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'The credit card number',
@@ -91,7 +91,7 @@ export class PaymentMethodDto implements PaymentMethodWithoutId {
   })
   @IsInt({ message: 'User ID must be an integer' })
   @Min(1, { message: 'User ID must be a positive integer' })
-  userId: number;
+  userId: string;
 }
 
-export class UpdatePaymentMethodDto extends PartialType(PaymentMethodDto) {}
+export class UpdatePaymentMethodDto extends PartialType(PaymentMethodDto) { }

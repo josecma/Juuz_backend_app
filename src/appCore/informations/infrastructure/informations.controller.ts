@@ -37,7 +37,7 @@ const controllerName = 'Informations';
   version: '1',
 })
 export class InformationsController {
-  constructor(private readonly service: InformationsService) {}
+  constructor(private readonly service: InformationsService) { }
 
   /**
    * Creates a Information.
@@ -109,7 +109,7 @@ export class InformationsController {
   ): Promise<InformationEntity> {
     return this.service.update(this.service.filter(id), {
       data: updateInformationDto,
-      where: { id: +id },
+      where: { id: id },
     });
   }
 

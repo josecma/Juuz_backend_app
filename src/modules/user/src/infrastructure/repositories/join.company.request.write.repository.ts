@@ -1,84 +1,85 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
-import { UserRoleEnum } from "../../domain/enums/user.role.enum";
+// import { Inject, Injectable } from "@nestjs/common";
+// import { PrismaClient } from "@prisma/client";
+// import { UserRoleEnum } from "../../domain/enums/user.role.enum";
 
-@Injectable({})
-export default class JoinCompanyRequestWriteRepository {
+// @Injectable({})
+// export default class JoinCompanyRequestWriteRepository {
 
-    public constructor(
-        @Inject(PrismaClient)
-        private readonly client: PrismaClient,
-    ) { };
+//     public constructor(
+//         @Inject(PrismaClient)
+//         private readonly client: PrismaClient,
+//     ) { };
 
-    public async save(
-        params: {
-            requestId: string;
-            companyId: string;
-            as: UserRoleEnum;
-        },
-    ) {
+//     public async save(
+//         params: {
+//             requestId: string;
+//             companyId: string;
+//             role: string;
+//         },
+//     ) {
 
-        const {
-            requestId,
-            companyId,
-            as,
-        } = params;
+//         const {
+//             requestId,
+//             companyId,
+//             role,
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.joinCompanyRequest.create(
-                {
-                    data: {
-                        requestId,
-                        companyId: companyId.toString(),
-                        as,
-                    },
-                },
-            );
+//             const res = await this.client.joinCompanyRequest.create(
+//                 {
+//                     data: {
+//                         requestId,
+//                         companyId: companyId.toString(),
+//                         role,
+//                         status: "PENDING",
+//                     },
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-    public async update(
-        params: {
-            id: string;
-            updateObject: {
-                status?: string;
-            };
-        },
-    ) {
+//     public async update(
+//         params: {
+//             id: string;
+//             updateObject: {
+//                 status?: string;
+//             };
+//         },
+//     ) {
 
-        const {
-            id,
-            updateObject,
-        } = params;
+//         const {
+//             id,
+//             updateObject,
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.joinCompanyRequest.update(
-                {
-                    where: {
-                        id,
-                    },
-                    data: updateObject,
-                },
-            );
+//             const res = await this.client.joinCompanyRequest.update(
+//                 {
+//                     where: {
+//                         id,
+//                     },
+//                     data: updateObject,
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

@@ -31,7 +31,7 @@ export default class ChannelReadRepository {
 
             const userChannels = await this.client.userChannel.findMany({
                 where: {
-                    userId: Number(userId),
+                    userId: userId,
                     channel: {
                         name: {
                             contains: subStr,
@@ -73,7 +73,7 @@ export default class ChannelReadRepository {
 
             const userChannels = await this.client.userChannel.findMany({
                 where: {
-                    userId: Number(userId)
+                    userId: userId
                 },
                 include: {
                     channel: true,

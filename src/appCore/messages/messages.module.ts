@@ -4,8 +4,14 @@ import { MassagesService } from './application/messages.service';
 import { SubcservicesController } from './infrastructure/messages.controller';
 
 @Module({
-  controllers: [SubcservicesController],
-  providers: [MassagesService, PrismaService],
-  exports: [MassagesService],
+  controllers: [
+    SubcservicesController
+  ],
+  providers: [
+    MassagesService,
+    PrismaService],
+  exports: [
+    MassagesService
+  ],
 })
-export class MessagesModule {}
+export class MessagesModule { }

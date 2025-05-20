@@ -24,16 +24,16 @@ export default class DefaultCriterionSetRepository {
                 {
                     where: {
                         criterionSetId_userRole: {
-                            criterionSetId: Number(criterionSetId),
+                            criterionSetId: criterionSetId,
                             userRole,
                         },
                     },
                     update: {
-                        criterionSetId: Number(criterionSetId),
+                        criterionSetId: criterionSetId,
                         userRole,
                     },
                     create: {
-                        criterionSetId: Number(criterionSetId),
+                        criterionSetId: criterionSetId,
                         userRole,
                     }
                 }

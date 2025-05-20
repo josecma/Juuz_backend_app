@@ -35,7 +35,7 @@ export default class VerifyEvidenceService {
 
             const order = await this.findOneOrderByIdService.find({ id: orderId });
 
-            if (order.userId !== Number(userId)) {
+            if (order.userId.toString() !== userId) {
 
                 throw new NotFoundException(`evidence with id: ${evidenceId} not found`);
 

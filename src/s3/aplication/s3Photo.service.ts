@@ -8,12 +8,12 @@ export class S3PhotoService {
   constructor(
     readonly s3Service: S3Service,
     private readonly prismaService: PrismaService
-  ) {}
+  ) { }
 
   async OrderCreate(
     files: Express.Multer.File[],
-    ownerId: number,
-    companyId: number
+    ownerId: string,
+    companyId: string,
   ) {
     if (!files)
       throw new BadRequestException(

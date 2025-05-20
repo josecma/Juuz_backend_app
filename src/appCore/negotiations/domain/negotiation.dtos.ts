@@ -48,9 +48,9 @@ export class NegotiationDto implements NegotiationWithoutId {
     description: 'The ID of the user.',
     example: 1,
   })
-  @IsInt({ message: 'User ID must be an integer.' })
-  @IsPositive({ message: 'User ID must be a positive integer.' })
-  userId: number;
+  //@IsInt({ message: 'User ID must be an integer.' })
+  //@IsPositive({ message: 'User ID must be a positive integer.' })
+  userId: string;
 
   @ApiProperty({
     description: 'The ID of the order.',
@@ -58,7 +58,7 @@ export class NegotiationDto implements NegotiationWithoutId {
   })
   @IsInt({ message: 'Order ID must be an integer.' })
   @IsPositive({ message: 'Order ID must be a positive integer.' })
-  orderId: number;
+  orderId: string;
 }
 
 export class UpdateNegotiationDto {

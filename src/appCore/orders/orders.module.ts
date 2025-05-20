@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { OrdersController } from './infrastructure/orders.controller';
-import { OrdersService } from './application/orders.service';
+import { OrdersService } from './application/orders.service'; 1
 import { PrismaService } from 'nestjs-prisma';
 import { DriversModule } from 'src/appCore/drivers/drivers.module';
 import { VehicleInfosModule } from 'src/appCore/vehicleInfos/vehicleInfos.module';
@@ -29,7 +29,11 @@ import OrderModule from 'src/modules/order/order.module';
     OrdersCarrierController,
     OrdersShipperController,
   ],
-  providers: [OrdersService, PrismaService, S3Service],
-  exports: [OrdersService],
+  providers: [
+    OrdersService,
+    PrismaService, S3Service],
+  exports: [
+    OrdersService
+  ],
 })
 export class OrdersModule { }

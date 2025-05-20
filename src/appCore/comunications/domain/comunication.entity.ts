@@ -5,16 +5,16 @@ export class ComunicationEntity implements Comunication {
     description: 'Unique identifier of the communication',
     example: 123,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({ description: 'Associated order ID', example: 456 })
-  orderId: number;
+  orderId: string;
 
   @ApiProperty({ description: 'Channel ID for the driver', example: 789 })
-  driverChanelId: number;
-  
+  driverChanelId: string;
+
   @ApiProperty({ description: 'Channel ID for the rider', example: 101112 })
-  riderChanelId: number;
+  riderChanelId: string;
 
   @ApiProperty({ description: 'Number of communications', example: 5 })
   numberOfComunications: number;
@@ -78,11 +78,11 @@ export class ComunicationEntity implements Comunication {
     description: 'Owner ID associated with this communication',
     example: 987,
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     description: 'Company ID associated with this communication',
     example: 654,
   })
-  companyId: number;
+  companyId: string;
 }

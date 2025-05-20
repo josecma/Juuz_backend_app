@@ -5,7 +5,7 @@ export class TransferEntity implements Transfer {
     description: 'The unique identifier of the transfer',
     example: 1,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'A brief description of the transfer.',
@@ -29,19 +29,19 @@ export class TransferEntity implements Transfer {
     description: 'The ID of the associated payment.',
     example: 1,
   })
-  paymentId: number;
+  paymentId: string;
 
   @ApiProperty({
     description: 'The ID of the company making the transfer.',
     example: 2,
   })
-  companyId: number;
+  companyId: string;
 
   @ApiProperty({
     description: 'The ID of the account receiving the transfer.',
     example: 3,
   })
-  accountId: number;
+  accountId: string;
 
   @ApiProperty({
     example: '2024-04-07T10:00:00Z',

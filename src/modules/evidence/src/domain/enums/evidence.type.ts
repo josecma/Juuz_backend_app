@@ -2,5 +2,4 @@ export enum EvidenceType {
     DEPARTURE = "DEPARTURE",
     DESTINATION = "DESTINATION",
     REPORT = 'REPORT',
-    BILL_OF_LANDING = 'BILL OF LANDING',
 }

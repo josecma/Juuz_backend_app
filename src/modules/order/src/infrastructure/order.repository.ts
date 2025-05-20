@@ -11,7 +11,7 @@ export default class OrderRepository {
         private readonly prisma: PrismaClient,
     ) { };
 
-    public async find(params?: { ids: number[]; }) {
+    public async find(params?: { ids: string[]; }) {
 
         const { ids } = params;
 
@@ -48,45 +48,44 @@ export default class OrderRepository {
         }
     ) {
 
-        const {
-            id
-        } = params;
+        const { id } = params;
 
         try {
 
             const order = await this.prisma.order.findUnique({
                 where: {
-                    id: Number(id),
+                    id: id,
                 },
                 include: {
                     departure: true,
                     destination: true,
-                    Negotiation: {
-                        include: {
-                            driver: {
-                                include: {
-                                    userCompanyRoles: {
-                                        include: {
-                                            company: true,
-                                        },
-                                    },
-                                    driver: {
-                                        include: {
-                                            vehicleInfo: {
-                                                include: {
-                                                    model: {
-                                                        include: {
-                                                            brand: true,
-                                                        }
-                                                    },
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                        },
-                    },
+                    Negotiation: true,
+                    // Negotiation: {
+                    //     include: {
+                    //         driver: {
+                    //             include: {
+                    //                 userCompanyRoles: {
+                    //                     include: {
+                    //                         company: true,
+                    //                     },
+                    //                 },
+                    //                 driver: {
+                    //                     include: {
+                    //                         vehicleInfo: {
+                    //                             include: {
+                    //                                 model: {
+                    //                                     include: {
+                    //                                         brand: true,
+                    //                                     }
+                    //                                 },
+                    //                             }
+                    //                         }
+                    //                     }
+                    //                 }
+                    //             }
+                    //         },
+                    //     },
+                    // },
                 },
 
             });
@@ -107,7 +106,7 @@ export default class OrderRepository {
             status?: string;
             subStatus?: string;
         };
-    }) {
+    }): Promise<any> {
 
         const { id, updateObj } = params;
 
@@ -115,17 +114,15 @@ export default class OrderRepository {
 
         try {
 
-            const res = await this.prisma.order.update({
+            return await this.prisma.order.update({
                 where: {
-                    id: Number(id),
+                    id: id,
                 },
                 data: {
                     status: (status as OrderStatusEnum),
                     subStatus: (subStatus as OrderSubStatus)
                 },
             });
-
-            return res;
 
         } catch (error) {
 

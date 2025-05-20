@@ -1,4 +1,4 @@
-import {} from '@nestjs/mapped-types';
+import { } from '@nestjs/mapped-types';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { Payment, PaymentMethodType } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
@@ -77,7 +77,7 @@ export class PaymentDto implements PaymentWithoutId {
   @IsNumber()
   @IsNotEmpty()
   @IsPositive()
-  orderId: number;
+  orderId: string;
 }
 
 export class PaymentCashDto {
@@ -88,7 +88,7 @@ export class PaymentCashDto {
   @IsNumber()
   @IsNotEmpty()
   @IsPositive()
-  orderId: number;
+  orderId: string;
 }
 
-export class UpdatePaymentDto extends PartialType(PaymentDto) {}
+export class UpdatePaymentDto extends PartialType(PaymentDto) { }

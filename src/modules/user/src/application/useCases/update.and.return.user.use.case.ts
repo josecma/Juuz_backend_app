@@ -1,46 +1,46 @@
-import { Inject, Injectable } from "@nestjs/common";
-import FindOneUserByIdService from "../../domain/services/find.one.user.by.id.service";
-import UserRepository from "../../infrastructure/repositories/user.repository";
+// import { Inject, Injectable } from "@nestjs/common";
+// import FindOneUserByIdService from "../../domain/services/find.one.user.by.id.service";
+// import UserRepository from "../../infrastructure/repositories/user.write.repository";
 
-@Injectable({})
-export default class UpdateAndReturnUserUseCase {
+// @Injectable({})
+// export default class UpdateAndReturnUserUseCase {
 
-    public constructor(
-        @Inject(UserRepository)
-        private readonly userRepository: UserRepository,
-        @Inject(FindOneUserByIdService)
-        private readonly findOneUserByIdService: FindOneUserByIdService,
-    ) { };
+//     public constructor(
+//         @Inject(UserRepository)
+//         private readonly userRepository: UserRepository,
+//         @Inject(FindOneUserByIdService)
+//         private readonly findOneUserByIdService: FindOneUserByIdService,
+//     ) { };
 
-    public async execute(
-        params: {
-            id: string;
-            coordinates?: {
-                latitude: number;
-                longitude: number;
-            };
-        }
-    ) {
+//     public async execute(
+//         params: {
+//             id: string;
+//             coordinates?: {
+//                 latitude: number;
+//                 longitude: number;
+//             };
+//         }
+//     ) {
 
-        const { id, coordinates } = params;
+//         const { id, coordinates } = params;
 
-        try {
+//         try {
 
-            const user = await this.findOneUserByIdService.find({ id });
+//             const user = await this.findOneUserByIdService.find({ id });
 
-            return await this.userRepository.update({
-                id,
-                updateObj: {
-                    coordinates,
-                }
-            });
+//             return await this.userRepository.update({
+//                 id,
+//                 updateObj: {
+//                     coordinates,
+//                 }
+//             });
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

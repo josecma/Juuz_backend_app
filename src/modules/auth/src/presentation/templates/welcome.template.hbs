@@ -1,0 +1,98 @@
+<html></html>
+  <head>
+    <style>
+      body { 
+        font-family: Arial, sans-serif; 
+        line-height: 1.6; 
+        color: #333; 
+        max-width: 600px; 
+        margin: 0 auto; 
+        padding: 20px; 
+      }
+      .header { 
+        color: #25D606; 
+        border-bottom: 2px solid #25D606; 
+        padding-bottom: 10px; 
+      }
+      .button { 
+        display: inline-block; 
+        background-color: #25D606; 
+        color: white; 
+        padding: 12px 24px; 
+        text-decoration: none; 
+        border-radius: 5px; 
+        margin: 15px 0;
+        font-weight: bold;
+        transition: background-color 0.3s;
+      }
+      .button:hover {
+        background-color: #20C005; 
+      }
+      .footer { 
+        margin-top: 20px; 
+        font-size: 12px; 
+        color: #7f8c8d; 
+        border-top: 1px solid #e8f5e9; 
+        padding-top: 10px;
+      }
+      .details {
+        background-color: #f0f9ee; 
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+        border-left: 4px solid #374957; 
+      }
+      .otp-code {
+        font-size: 28px;
+        letter-spacing: 5px;
+        color: #374957; 
+        font-weight: bold;
+        margin: 20px 0;
+        text-align: center;
+        background-color: #f0f9ee;
+        padding: 15px;
+        border-radius: 5px;
+        border: 1px dashed #25D606;
+      }
+      a {
+        color: #25D606;
+      }
+      .note {
+        font-size: 14px;
+        color: #7f8c8d;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Your {{platformName}} Verification Code</h1>
+    </div>
+
+    <p>Hello <strong>{{userName}}</strong></p>
+
+    <p>Here's your one-time passcode (OTP) to complete your authentication:</p>
+    
+    <div class="otp-code">
+      {{key}}
+    </div>
+    
+    <div class="details">
+      <p><strong>Security note:</strong></p>
+      <ul>
+        <li>Requested at: <strong>{{loginTime}}</strong></li>
+        <li>Expires in: <strong>{{expirationTime}} minutes</strong></li>
+      </ul>
+    </div>
+
+    <p class="note">For security reasons, never share this code with anyone.</p>
+    
+    <p>If you didn't request this, please secure your account immediately.</p>
+    
+    <div class="footer">
+      <p>Need help? Contact <a href="mailto:support@{{platformDomain}}">support@{{platformDomain}}</a></p>
+      <p>© {{currentYear}} {{platformName}}. All rights reserved.</p>
+      <p style="font-size: 11px; color: #bdc3c7;">Automated message - please do not reply.</p>
+    </div>
+  </body>
+</html>

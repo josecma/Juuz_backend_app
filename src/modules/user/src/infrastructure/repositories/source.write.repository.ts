@@ -1,45 +1,45 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+// import { Inject, Injectable } from "@nestjs/common";
+// import { PrismaClient } from "@prisma/client";
 
-@Injectable()
-export default class SourceWriteRepository {
+// @Injectable()
+// export default class SourceWriteRepository {
 
-    public constructor(
-        @Inject(PrismaClient)
-        private readonly client: PrismaClient,
-    ) { };
+//     public constructor(
+//         @Inject(PrismaClient)
+//         private readonly client: PrismaClient,
+//     ) { };
 
-    public async save(
-        params: {
-            type: string;
-            value: string;
-        },
-    ) {
+//     public async save(
+//         params: {
+//             type: string;
+//             value: string;
+//         },
+//     ) {
 
-        const {
-            type,
-            value
-        } = params;
+//         const {
+//             type,
+//             value
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.source.create(
-                {
-                    data: {
-                        type,
-                        value,
-                    },
-                },
-            );
+//             const res = await this.client.source.create(
+//                 {
+//                     data: {
+//                         type,
+//                         value,
+//                     },
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

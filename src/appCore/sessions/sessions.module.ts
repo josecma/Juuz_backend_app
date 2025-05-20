@@ -4,8 +4,10 @@ import { SessionsService } from './application/sessions.service';
 import { PrismaService } from 'nestjs-prisma';
 
 @Module({
-  controllers: [SessionsController],
+  controllers: [
+    SessionsController
+  ],
   providers: [SessionsService, PrismaService],
   exports: [SessionsService],
 })
-export class SessionsModule {}
+export class SessionsModule { }

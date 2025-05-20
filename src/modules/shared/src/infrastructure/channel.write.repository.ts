@@ -34,7 +34,7 @@ export default class ChannelWriteRepository {
 
                     let channel: {
                         name: string;
-                        id: number;
+                        id: string;
                     } | null = null;
 
                     channel = await tx.channel.findUnique(
@@ -59,7 +59,7 @@ export default class ChannelWriteRepository {
                         {
                             where: {
                                 channelId_userId: {
-                                    userId: Number(userId),
+                                    userId: userId,
                                     channelId: channel.id,
                                 },
                             },
@@ -67,7 +67,7 @@ export default class ChannelWriteRepository {
                                 items,
                             },
                             create: {
-                                userId: Number(userId),
+                                userId: userId,
                                 channelId: channel.id,
                                 permissions,
                                 items,

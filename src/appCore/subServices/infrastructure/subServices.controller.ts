@@ -34,7 +34,7 @@ const controllerName = 'Subcservices';
   version: '1',
 })
 export class SubcservicesController {
-  constructor(private readonly service: SubcServicesService) {}
+  constructor(private readonly service: SubcServicesService) { }
 
   /**
    * Creates a subService.
@@ -108,7 +108,7 @@ export class SubcservicesController {
   ): Promise<SubServiceEntity> {
     return this.service.update(this.service.filter(id), {
       data: updateSubServiceDto,
-      where: { id: +id },
+      where: { id: id },
     });
   }
 

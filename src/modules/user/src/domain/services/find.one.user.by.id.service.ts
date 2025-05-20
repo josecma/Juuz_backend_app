@@ -1,13 +1,14 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import BadRequestDomainException from "src/modules/shared/src/domain/exceptions/bad.request.domain.exception";
-import UserRepository from "../../infrastructure/repositories/user.repository";
+import UserRepository from "../../infrastructure/repositories/user.write.repository";
+import UserReadRepository from "../../infrastructure/repositories/user.read.repository";
 
 @Injectable()
 export default class FindOneUserByIdService {
 
     public constructor(
-        @Inject(UserRepository)
-        private readonly userRepository: UserRepository,
+        @Inject(UserReadRepository)
+        private readonly userReadRepository: UserReadRepository,
     ) { };
 
     public async find(params: { id: string; }) {
@@ -16,7 +17,7 @@ export default class FindOneUserByIdService {
 
         try {
 
-            if (!id || Number(id) <= 0) {
+            if (!id) {
 
                 throw new BadRequestDomainException(
                     {
@@ -27,7 +28,7 @@ export default class FindOneUserByIdService {
 
             };
 
-            const user = await this.userRepository.findOneBy({ id });
+            const user = await this.userReadRepository.findOneById(id);
 
             if (!user) {
 

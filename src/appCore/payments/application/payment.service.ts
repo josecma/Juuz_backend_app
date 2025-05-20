@@ -328,9 +328,9 @@ export class PaymentsService extends PrismaGenericService<
       company: {
         connect: { id: companyId },
       },
-      user: {
-        connect: { id: userId },
-      },
+      // user: {
+      //   connect: { id: userId },
+      // },
       order: {
         connect: { id: orderId },
       },
@@ -341,7 +341,7 @@ export class PaymentsService extends PrismaGenericService<
     });
   }
 
-  async paymentNow(id: string, companyId: number) {
+  async paymentNow(id: string, companyId: string) {
     const sd = await this.findOne(this.companyFilter(id, companyId));
   }
 }

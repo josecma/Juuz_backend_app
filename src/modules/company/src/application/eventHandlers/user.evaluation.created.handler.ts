@@ -1,8 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import UserEvaluationCreatedEvent from "src/modules/performance/src/domain/events/user.evaluation.created.event";
 import IEventHandler from "src/modules/shared/src/application/contracts/i.event.handler";
-import UserCompanyRepository from "src/modules/user/src/infrastructure/repositories/user.company.repository";
+// import UserCompanyRepository from "src/modules/user/src/infrastructure/repositories/user.company.repository";
 import UpdateCompanyScoreService from "../../domain/services/update.company.score.service";
+import FindCompanyByOwnerIdUseCase from "../useCases/find.company.by.owner.use.case";
 
 @Injectable({})
 export default class UserEvaluationCreatedHandler implements IEventHandler<UserEvaluationCreatedEvent> {
@@ -10,8 +11,8 @@ export default class UserEvaluationCreatedHandler implements IEventHandler<UserE
     public constructor(
         @Inject(UpdateCompanyScoreService)
         private readonly updateCompanyScoreService: UpdateCompanyScoreService,
-        @Inject(UserCompanyRepository)
-        private readonly userCompanyRepository: UserCompanyRepository,
+        @Inject(FindCompanyByOwnerIdUseCase)
+        private readonly findCompanyByOwnerIdUseCase: FindCompanyByOwnerIdUseCase,
     ) { };
 
     public async handle(event: UserEvaluationCreatedEvent): Promise<void> {
@@ -20,10 +21,8 @@ export default class UserEvaluationCreatedHandler implements IEventHandler<UserE
 
         try {
 
-            const userCompany = await this.userCompanyRepository.findUserCompanyByUserId(
-                {
-                    userId: evaluatedId,
-                }
+            const userCompany = await this.findCompanyByOwnerIdUseCase.execute(
+                evaluatedId
             );
 
             const newScoreSum = evaluation.scores.reduce(
@@ -33,17 +32,11 @@ export default class UserEvaluationCreatedHandler implements IEventHandler<UserE
                 0
             );
 
-            await Promise.all(
-                userCompany.map(
-                    async (e) => {
-                        await this.updateCompanyScoreService.update(
-                            {
-                                companyId: e.id.toString(),
-                                score: newScoreSum / evaluation.scores.length,
-                            }
-                        );
-                    }
-                )
+            await this.updateCompanyScoreService.update(
+                {
+                    companyId: userCompany.id.toString(),
+                    score: newScoreSum / evaluation.scores.length,
+                }
             );
 
         } catch (error) {

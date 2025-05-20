@@ -110,7 +110,7 @@ export class OrderApkDto implements OrderWithoutId {
   @Min(1, { message: 'subServiceId must be a positive integer' })
   @IsNotEmpty({ message: 'subServiceId is required' })
   @IsNotEmpty()
-  subServiceId: number;
+  subServiceId: string;
 
   @ApiProperty({
     description: 'The ID of the subService this entity belongs to',
@@ -121,7 +121,7 @@ export class OrderApkDto implements OrderWithoutId {
   @Min(1, { message: 'serviceId must be a positive integer' })
   @IsNotEmpty({ message: 'serviceId is required' })
   @IsNotEmpty()
-  serviceId: number;
+  serviceId: string;
 
   @ApiProperty({ example: 'John', description: 'The first name of the user' })
   @IsString()

@@ -29,9 +29,9 @@ export default class EvaluationRepository {
                 const evaluation = await tx.evaluation.create(
                     {
                         data: {
-                            criterionSetId: Number(criterionSetId),
-                            evaluatedId: Number(evaluatedId),
-                            evaluatorId: Number(evaluatorId),
+                            criterionSetId: criterionSetId,
+                            evaluatedId: evaluatedId,
+                            evaluatorId: evaluatorId,
                             role,
                         }
                     }
@@ -47,7 +47,7 @@ export default class EvaluationRepository {
                                 evaluationId: evaluation.id,
                                 value,
                                 comment,
-                                criterionId: Number(id)
+                                criterionId: id
                             }
                         }),
                     }

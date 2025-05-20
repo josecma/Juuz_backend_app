@@ -6,7 +6,7 @@ export class PaymentMethodEntity implements PaymentMethod {
     example: 123,
     type: Number,
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'Nombre del método de pago',
@@ -38,7 +38,7 @@ export class PaymentMethodEntity implements PaymentMethod {
     description: 'ID de la compañía asociada',
     type: Number,
   })
-  companyId: number;
+  companyId: string;
 
   @ApiProperty({
     description: 'The credit card number',
@@ -52,7 +52,7 @@ export class PaymentMethodEntity implements PaymentMethod {
     example: 1,
     type: Number,
   })
-  userId: number;
+  userId: string;
 
   @ApiProperty({
     description: 'Creation date of the communication record',
@@ -106,5 +106,5 @@ export class PaymentMethodEntity implements PaymentMethod {
     description: 'Owner ID associated with this communication',
     example: 987,
   })
-  ownerId: number;
+  ownerId: string;
 }

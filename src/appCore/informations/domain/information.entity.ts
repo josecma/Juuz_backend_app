@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Information } from '@prisma/client';
 export class InformationEntity implements Information {
   @ApiProperty({ example: 1, description: 'The unique identifier' })
-  id: number;
+  id: string;
 
   @ApiProperty({
     example: 'This is a description',
@@ -15,7 +15,7 @@ export class InformationEntity implements Information {
     example: 1,
     type: Number,
   })
-  orderId: number;
+  orderId: string;
 
   @ApiProperty({
     description:
@@ -23,7 +23,7 @@ export class InformationEntity implements Information {
     example: 100,
     type: Number,
   })
-  pointId: number;
+  pointId: string;
 
   @ApiProperty({
     example: '2024-04-07T10:00:00Z',
@@ -69,12 +69,12 @@ export class InformationEntity implements Information {
     example: 1,
     description: 'The unique identifier of the owner of the data',
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     example: 1,
     description:
       'The unique identifier of the company associated with the data',
   })
-  companyId: number;
+  companyId: string;
 }

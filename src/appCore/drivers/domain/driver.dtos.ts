@@ -60,7 +60,7 @@ export class DriverVehicleInfoDto {
   @IsInt({ message: 'modelId must be an integer' })
   @Min(1, { message: 'modelId must be a positive integer' })
   @IsNotEmpty({ message: 'modelId is required' })
-  modelId: number;
+  modelId: string;
 }
 
 export class VehicleBaseDto {
@@ -72,7 +72,7 @@ export class VehicleBaseDto {
   @IsInt({ each: true })
   @Type(() => Number)
   @IsOptional()
-  photoIds: number[];
+  photoIds: string[];
 
   @ApiProperty({
     description: 'The year of vehicles',
@@ -108,7 +108,7 @@ export class VehicleBaseDto {
   @IsInt({ message: 'serviceId must be an integer' })
   @Min(1, { message: 'serviceId must be a positive integer' })
   @IsOptional()
-  serviceId: number;
+  serviceId: string;
 
   @ApiProperty({
     description: "A unique identifier for the user's facial recognition data",
@@ -149,7 +149,7 @@ export class VehicleBaseDto {
   vehicleInfo: DriverVehicleInfoDto;
 }
 
-export class DriverDto extends VehicleBaseDto implements DriverWithoutId {}
+export class DriverDto extends VehicleBaseDto implements DriverWithoutId { }
 
 export class CarrierDto extends VehicleBaseDto implements CarrierWithoutId {
   @ApiProperty({
@@ -157,11 +157,10 @@ export class CarrierDto extends VehicleBaseDto implements CarrierWithoutId {
     example: 42,
     type: Number,
   })
-  @IsInt({ message: 'userId must be an integer' })
-  @Min(1, { message: 'userId must be a positive integer' })
-  @IsInt()
+  //@IsInt({ message: 'userId must be an integer' })
+  //@Min(1, { message: 'userId must be a positive integer' })
   @IsOptional()
-  userId: number;
+  userId: string;
 }
 
 export class UpdateDriverDto extends PartialType(
@@ -196,7 +195,7 @@ export class UpdateCarrierDto extends PartialType(
   @IsNumber()
   @IsPositive({ message: 'Id must be a positive number.' })
   @IsOptional()
-  id: number;
+  id: string;
 }
 
 export class CarrierWithIdDto extends UpdateDriverDto {
@@ -207,5 +206,5 @@ export class CarrierWithIdDto extends UpdateDriverDto {
   @IsNumber()
   @IsPositive({ message: 'Id must be a positive number.' })
   @IsOptional()
-  id: number;
+  id: string;
 }
