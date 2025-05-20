@@ -41,12 +41,14 @@ export default class CreateUserService {
 
             };
 
-            const hashingCredential = await this.bcryptAdapter.hash(credential.value);
-
             const savedUser = await this.userWriteRepository.save(
                 {
                     user,
-                    credential: hashingCredential,
+                    credential: credential
+                        ?
+                        await this.bcryptAdapter.hash(credential.value)
+                        :
+                        undefined,
                     emails,
                 }
             );

@@ -54,6 +54,8 @@ export default class NodemailerAdapter implements EmailPort {
                 html: template,
             });
 
+            this.logger.log(`email sent to: ${to}`);
+
         } catch (error) {
 
             this.logger.error(`error sending email to ${to}:`, error);

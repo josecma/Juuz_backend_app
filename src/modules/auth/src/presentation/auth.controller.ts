@@ -1,5 +1,6 @@
-import { Body, Controller, Inject, Logger, Post } from "@nestjs/common";
+import { Body, Controller, Inject, Logger, Post, Res } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { Response } from "express";
 import CompleteOtpAuthByEmailUseCase from "../application/useCases/complete.otp.auth.by.email.use.case";
 import InitiateOtpAuthByEmailUseCase from "../application/useCases/initiate.otp.auth.by.email.use.case";
 import { Public } from "./decorators/public.route.decorator";
@@ -36,6 +37,7 @@ export default class AuthController {
     @Post('/otp/initiate')
     public async otpInitiate(
         @Body() body: InitiateOtpAuthRequestBody,
+        @Res() res: Response,
     ) {
 
         const {
@@ -53,11 +55,17 @@ export default class AuthController {
                 );
             };
 
-            return initiateOtpAuth;
+            return res
+                .status(200)
+                .json(initiateOtpAuth);
 
         } catch (error) {
 
             this.logger.error(error);
+
+            return res
+                .status(500)
+                .json(error);
 
         };
 
@@ -69,6 +77,7 @@ export default class AuthController {
     @Post('/otp/complete')
     public async otpComplate(
         @Body() body: CompleteOtpAuthRequestBody,
+        @Res() res: Response,
     ) {
 
         const {
@@ -90,12 +99,17 @@ export default class AuthController {
                 );
             };
 
-            return completeOtpAuth;
+            return res
+                .status(200)
+                .json(completeOtpAuth);
 
         } catch (error) {
 
             this.logger.error(error);
-            throw error;
+
+            return res
+                .status(500)
+                .json(error);
 
         };
 

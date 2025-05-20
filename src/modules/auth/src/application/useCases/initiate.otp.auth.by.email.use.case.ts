@@ -3,8 +3,10 @@ import { ConfigService } from "@nestjs/config";
 import HandlebarsAdapter from "src/modules/shared/src/infrastructure/adapters/handlebars.adapter";
 import NodemailerAdapter from "src/modules/shared/src/infrastructure/adapters/nodemailer.adapter";
 import { AuthMethodEnum } from "../../domain/enums/auth.method.enum";
+import { AuthNProcessStatusEnum } from "../../domain/enums/auth.process.status.enum";
 import FindEmailOwnerAdapter from "../../infrastructure/adapters/find.email.owner.adapter";
 import TotpAdapter from "../../infrastructure/adapters/totp.adapter";
+import AuthProcessReadRepository from "../../infrastructure/repositories/auth.process.read.repository";
 import AuthProcessWriteRepository from "../../infrastructure/repositories/auth.process.write.repository";
 import UserAuthProcessWriteRepository from "../../infrastructure/repositories/user.auth.process.write.repository";
 
@@ -20,6 +22,7 @@ export default class InitiateOtpAuthByEmailUseCase {
         private readonly configService: ConfigService,
         private readonly userAuthProcessWriteRepository: UserAuthProcessWriteRepository,
         private readonly authProcessWriteRepository: AuthProcessWriteRepository,
+        private readonly authProcessReadRepository: AuthProcessReadRepository,
         private readonly findEmailOwnerAdapter: FindEmailOwnerAdapter,
     ) { };
 
@@ -42,6 +45,26 @@ export default class InitiateOtpAuthByEmailUseCase {
                 emailOwner.otpSecret;
 
             const otp = this.totpAdapter.generateToken({ secret });
+
+            const pendingTOTPAuthNProcessByEmail = await this.authProcessReadRepository.findPendingOtpAuthByEmail(
+                {
+                    method: AuthMethodEnum.TOTP,
+                    email
+                }
+            );
+
+            if (pendingTOTPAuthNProcessByEmail) {
+
+                await this.authProcessWriteRepository.update(
+                    {
+                        id: pendingTOTPAuthNProcessByEmail.id,
+                        updateObject: {
+                            status: AuthNProcessStatusEnum.FAILED,
+                        },
+                    }
+                );
+
+            };
 
             const authnProcess = await this.authProcessWriteRepository.save(
                 {
@@ -89,7 +112,7 @@ export default class InitiateOtpAuthByEmailUseCase {
             await this.nodemailerAdapter.send(
                 {
                     to: [email],
-                    subject: 'authentication',
+                    subject: 'Authentication',
                     text: '',
                     template,
                 }

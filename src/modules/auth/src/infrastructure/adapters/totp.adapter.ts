@@ -9,6 +9,7 @@ export default class TotpAdapter implements TotpPort {
         totp.options = {
             digits: 4,
             step: 60 * 5,
+            window: 1,
         };
     };
 

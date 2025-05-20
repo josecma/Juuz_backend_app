@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import FindUserByIdUseCase from "src/modules/user/src/application/useCases/find.user.by.id.use.case";
 import UserIdentityReadRepository from "src/modules/user/src/infrastructure/repositories/user.identity.read.repository";
 
@@ -25,7 +25,7 @@ export default class FindEmailOwnerAdapter {
 
             if (!identity) {
 
-                throw new NotFoundException('identity not found');
+                return null;
 
             };
 

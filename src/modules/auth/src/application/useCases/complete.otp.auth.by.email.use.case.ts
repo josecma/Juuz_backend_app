@@ -12,6 +12,7 @@ import AuthProcessReadRepository from "../../infrastructure/repositories/auth.pr
 import AuthProcessWriteRepository from "../../infrastructure/repositories/auth.process.write.repository";
 import UserAuthProcessReadRepository from "../../infrastructure/repositories/user.auth.process.read.repository";
 import UserAuthProcessWriteRepository from "../../infrastructure/repositories/user.auth.process.write.repository";
+import { IdentityEnum } from "src/modules/user/src/domain/enums/identity.enum";
 
 @Injectable({})
 export default class CompleteOtpAuthByEmailUseCase {
@@ -95,8 +96,11 @@ export default class CompleteOtpAuthByEmailUseCase {
 
             };
 
-            if (!secret)
+            if (!secret) {
+
                 secret = this.configService.get<string>('SECRET');
+
+            };
 
             if (!(this.totpAdapter.verifyToken({ secret, token: key }))) {
 
@@ -122,15 +126,13 @@ export default class CompleteOtpAuthByEmailUseCase {
                 }
             });
 
-            const { user, emails } = userData;
-
             if (!userData) {
 
                 userData = await this.createUserAdapter.create(
                     {
                         identities: [
                             {
-                                type: 'EMAIL',
+                                type: IdentityEnum.EMAIL,
                                 value: email,
                             }
                         ]
@@ -138,6 +140,8 @@ export default class CompleteOtpAuthByEmailUseCase {
                 );
 
             };
+
+            const { user, emails } = userData;
 
             await this.userAuthProcessWriteRepository.save(
                 {
@@ -172,8 +176,8 @@ export default class CompleteOtpAuthByEmailUseCase {
                 refreshToken,
                 user: {
                     id: user.id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
+                    firstName: user?.firstName,
+                    lastName: user?.lastName,
                     emails,
                 },
             };

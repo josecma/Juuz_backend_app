@@ -38,8 +38,8 @@ export default class CreateUserUseCase {
 
             const newUser = new User(
                 {
-                    firstName: user.firstName,
-                    lastName: user.lastName,
+                    firstName: user?.firstName,
+                    lastName: user?.lastName,
                     verified: false,
                 }
             );
