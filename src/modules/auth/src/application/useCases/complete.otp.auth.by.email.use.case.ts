@@ -2,17 +2,16 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from "@nes
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { ThrottlerException } from "@nestjs/throttler";
-import User from "src/modules/user/src/domain/entities/user";
+import { IdentityEnum } from "src/modules/user/src/domain/enums/identity.enum";
 import { AuthMethodEnum } from "../../domain/enums/auth.method.enum";
 import { AuthNProcessStatusEnum } from "../../domain/enums/auth.process.status.enum";
 import CreateUserAdapter from "../../infrastructure/adapters/create.user.adapter";
-import FindUserByIdAdapter from "../../infrastructure/adapters/find.user.by.id.adapter";
+import FindEmailOwnerAdapter from "../../infrastructure/adapters/find.email.owner.adapter";
 import TotpAdapter from "../../infrastructure/adapters/totp.adapter";
 import AuthProcessReadRepository from "../../infrastructure/repositories/auth.process.read.repository";
 import AuthProcessWriteRepository from "../../infrastructure/repositories/auth.process.write.repository";
-import UserAuthProcessReadRepository from "../../infrastructure/repositories/user.auth.process.read.repository";
+import OtpSecretCacheRepository from "../../infrastructure/repositories/otp.secret.cache.repository";
 import UserAuthProcessWriteRepository from "../../infrastructure/repositories/user.auth.process.write.repository";
-import { IdentityEnum } from "src/modules/user/src/domain/enums/identity.enum";
 
 @Injectable({})
 export default class CompleteOtpAuthByEmailUseCase {
@@ -23,12 +22,12 @@ export default class CompleteOtpAuthByEmailUseCase {
         private readonly totpAdapter: TotpAdapter,
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
-        private readonly findUserByIdAdapter: FindUserByIdAdapter,
         private readonly authProcessReadRepository: AuthProcessReadRepository,
         private readonly authProcessWriteRepository: AuthProcessWriteRepository,
-        private readonly userAuthProcessReadRepository: UserAuthProcessReadRepository,
         private readonly userAuthProcessWriteRepository: UserAuthProcessWriteRepository,
         private readonly createUserAdapter: CreateUserAdapter,
+        private readonly findEmailOwnerAdapter: FindEmailOwnerAdapter,
+        private readonly otpSecretCacheRepository: OtpSecretCacheRepository,
     ) { };
 
     public async execute(
@@ -43,16 +42,15 @@ export default class CompleteOtpAuthByEmailUseCase {
             key,
         } = params;
 
-        let secret: string;
-
-        let userData: {
-            user: User,
-            otpSecret?: string;
+        let user: {
+            id: string,
+            firstName?: string,
+            lastName?: string,
             emails: Array<{
                 value: string,
                 metadata: Record<string, unknown>,
-            }>;
-        };
+            }>,
+        } = null;
 
         try {
 
@@ -86,21 +84,7 @@ export default class CompleteOtpAuthByEmailUseCase {
 
             };
 
-            const userAuthNProcess = await this.userAuthProcessReadRepository.findOneByAuthProcessId(PendingOtpAuthProcessByEmail.id);
-
-            if (userAuthNProcess) {
-
-                userData = await this.findUserByIdAdapter.find(userAuthNProcess.userId);
-
-                secret = userData.otpSecret;
-
-            };
-
-            if (!secret) {
-
-                secret = this.configService.get<string>('SECRET');
-
-            };
+            const secret = await this.otpSecretCacheRepository.get(email);
 
             if (!(this.totpAdapter.verifyToken({ secret, token: key }))) {
 
@@ -126,9 +110,11 @@ export default class CompleteOtpAuthByEmailUseCase {
                 }
             });
 
-            if (!userData) {
+            user = await this.findEmailOwnerAdapter.find(email);
 
-                userData = await this.createUserAdapter.create(
+            if (!user) {
+
+                user = await this.createUserAdapter.create(
                     {
                         identities: [
                             {
@@ -140,8 +126,6 @@ export default class CompleteOtpAuthByEmailUseCase {
                 );
 
             };
-
-            const { user, emails } = userData;
 
             await this.userAuthProcessWriteRepository.save(
                 {
@@ -174,12 +158,7 @@ export default class CompleteOtpAuthByEmailUseCase {
             return {
                 accessToken,
                 refreshToken,
-                user: {
-                    id: user.id,
-                    firstName: user?.firstName,
-                    lastName: user?.lastName,
-                    emails,
-                },
+                user,
             };
 
         } catch (error) {

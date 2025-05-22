@@ -1,13 +1,14 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import HandlebarsAdapter from "src/modules/shared/src/infrastructure/adapters/handlebars.adapter";
 import NodemailerAdapter from "src/modules/shared/src/infrastructure/adapters/nodemailer.adapter";
 import { AuthMethodEnum } from "../../domain/enums/auth.method.enum";
 import { AuthNProcessStatusEnum } from "../../domain/enums/auth.process.status.enum";
 import FindEmailOwnerAdapter from "../../infrastructure/adapters/find.email.owner.adapter";
+import { OtpSecretAdapter } from "../../infrastructure/adapters/otp.secret.adapter";
 import TotpAdapter from "../../infrastructure/adapters/totp.adapter";
 import AuthProcessReadRepository from "../../infrastructure/repositories/auth.process.read.repository";
 import AuthProcessWriteRepository from "../../infrastructure/repositories/auth.process.write.repository";
+import OtpSecretCacheRepository from "../../infrastructure/repositories/otp.secret.cache.repository";
 import UserAuthProcessWriteRepository from "../../infrastructure/repositories/user.auth.process.write.repository";
 
 @Injectable({})
@@ -19,11 +20,12 @@ export default class InitiateOtpAuthByEmailUseCase {
         private readonly nodemailerAdapter: NodemailerAdapter,
         private readonly handlebarsAdapter: HandlebarsAdapter,
         private readonly totpAdapter: TotpAdapter,
-        private readonly configService: ConfigService,
+        private readonly otpSecretAdapter: OtpSecretAdapter,
         private readonly userAuthProcessWriteRepository: UserAuthProcessWriteRepository,
         private readonly authProcessWriteRepository: AuthProcessWriteRepository,
         private readonly authProcessReadRepository: AuthProcessReadRepository,
         private readonly findEmailOwnerAdapter: FindEmailOwnerAdapter,
+        private readonly otpSecretCacheRepository: OtpSecretCacheRepository,
     ) { };
 
     public async execute(
@@ -38,13 +40,15 @@ export default class InitiateOtpAuthByEmailUseCase {
 
             const emailOwner = await this.findEmailOwnerAdapter.find(email);
 
-            const secret = !emailOwner
-                ?
-                this.configService.get<string>('SECRET')
-                :
-                emailOwner.otpSecret;
+            const otpSecret = await this.otpSecretCacheRepository.set(
+                {
+                    key: email,
+                    value: emailOwner ? emailOwner.otpSecret : this.otpSecretAdapter.generate(),
+                    ttl: 60000 * 6,
+                }
+            );
 
-            const otp = this.totpAdapter.generateToken({ secret });
+            const otp = this.totpAdapter.generateToken({ secret: otpSecret });
 
             const pendingTOTPAuthNProcessByEmail = await this.authProcessReadRepository.findPendingOtpAuthByEmail(
                 {

@@ -29,7 +29,17 @@ export default class CreateUserAdapter {
                 }
             );
 
-            return user;
+            return Object.assign(
+                {},
+                {
+                    id: user.user.id,
+                    firstName: user.user.firstName,
+                    lastName: user.user.lastName,
+                },
+                {
+                    emails: user.emails,
+                }
+            );
 
         } catch (error) {
 

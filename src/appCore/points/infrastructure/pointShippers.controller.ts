@@ -18,7 +18,7 @@ import {
 import { ApiResponseSwagger } from 'src/_shared/infrastructure/swagger/response.swagger';
 import { PointEntity } from '../domain/point.entity';
 import { RequestUserId } from 'src/_shared/domain/requestId';
-import { PointCacheService } from '../application/pointCache.service';
+// import { PointCacheService } from '../application/pointCache.service';
 import { PositiveNumberStringPipe } from 'src/_shared/infrastructure/validators/paramsPositeNumber.validator';
 import { OrdersService } from 'src/appCore/orders/application/orders.service';
 import { OrderStatusEnum, Prisma } from '@prisma/client';
@@ -35,46 +35,46 @@ const controllerName = 'Point Shippers';
 })
 export class PointsShippersController {
     constructor(
-        private readonly pointCacheService: PointCacheService,
+        // private readonly pointCacheService: PointCacheService,
         private readonly ordersService: OrdersService,
         private readonly service: PointsService
     ) { }
 
-    @HttpCode(HttpStatus.ACCEPTED)
-    @ApiResponseSwagger(updateSwagger(PointEntity, controllerName))
-    @UseGuards(CustomThrottleGuard)
-    @Throttle({
-        default: {
-            limit: 2,
-            ttl: 119000,
-        },
-    })
-    @Patch('subscribe_driver/:id')
-    async updatePoint(
-        @Request() req: RequestUserId,
-        @Param('id', PositiveNumberStringPipe) id: string
-    ): Promise<any> {
-        const find: Prisma.OrderFindFirstArgs = {
-            where: {
-                userId: req.user.id.toString(),
-                driverId: id,
-                OR: [
-                    { status: OrderStatusEnum.IN_TRANSIT },
-                    { status: OrderStatusEnum.ASSIGNED },
-                ],
-            },
-            orderBy: {
-                createdAt: 'asc',
-            },
-        };
-        const order = await this.ordersService.model.findFirst(find);
-        if (!order)
-            new BadRequestException('You cant subscribe to that driver id.');
-        return this.pointCacheService.addOrUpdateEntry({
-            userId: req.user.id + '',
-            driverId: id + '',
-        });
-    }
+    // @HttpCode(HttpStatus.ACCEPTED)
+    // @ApiResponseSwagger(updateSwagger(PointEntity, controllerName))
+    // @UseGuards(CustomThrottleGuard)
+    // @Throttle({
+    //     default: {
+    //         limit: 2,
+    //         ttl: 119000,
+    //     },
+    // })
+    // @Patch('subscribe_driver/:id')
+    // async updatePoint(
+    //     @Request() req: RequestUserId,
+    //     @Param('id', PositiveNumberStringPipe) id: string
+    // ): Promise<any> {
+    //     const find: Prisma.OrderFindFirstArgs = {
+    //         where: {
+    //             userId: req.user.id.toString(),
+    //             driverId: id,
+    //             OR: [
+    //                 { status: OrderStatusEnum.IN_TRANSIT },
+    //                 { status: OrderStatusEnum.ASSIGNED },
+    //             ],
+    //         },
+    //         orderBy: {
+    //             createdAt: 'asc',
+    //         },
+    //     };
+    //     const order = await this.ordersService.model.findFirst(find);
+    //     if (!order)
+    //         new BadRequestException('You cant subscribe to that driver id.');
+    //     return this.pointCacheService.addOrUpdateEntry({
+    //         userId: req.user.id + '',
+    //         driverId: id + '',
+    //     });
+    // }
 
     /**
      * Gets all Points. It allows to filter by any field contained in the DTO object of the Point.

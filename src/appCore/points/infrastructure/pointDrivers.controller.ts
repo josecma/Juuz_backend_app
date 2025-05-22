@@ -27,7 +27,7 @@ import { ApiResponseSwagger } from 'src/_shared/infrastructure/swagger/response.
 import { AblyService } from 'src/_shared/providers/ably/application/ably.service';
 // import ToggleAndReturnUserLocationUseCase from 'src/modules/user/src/application/useCases/toggle.and.return.user.location.use.case';
 // import UpdateAndReturnUserUseCase from 'src/modules/user/src/application/useCases/update.and.return.user.use.case';
-import { PointCacheService } from '../application/pointCache.service';
+// import { PointCacheService } from '../application/pointCache.service';
 import { PointsService } from '../application/points.service';
 import { ListNearbyPointDto } from '../domain/listNearbyPoint.dtos';
 import { NearbyPointDto, OnOrOffPointDto } from '../domain/nearbyPoint.dtos';
@@ -44,7 +44,7 @@ export class PointsDriversController {
     constructor(
         private readonly service: PointsService,
         private readonly ablyService: AblyService,
-        private readonly pointCachesService: PointCacheService,
+        // private readonly pointCachesService: PointCacheService,
         // @Inject(ToggleAndReturnUserLocationUseCase)
         // private readonly toggleAndReturnUserLocationUseCase: ToggleAndReturnUserLocationUseCase,
         // private readonly updateAndReturnUserUseCase: UpdateAndReturnUserUseCase,
