@@ -162,6 +162,17 @@ model UserOtpSecret {
   @@map("user_otp_secrets")
 }
 
+model UserNotificationToken {
+  id        String   @id() @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  metadata  Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, token])
+  @@map("user_notification_tokens")
+}
+
 // model UserHotpCounter {
 //   id              String   @id @default(uuid())
 //   userOtpSecretId String   @unique @map("user_otp_secret_id")

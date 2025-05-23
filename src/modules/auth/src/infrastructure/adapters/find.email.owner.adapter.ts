@@ -32,6 +32,9 @@ export default class FindEmailOwnerAdapter {
             const owner = await this.findUserByIdUseCase.execute(
                 {
                     userId: identity.userId,
+                    include: {
+                        otpSecret: true,
+                    }
                 }
             );
 
@@ -41,6 +44,7 @@ export default class FindEmailOwnerAdapter {
                     id: owner.user.id,
                     firstName: owner.user.firstName,
                     lastName: owner.user.lastName,
+                    otpSecret: owner.otpSecret,
                 },
                 {
                     emails: owner.emails,

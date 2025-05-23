@@ -2,7 +2,6 @@ import { CanActivate, ExecutionContext, Inject, Injectable, Logger, Unauthorized
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-// import UserIdentityReadRepository from '../../infrastructure/repositories/user.identity.read.repository';
 import { IS_PUBLIC } from '../decorators/public.route.decorator';
 
 @Injectable({})
@@ -15,7 +14,6 @@ export class AuthzGuard implements CanActivate {
         private readonly jwtService: JwtService,
         @Inject(Reflector)
         private reflector: Reflector,
-        // private readonly userIdentityReadRepository: UserIdentityReadRepository,
     ) { };
 
     async canActivate(
@@ -53,19 +51,6 @@ export class AuthzGuard implements CanActivate {
         try {
 
             let payload = await this.jwtService.verifyAsync(token);
-
-            // if (!payload?.id) {
-
-            //     const identityOwner = await this.userIdentityReadRepository.findIdentityOwnerId(
-            //         {
-            //             type: "EMAIL",
-            //             value: payload.email,
-            //         }
-            //     );
-
-            //     payload.id = identityOwner?.userId;
-
-            // };
 
             request.user = payload;
 

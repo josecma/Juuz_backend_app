@@ -1,9 +1,9 @@
-import { BullModule } from "@nestjs/bullmq";
 import { forwardRef, Module } from "@nestjs/common";
 import DatabaseModule from "../database/database.module";
 import UserModule from "../user/user.module";
 import GetPrivateUserChannelByUserIdUseCase from "./src/application/useCases/get.private.user.channel.by.user.id.use.case";
 import AblyAdapter from "./src/infrastructure/adapters/ably.adapter";
+import FCMAdapter from "./src/infrastructure/adapters/fcm.adapter";
 import HandlebarsAdapter from "./src/infrastructure/adapters/handlebars.adapter";
 import NodemailerAdapter from "./src/infrastructure/adapters/nodemailer.adapter";
 import S3Adapter from "./src/infrastructure/adapters/s3.adapter";
@@ -23,6 +23,7 @@ import RequestWriteRepository from "./src/infrastructure/repositories/request.wr
         S3Adapter,
         AblyAdapter,
         UUIDAdapter,
+        FCMAdapter,
         NodemailerAdapter,
         HandlebarsAdapter,
         EventDispatcher,
@@ -35,6 +36,7 @@ import RequestWriteRepository from "./src/infrastructure/repositories/request.wr
         S3Adapter,
         AblyAdapter,
         UUIDAdapter,
+        FCMAdapter,
         NodemailerAdapter,
         HandlebarsAdapter,
         EventDispatcher,
