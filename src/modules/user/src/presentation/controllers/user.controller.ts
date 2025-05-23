@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import Request from "src/modules/shared/src/types/types";
 import CompleteEmailIdvUseCase from "../../application/useCases/complete.email.idv.use.case";
+import CreateOrUpdateUserNotificationTokenUseCase from "../../application/useCases/create.or.update.user.notification.token.use.case";
 import CreateUserUseCase from "../../application/useCases/create.user.use.case";
 import DeleteUserUseCase from "../../application/useCases/delete.user.use.case";
 import GetAllUsersUseCase from "../../application/useCases/get.all.users.use.case";
@@ -16,9 +17,11 @@ import createUserBodyOptions from "../docs/bodies/create.user.body.options";
 import initiateIdvBodyOptions from "../docs/bodies/initiate.idv.body.options";
 import inviteUserToCompanyBodyOptions from "../docs/bodies/invite.user.to.company.body.options";
 import respondToCompanyInvitationBodyOptions from "../docs/bodies/respond.to.company.invitation.body.options";
+import setUserNotificationTokenBodyOptions from "../docs/bodies/set.user.notification.token.body.options";
 import { ApiCompleteIdvProcessResponse } from "../docs/decorators/api.complete.idv.process.response";
 import { ApiGetAllUsersResponse } from "../docs/decorators/api.get.all.users.response";
 import { ApiInitiateIdvProcessResponse } from "../docs/decorators/api.initiate.idv.process.response";
+import { ApiSetUserNotificationTokenResponse } from "../docs/decorators/api.set.user.notification.token.response";
 import { ApiInviteUserToCompanyResponse } from "../docs/decorators/invite.user.to.company.response";
 import { ApiRespondToCompanyInvitationResponse } from "../docs/decorators/respond.to.company.invitation.response";
 import completeIdvOperationOptions from "../docs/operations/complete.idv.operation.options";
@@ -29,6 +32,7 @@ import getOneUserOperationOptions from "../docs/operations/get.one.user.operatio
 import initiateIdvOperationOptions from "../docs/operations/initiate.idv.operation.options";
 import inviteUserToCompanyOperationOptions from "../docs/operations/invite.user.to.company.operation.options";
 import respondToCompanyInvitationOperationOptions from "../docs/operations/respond.to.company.invitation.operation.options";
+import setUserNotificationTokenOperationOptions from "../docs/operations/set.user.notification.token.operation.options";
 import userIdParamOptions from "../docs/params/user.id.param.options";
 import { ApiCreateUserResponse } from "../docs/responses/api.create.user.response";
 import { ApiDeleteOneUserResponse } from "../docs/responses/api.delete.one.user.response";
@@ -38,6 +42,7 @@ import CreateUserDto from "../dtos/create.user.dto";
 import InitiateUserIdvRequestBody from "../dtos/initiate.user.idv.request.body";
 import InviteJoinCompanyRequestBody from "../dtos/invite.user.to.company.request.body";
 import RespondToCompanyInvitationRequestBody from "../dtos/respond.to.company.invitation.request.body";
+import SetUserNotificationTokenRequestBody from "../dtos/set.user.notification.token.request.body";
 
 @ApiTags('users')
 @Controller({
@@ -54,6 +59,7 @@ export default class UserController {
         private readonly completeEmailIdvUseCase: CompleteEmailIdvUseCase,
         private readonly inviteUserToCompanyUseCase: InviteUserToCompanyUseCase,
         private readonly respondToCompanyInvitationUseCase: RespondToCompanyInvitationUseCase,
+        private readonly createOrUpdateUserNotificationTokenUseCase: CreateOrUpdateUserNotificationTokenUseCase,
     ) { };
 
     @ApiOperation(getAllUsersOperationOptions)
@@ -319,10 +325,45 @@ export default class UserController {
 
         } catch (error) {
 
-            throw error;
+            return error;
 
         };
 
     };
+
+    @ApiOperation(setUserNotificationTokenOperationOptions)
+    @ApiBody(setUserNotificationTokenBodyOptions)
+    @ApiSetUserNotificationTokenResponse()
+    @Post('/notifications/tokens')
+    public async createNotificationToken(
+        @Req() req: Request,
+        @Body() body: SetUserNotificationTokenRequestBody,
+        @Res() res: Response
+    ) {
+
+        try {
+
+            await this.createOrUpdateUserNotificationTokenUseCase.execute(
+                {
+                    userId: req.user.id,
+                    platform: body.platform,
+                    token: body.token,
+                }
+            );
+
+            return res
+                .status(201)
+                .json({ message: 'notification token set successfully' });
+
+        } catch (error) {
+
+            return error;
+
+        };
+
+    };
+
+    @Put('/notifications/tokens')
+    public async updateNotificationToken() { };
 
 };

@@ -45,6 +45,8 @@ import IdvWriteRepository from "./src/infrastructure/repositories/idv.write.repo
 import CompanyInvitationRequestReadRepository from "./src/infrastructure/repositories/company.invitation.request.read.repository";
 import CompanyInvitationRequestWriteRepository from "./src/infrastructure/repositories/company.invitation.request.write.repository";
 import InviteUserToCompanyUseCase from "./src/application/useCases/invite.user.to.company.use.case";
+import CreateOrUpdateUserNotificationTokenUseCase from "./src/application/useCases/create.or.update.user.notification.token.use.case";
+import UserNotificationTokenWriteRepository from "./src/infrastructure/repositories/user.notification.token.write.repository";
 
 @Module({
         imports: [
@@ -70,6 +72,7 @@ import InviteUserToCompanyUseCase from "./src/application/useCases/invite.user.t
                 IdvWriteRepository,
                 CompanyInvitationRequestReadRepository,
                 CompanyInvitationRequestWriteRepository,
+                UserNotificationTokenWriteRepository,
                 FindOneUserByIdService,
                 CreateUserUseCase,
                 GetUserDetailUseCase,
@@ -92,6 +95,7 @@ import InviteUserToCompanyUseCase from "./src/application/useCases/invite.user.t
                 InitiateEmailIdvUseCase,
                 CompleteEmailIdvUseCase,
                 InviteUserToCompanyUseCase,
+                CreateOrUpdateUserNotificationTokenUseCase,
         ],
         exports: [
                 UserRepository,
