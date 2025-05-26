@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Req, Res } from "@nestjs/common";
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import Request from "src/modules/shared/src/types/types";
@@ -302,15 +302,16 @@ export default class UserController {
     ) {
 
         const {
-            token,
-            status
+            companyInvitationId,
+            status,
         } = body;
 
         try {
 
             await this.respondToCompanyInvitationUseCase.execute(
                 {
-                    token,
+                    inviteeId: req.user.id,
+                    companyInvitationId,
                     status
                 }
             );
@@ -362,8 +363,5 @@ export default class UserController {
         };
 
     };
-
-    @Put('/notifications/tokens')
-    public async updateNotificationToken() { };
 
 };

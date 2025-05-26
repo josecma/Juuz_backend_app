@@ -1,5 +1,4 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
 import AddMemberToCompanyUseCase from "src/modules/company/src/application/useCases/add.member.to.company.use.case";
 import { CompanyInvitationRequestStatusEnum } from "../../domain/enums/company.invitation.request.status.enum";
 import CompanyInvitationRequestReadRepository from "../../infrastructure/repositories/company.invitation.request.read.repository";
@@ -11,7 +10,6 @@ export default class RespondToCompanyInvitationUseCase {
     private readonly logger = new Logger(RespondToCompanyInvitationUseCase.name);
 
     public constructor(
-        private readonly jwtService: JwtService,
         private readonly companyInvitationRequestReadRepository: CompanyInvitationRequestReadRepository,
         private readonly companyInvitationRequestWriteRepository: CompanyInvitationRequestWriteRepository,
         private readonly addMemberToCompanyUseCase: AddMemberToCompanyUseCase,
@@ -19,27 +17,27 @@ export default class RespondToCompanyInvitationUseCase {
 
     public async execute(
         params: {
-            token: string,
+            inviteeId: string,
+            companyInvitationId: string,
             status: CompanyInvitationRequestStatusEnum,
         }
     ) {
 
         const {
-            token,
+            inviteeId,
+            companyInvitationId,
             status,
         } = params;
 
         try {
 
-            const payload = await this.jwtService.verifyAsync(token);
+            const companyInvitationRequest = await this.companyInvitationRequestReadRepository.findOneById(companyInvitationId);
 
-            const {
-                companyInvitationRequestId,
-            } = payload;
-
-            const companyInvitationRequest = await this.companyInvitationRequestReadRepository.findOneById(companyInvitationRequestId);
-
-            if (!companyInvitationRequest) {
+            if (
+                !companyInvitationRequest
+                ||
+                companyInvitationRequest.inviteeId !== inviteeId
+            ) {
 
                 throw new NotFoundException('company invitation request not found');
 

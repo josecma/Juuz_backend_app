@@ -430,7 +430,7 @@ model Company {
   state              String?
   zipCode            String?
   country            String?
-  rating             Int             @default(0)
+  rating             Int?            @default(0)
   dotNumber          String?         @unique
   stripeAccountId    String?         @map("stripe_account_id")
   expMonth           String?         @map("exp_month")
@@ -442,8 +442,7 @@ model Company {
   name               String?         @unique
   insuranceDetailsId String?         @unique
   insuranceDetails   Photo?          @relation("InsuranceDetails", fields: [insuranceDetailsId], references: [id]) // Relación nombrada
-  status             CompanyStatus?  @default(NON_VERIFIED)
-  //companyType        CompanyType?    @default(SHIPPER) @map("company_type")
+  status             String          @default("NON_VERIFIED")
   licenseType        String?
   photos             Photo[]         @relation("CompanyPhotos")
   transfers          Transfer[]
@@ -453,7 +452,7 @@ model Company {
   updatedBy          String?         @map("updated_by")
   deletedAt          DateTime?       @map("deleted_at")
   deletedBy          String?         @map("deleted_by")
-  version            Int             @default(0)
+  version            Int?            @default(0)
   ownerId            String?         @unique @map("owner_id")
   payments           Payment[]
   paymentMethod      PaymentMethod[]

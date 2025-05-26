@@ -6,11 +6,11 @@ export default class RespondToCompanyInvitationSchema {
     @ApiProperty(
         {
             type: String,
-            example: '4fJ8vL9z7b2a1n0x5q6w3e7r8t9y0u1i2o3p4',
+            example: '550e8400-e29b-41d4-a716-446655440000',
             required: true,
         }
     )
-    token: string;
+    companyInvitationId: string;
 
     @ApiProperty(
         {

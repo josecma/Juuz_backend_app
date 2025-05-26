@@ -106,11 +106,10 @@ export class CompanyEntity implements Company {
   stripeAccountId: string;
 
   @ApiProperty({
-    enum: ['$Enums.ComapanyStatus'],
     description: 'The status the comunication.',
-    example: $Enums.CompanyStatus.NON_VERIFIED,
+    example: 'NON_VERIFIED',
   })
-  status: $Enums.CompanyStatus;
+  status: string;
 
   // @ApiProperty({
   //   enum: ['$Enums.CompanyType'],

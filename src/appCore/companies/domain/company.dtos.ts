@@ -242,9 +242,9 @@ export class UpdateCompanyDto extends PartialType(CompanyDto) {
     description: 'Data Ids',
   })
   @IsInt({ each: true })
-  @Type(() => Number)
+  @Type(() => String)
   @IsOptional()
-  dataIds: number[];
+  dataIds: string[];
 
   @ApiProperty({ type: [UpdateCarrierDto] })
   @ValidateNested({ each: true })
@@ -255,10 +255,10 @@ export class UpdateCompanyDto extends PartialType(CompanyDto) {
 
 export class UpdateStatusCompanyDto {
   @ApiProperty({
-    enum: ['$Enums.CompanyStatus'],
+    type: String,
     description: 'The status the comunication.',
-    example: $Enums.CompanyStatus.NON_VERIFIED,
+    example: 'NON_VERIFIED',
   })
   @IsOptional()
-  status: $Enums.CompanyStatus;
+  status: string;
 }

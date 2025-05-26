@@ -5,7 +5,7 @@ export default class RespondToCompanyInvitationRequestBody {
 
     @IsNotEmpty()
     @IsString()
-    token: string;
+    companyInvitationId: string;
 
     @IsNotEmpty()
     @IsEnum(CompanyInvitationRequestStatusEnum)
