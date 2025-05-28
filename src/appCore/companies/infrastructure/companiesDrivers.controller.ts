@@ -26,7 +26,7 @@ import { PositiveNumberStringPipe } from 'src/_shared/infrastructure/validators/
 // import { UserCompanyRolesService } from 'src/appCore/userCompanyRoles/application/userCompanyRoles.service';
 import { CompanyOtpDto } from '../domain/companyOtp.dtos';
 // import { AuthService } from 'src/auth/application/auth.service';
-import { UserEntity } from 'src/appCore/users/domain/user.entity';
+// import { UserEntity } from 'src/appCore/users/domain/user.entity';
 import { PaginationCompanyDto } from '../domain/pagination-company.dto';
 import { S3PhotoService } from 'src/s3/aplication/s3Photo.service';
 

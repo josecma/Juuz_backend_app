@@ -9,7 +9,7 @@ import {
 } from '@nestjs/terminus';
 import { HealthService } from '../application/healthCheck.service';
 import { ApiTags } from '@nestjs/swagger';
-import { Public } from 'src/auth/decorators/public.decorator';
+// import { Public } from 'src/auth/decorators/public.decorator';
 
 @ApiTags('HealthCheck')
 @Controller({
@@ -25,7 +25,7 @@ export class HealthController {
     private disk: DiskHealthIndicator,
     private memory: MemoryHealthIndicator,
   ) { }
-  @Public()
+  // @Public()
   @Get('db')
   @HealthCheck()
   checkDB() {

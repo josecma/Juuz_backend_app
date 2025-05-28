@@ -31,12 +31,12 @@ import { PointsModule } from './appCore/points/points.module';
 import { RolesModule } from './appCore/roles/roles.module';
 import { ServicesModule } from './appCore/services/services.module';
 import { SubServicesModule } from './appCore/subServices/subServices.module';
-import { UserCompanyRolesModule } from './appCore/userCompanyRoles/userCompanyRoles.module';
+// import { UserCompanyRolesModule } from './appCore/userCompanyRoles/userCompanyRoles.module';
 import { VehicleInfosModule } from './appCore/vehicleInfos/vehicleInfos.module';
 // import { RolesGuard } from './auth/application/roles.guard';
 // import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
-import { DashboardModule } from './dashboard/dashboard.module';
+// import { DashboardModule } from './dashboard/dashboard.module';
 import AuthModule from './modules/auth/auth.module';
 import { AuthzGuard } from './modules/auth/src/presentation/guards/authz.guard';
 import CompanyModule from './modules/company/company.module';
@@ -118,9 +118,9 @@ import { AWSModule } from './s3/aws.module';
     BrandsModule,
     NegotiationsModule,
     StripeModule,
-    UserCompanyRolesModule,
+    // UserCompanyRolesModule,
     MessagesModule,
-    DashboardModule,
+    // DashboardModule,
     AWSModule,
     SharedModule,
     PointModule,

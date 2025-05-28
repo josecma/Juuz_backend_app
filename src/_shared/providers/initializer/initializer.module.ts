@@ -8,8 +8,8 @@ import { RolesModule } from 'src/appCore/roles/roles.module';
 import { SubServicesModule } from 'src/appCore/subServices/subServices.module';
 import { ServicesModule } from 'src/appCore/services/services.module';
 import { MailerService } from 'src/_shared/application/nodeMailer.service';
-import { AuthModule } from 'src/auth/auth.module';
-import { UserCompanyRolesModule } from 'src/appCore/userCompanyRoles/userCompanyRoles.module';
+// import { AuthModule } from 'src/auth/auth.module';
+// import { UserCompanyRolesModule } from 'src/appCore/userCompanyRoles/userCompanyRoles.module';
 
 @Module({
   imports: [
@@ -19,8 +19,8 @@ import { UserCompanyRolesModule } from 'src/appCore/userCompanyRoles/userCompany
     RolesModule,
     SubServicesModule,
     ServicesModule,
-    AuthModule,
-    UserCompanyRolesModule,
+    // AuthModule,
+    // UserCompanyRolesModule,
   ],
   providers: [
     PopulateDBService,

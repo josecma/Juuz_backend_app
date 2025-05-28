@@ -3,12 +3,13 @@ import { forwardRef, Module } from '@nestjs/common';
 // import { StripeService } from './application/stripe.service';
 import { PrismaService } from 'nestjs-prisma';
 // import { PaymentsModule } from 'src/appCore/payments/payments.module';
-import { UsersModule } from 'src/appCore/users/users.module';
+// import { UsersModule } from 'src/appCore/users/users.module';
 
 @Module({
   imports: [
     // forwardRef(() => PaymentsModule), 
-    UsersModule],
+    // UsersModule
+  ],
   controllers: [
     // StripeController
   ],

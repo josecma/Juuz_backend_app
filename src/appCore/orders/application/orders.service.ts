@@ -23,7 +23,6 @@ import { PointsService } from 'src/appCore/points/application/points.service';
 import { PointDto } from 'src/appCore/points/domain/point.dtos';
 import { DriverAcceptOrderFilterDto } from '../domain/driverAcceptOrderFilterDto.dto';
 import { UpdateReferedOrderDto } from '../domain/order.dtos';
-import { UsersService } from 'src/appCore/users/application/users.service';
 import { VehicleOrderDto } from '../domain/vehicleOrder.dto';
 import { MassagesService } from 'src/appCore/messages/application/messages.service';
 import { S3Service } from 'src/s3/aplication/s3.service';
@@ -44,7 +43,6 @@ export class OrdersService extends PrismaGenericService<
         private readonly prismaService: PrismaService,
         private readonly ablyService: AblyService,
         private readonly pointsService: PointsService,
-        private readonly usersService: UsersService,
         private readonly messagesService: MassagesService,
         private readonly s3Service: S3Service,
     ) {
@@ -507,12 +505,11 @@ export class OrdersService extends PrismaGenericService<
         const userFind: Prisma.UserFindUniqueArgs = {
             where: { id: filter.driverId.toString() },
             select: {
-                // driver: true,
                 id: true,
             },
         };
 
-        const user: any = await this.usersService.findOne(userFind);
+        // const user: any = await this.usersService.findOne(userFind);
 
         const dataUpdate: Prisma.OrderUpdateArgs = {
             data: {
@@ -680,10 +677,10 @@ export class OrdersService extends PrismaGenericService<
                 id: true,
             },
         };
-        const users: any = await this.usersService.findAll(userFilter);
+        // const users: any = await this.usersService.findAll(userFilter);
 
-        if (!users.data[0])
-            throw new BadRequestException('The user does not belong to the company.');
+        // if (!users.data[0])
+        //     throw new BadRequestException('The user does not belong to the company.');
         // const channelName = users.data[0].ablyChannel.channelName;
         const createMessage: Prisma.MessageCreateArgs = {
             data: {
@@ -714,12 +711,12 @@ export class OrdersService extends PrismaGenericService<
                 driverId: updateReferedOrderDto.userId,
                 referredId: referredId,
                 FleetRecord: {
-                    update: {
-                        vinNumber: users.data[0].driver.vinNumber,
-                        vehicleType: users.data[0].driver.vehicleType,
-                        vehicleInfoId: users.data[0].driver.vehicleInfoId,
-                        ownerId: users.data[0].id,
-                    },
+                    // update: {
+                    //     vinNumber: users.data[0].driver.vinNumber,
+                    //     vehicleType: users.data[0].driver.vehicleType,
+                    //     vehicleInfoId: users.data[0].driver.vehicleInfoId,
+                    //     ownerId: users.data[0].id,
+                    // },
                 },
             },
             where: find,
