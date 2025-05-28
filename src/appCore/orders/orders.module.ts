@@ -10,7 +10,6 @@ import { NegotiationsModule } from 'src/appCore/negotiations/negotiations.module
 import { S3Service } from 'src/s3/aplication/s3.service';
 import { OrdersCarrierController } from './infrastructure/ordersCarrier.controller';
 import { OrdersShipperController } from './infrastructure/ordersShipper.controller';
-import { UsersModule } from 'src/appCore/users/users.module';
 import { MessagesModule } from 'src/appCore/messages/messages.module';
 import OrderModule from 'src/modules/order/order.module';
 @Module({
@@ -20,7 +19,6 @@ import OrderModule from 'src/modules/order/order.module';
     VehicleInfosModule,
     forwardRef(() => PointsModule),
     NegotiationsModule,
-    UsersModule,
     MessagesModule,
     OrderModule,
   ],

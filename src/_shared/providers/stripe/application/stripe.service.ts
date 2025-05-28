@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CardDetails } from 'src/_shared/domain/interface/CardDetails.interface';
 import { PaymentsService } from 'src/appCore/payments/application/payment.service';
-import { UsersService } from 'src/appCore/users/application/users.service';
+// import { UsersService } from 'src/appCore/users/application/users.service';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class StripeService {
     constructor(
         @Inject(forwardRef(() => PaymentsService))
         private paymentsService: PaymentsService,
-        private readonly usersService: UsersService
+        // private readonly usersService: UsersService
     ) {
         this.stripeApiKey = process.env.STRIPE_API_KEY;
         // this.stripe = new Stripe(this.stripeApiKey, {
