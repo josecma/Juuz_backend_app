@@ -23,7 +23,7 @@ export default class CompanyInvitationRequestReadRepository {
                 }
             );
 
-            return res;
+            return res as Omit<typeof res, "invitee"> & { invitee: { id?: string, email?: string } };
 
         } catch (error) {
 

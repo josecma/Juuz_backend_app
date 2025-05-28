@@ -7,12 +7,8 @@ export default class InviteUserToCompanyRequestBody {
     @IsEnum(CompanyMemberRoleEnum)
     role: CompanyMemberRoleEnum;
 
-    @IsNotEmpty()
-    @IsString()
-    inviteeId: string;
-
     @IsOptional()
     @IsEmail()
-    email?: string;
+    email: string;
 
 };

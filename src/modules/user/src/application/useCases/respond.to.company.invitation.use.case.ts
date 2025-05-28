@@ -36,7 +36,7 @@ export default class RespondToCompanyInvitationUseCase {
             if (
                 !companyInvitationRequest
                 ||
-                companyInvitationRequest.inviteeId !== inviteeId
+                companyInvitationRequest.invitee.id !== inviteeId
             ) {
 
                 throw new NotFoundException('company invitation request not found');
@@ -47,7 +47,7 @@ export default class RespondToCompanyInvitationUseCase {
 
                 await this.addMemberToCompanyUseCase.execute(
                     {
-                        memberId: companyInvitationRequest.inviteeId,
+                        memberId: companyInvitationRequest.invitee.id,
                         roleName: companyInvitationRequest.role,
                         companyId: companyInvitationRequest.companyId,
                     }
@@ -69,7 +69,7 @@ export default class RespondToCompanyInvitationUseCase {
             this.logger.error(
                 {
                     source: `${RespondToCompanyInvitationUseCase.name}`,
-                    message: `${error.message}`,
+                    message: error.message,
                 }
             );
 

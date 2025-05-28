@@ -10,7 +10,7 @@ import {
     Post,
     Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
 import {
     createSwagger,
@@ -31,6 +31,7 @@ import { PaginationCompanyDto } from '../domain/pagination-company.dto';
 
 const controllerName = 'Companies';
 @ApiTags('Companies')
+@ApiBearerAuth()
 @Controller({
     path: 'companies/',
     version: '1',
@@ -101,25 +102,25 @@ export class CompaniesController {
         return this.service.findOne(this.service.filter(id));
     }
 
-    /**
-     * Updates a company. It allows to update any field contained in the DTO object of the company.
-     * @param id ID of the company to update.
-     * @param UpdateCompanyDto Object containing the fields to update.
-     * @returns The updated company or an error.
-     */
+    // /**
+    //  * Updates a company. It allows to update any field contained in the DTO object of the company.
+    //  * @param id ID of the company to update.
+    //  * @param UpdateCompanyDto Object containing the fields to update.
+    //  * @returns The updated company or an error.
+    //  */
 
-    @HttpCode(HttpStatus.ACCEPTED)
-    @ApiResponseSwagger(updateSwagger(CompanyDto, controllerName))
-    @Patch(':id')
-    async updateCompany(
-        @Param('id') id: string,
-        @Body() updateCompanyDto: UpdateCompanyDto
-    ): Promise<CompanyEntity> {
-        return this.service.update(this.service.filter(id), {
-            data: updateCompanyDto,
-            where: { id: id },
-        });
-    }
+    // @HttpCode(HttpStatus.ACCEPTED)
+    // @ApiResponseSwagger(updateSwagger(CompanyDto, controllerName))
+    // @Patch(':id')
+    // async updateCompany(
+    //     @Param('id') id: string,
+    //     @Body() updateCompanyDto: UpdateCompanyDto
+    // ) {
+    //     return this.service.update(this.service.filter(id), {
+    //         data: updateCompanyDto,
+    //         where: { id: id },
+    //     });
+    // }
 
     /**
      * Updates a company. It allows to update any field contained in the DTO object of the company.

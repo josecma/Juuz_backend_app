@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Req, Res } from "@nestjs/common";
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import Request from "src/modules/shared/src/types/types";
+import AcceptCompanyInvitationUseCase from "../../application/useCases/accept.company.invitation.use.case";
 import CompleteEmailIdvUseCase from "../../application/useCases/complete.email.idv.use.case";
 import CreateOrUpdateUserNotificationTokenUseCase from "../../application/useCases/create.or.update.user.notification.token.use.case";
 import CreateUserUseCase from "../../application/useCases/create.user.use.case";
@@ -12,6 +13,7 @@ import InitiateEmailIdvUseCase from "../../application/useCases/initiate.email.i
 import InviteUserToCompanyUseCase from "../../application/useCases/invite.user.to.company.use.case";
 import RespondToCompanyInvitationUseCase from "../../application/useCases/respond.to.company.invitation.use.case";
 import { IdentityEnum } from "../../domain/enums/identity.enum";
+import acceptCompanyInvitationBodyOptions from "../docs/bodies/accept.company.invitation.body.options";
 import completeIdvBodyOptions from "../docs/bodies/complete.idv.body.options";
 import createUserBodyOptions from "../docs/bodies/create.user.body.options";
 import initiateIdvBodyOptions from "../docs/bodies/initiate.idv.body.options";
@@ -24,6 +26,7 @@ import { ApiInitiateIdvProcessResponse } from "../docs/decorators/api.initiate.i
 import { ApiSetUserNotificationTokenResponse } from "../docs/decorators/api.set.user.notification.token.response";
 import { ApiInviteUserToCompanyResponse } from "../docs/decorators/invite.user.to.company.response";
 import { ApiRespondToCompanyInvitationResponse } from "../docs/decorators/respond.to.company.invitation.response";
+import acceptCompanyInvitationOperationOptions from "../docs/operations/accept.company.invitation.operation.options";
 import completeIdvOperationOptions from "../docs/operations/complete.idv.operation.options";
 import createUserOperationOptions from "../docs/operations/create.user.operation.options";
 import deleteUserOperationOptions from "../docs/operations/delete.user.operation.options";
@@ -37,6 +40,7 @@ import userIdParamOptions from "../docs/params/user.id.param.options";
 import { ApiCreateUserResponse } from "../docs/responses/api.create.user.response";
 import { ApiDeleteOneUserResponse } from "../docs/responses/api.delete.one.user.response";
 import { ApiGetOneUserResponse } from "../docs/responses/api.get.one.user.response";
+import AcceptCompanyInvitationRequestBody from "../dtos/accept.company.invitation.request.body";
 import CompleteUserIdvRequestBody from "../dtos/complete.user.idv.request.body";
 import CreateUserDto from "../dtos/create.user.dto";
 import InitiateUserIdvRequestBody from "../dtos/initiate.user.idv.request.body";
@@ -45,6 +49,7 @@ import RespondToCompanyInvitationRequestBody from "../dtos/respond.to.company.in
 import SetUserNotificationTokenRequestBody from "../dtos/set.user.notification.token.request.body";
 
 @ApiTags('users')
+@ApiBearerAuth()
 @Controller({
     path: "users"
 })
@@ -59,6 +64,7 @@ export default class UserController {
         private readonly completeEmailIdvUseCase: CompleteEmailIdvUseCase,
         private readonly inviteUserToCompanyUseCase: InviteUserToCompanyUseCase,
         private readonly respondToCompanyInvitationUseCase: RespondToCompanyInvitationUseCase,
+        private readonly acceptCompanyInvitationUseCase: AcceptCompanyInvitationUseCase,
         private readonly createOrUpdateUserNotificationTokenUseCase: CreateOrUpdateUserNotificationTokenUseCase,
     ) { };
 
@@ -261,7 +267,6 @@ export default class UserController {
 
         const {
             role,
-            inviteeId,
             email,
         } = body;
 
@@ -270,7 +275,7 @@ export default class UserController {
             await this.inviteUserToCompanyUseCase.execute(
                 {
                     inviterId: req.user.id,
-                    inviteeId,
+                    email,
                     role,
                 }
             );
@@ -285,7 +290,9 @@ export default class UserController {
 
         } catch (error) {
 
-            throw error;
+            return res
+                .status(500)
+                .json({ error });
 
         };
 
@@ -321,6 +328,40 @@ export default class UserController {
                 .json(
                     {
                         message: 'response received successfully'
+                    }
+                );
+
+        } catch (error) {
+
+            return error;
+
+        };
+
+    };
+
+    @ApiOperation(acceptCompanyInvitationOperationOptions)
+    @ApiBody(acceptCompanyInvitationBodyOptions)
+    @Post('/companies/invitations/accept')
+    public async acceptCompanyInvitation(
+        @Body() body: AcceptCompanyInvitationRequestBody,
+        @Res() res: Response,
+    ) {
+
+        const {
+            token
+        } = body;
+
+        try {
+
+            await this.acceptCompanyInvitationUseCase.execute(
+                token
+            );
+
+            return res
+                .status(200)
+                .json(
+                    {
+                        message: 'added to company successfully'
                     }
                 );
 

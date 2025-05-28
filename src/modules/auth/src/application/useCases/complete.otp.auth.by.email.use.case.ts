@@ -125,14 +125,14 @@ export default class CompleteOtpAuthByEmailUseCase {
                     }
                 );
 
-            };
+                await this.userAuthProcessWriteRepository.save(
+                    {
+                        userId: user.id,
+                        authNProcessId: PendingOtpAuthProcessByEmail.id,
+                    }
+                );
 
-            await this.userAuthProcessWriteRepository.save(
-                {
-                    userId: user.id,
-                    authNProcessId: PendingOtpAuthProcessByEmail.id,
-                }
-            );
+            };
 
             const payload = {
                 sub: user.id,

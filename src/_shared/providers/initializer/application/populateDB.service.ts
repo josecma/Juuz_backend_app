@@ -10,7 +10,7 @@ import { PrismaService } from 'nestjs-prisma';
 import { SubcServicesService } from 'src/appCore/subServices/application/subServices.service';
 import { ServicesService } from 'src/appCore/services/application/service.service';
 // import { AuthService } from 'src/auth/application/auth.service';
-import { UserCompanyRolesService } from 'src/appCore/userCompanyRoles/application/userCompanyRoles.service';
+// import { UserCompanyRolesService } from 'src/appCore/userCompanyRoles/application/userCompanyRoles.service';
 
 @Injectable()
 export class PopulateDBService implements OnModuleInit {
@@ -25,7 +25,7 @@ export class PopulateDBService implements OnModuleInit {
         private subcServicesService: SubcServicesService,
         private servicesService: ServicesService,
         // private authService: AuthService,
-        private userCompanyRolesService: UserCompanyRolesService
+        // private userCompanyRolesService: UserCompanyRolesService
     ) { }
     roles: Record<string, [string, string][]> = {
         SHIPPER: [

@@ -8,10 +8,6 @@ export function ApiInviteUserToCompanyResponse() {
             description: 'user invited successfully',
         }),
         ApiResponse({
-            status: 404,
-            description: 'user not found',
-        }),
-        ApiResponse({
             status: 500,
             description: 'Internal server error',
         }),

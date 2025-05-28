@@ -43,7 +43,7 @@ export default class UserReadRepository {
             const user = await this.client.user.findUnique({
                 where: {
                     id: userId,
-                }
+                },
             });
 
             return UserMapper.to(user);

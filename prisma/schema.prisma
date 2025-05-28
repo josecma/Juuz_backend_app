@@ -14,16 +14,16 @@ datasource db {
   extensions = [postgis()]
 }
 
-model Request {
-  id        String   @id @default(uuid())
-  source    Json?
-  target    Json?
-  channel   Json?
-  type      String
-  createdAt DateTime @default(now())
+// model Request {
+//   id        String   @id @default(uuid())
+//   source    Json?
+//   target    Json?
+//   channel   Json?
+//   type      String
+//   createdAt DateTime @default(now())
 
-  @@map("requests")
-}
+//   @@map("requests")
+// }
 
 // model OutboxRequestEvent {
 //   id          String   @id @default(uuid())
@@ -53,7 +53,7 @@ model CompanyJoinRequest {
 model CompanyInvitationRequest {
   id        String @id @default(uuid())
   inviterId String @map("inviter_id")
-  inviteeId String @map("invitee_id")
+  invitee   Json
   companyId String @map("company_id")
   role      String // [ DRIVER ] 
   status    String @default("PENDING") // [ PENDING, ACCEPTED, REJECTED ] 
@@ -86,6 +86,7 @@ model User {
   profilePicture ProfilePicture? @relation(name: "profile_picture")
   identities     Identity[]      @relation(name: "user_identities")
   credentials    Credential[]    @relation(name: "user_credentials")
+  vehicles       Driver[]        @relation(name: "user_vehicles")
 
   @@map("users")
 }
@@ -417,15 +418,15 @@ model Vehicle {
 
 model Company {
   id                 String          @id @default(uuid())
-  carrierIdentifier  String?
+  carrierIdentifier  String? // alias de la company
   usdot              String?
   mc                 String?
-  primaryAdminEmail  String?
+  primaryAdminEmail  String? // company email
   countryCode        String?
   phoneNumber        String?
   extension          String?
-  addressLine1       String?
-  addressLine2       String?
+  addressLine1       String? // sede
+  addressLine2       String? // sedes 11 y2 y3 
   city               String?
   state              String?
   zipCode            String?
@@ -456,7 +457,7 @@ model Company {
   ownerId            String?         @unique @map("owner_id")
   payments           Payment[]
   paymentMethod      PaymentMethod[]
-  drivers            Driver[]
+  vehicles           Driver[]
   score              Json?
 }
 
@@ -590,12 +591,12 @@ model CompanyMember {
   @@map("company_members")
 }
 
-model UserCompanyRole {
+model CompanyMemberRole {
   id   String @id @default(uuid())
   name String @unique
 
   @@index([name])
-  @@map("user_company_roles")
+  @@map("company_member_roles")
 }
 
 model UserRole {
@@ -685,9 +686,10 @@ model Driver {
   deletedBy     String?        @map("deleted_by")
   version       Int            @default(0)
   ownerId       String         @map("owner_id")
-  companyId     String?        @map("company_id")
-  userId        String         @map("user_id")
-  Company       Company?       @relation(fields: [companyId], references: [id])
+
+  user      User     @relation(name: "user_vehicles", fields: [ownerId], references: [id])
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
 }
 
 model VehicleInfo {

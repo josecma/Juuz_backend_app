@@ -17,7 +17,7 @@ export default class CompanyRoleReadRepository {
 
         try {
 
-            const companyRole = await this.client.userCompanyRole.findUnique(
+            const companyRole = await this.client.companyMemberRole.findUnique(
                 {
                     where: {
                         name

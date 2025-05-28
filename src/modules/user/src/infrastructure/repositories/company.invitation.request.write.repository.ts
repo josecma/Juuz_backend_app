@@ -14,7 +14,10 @@ export default class CompanyInvitationRequestWriteRepository {
     public async save(
         params: {
             inviterId: string,
-            inviteeId: string,
+            invitee: {
+                id?: string,
+                email?: string,
+            },
             companyId: string,
             role: CompanyMemberRoleEnum,
             status: CompanyInvitationRequestStatusEnum,
@@ -23,7 +26,7 @@ export default class CompanyInvitationRequestWriteRepository {
 
         const {
             inviterId,
-            inviteeId,
+            invitee,
             companyId,
             role,
             status,
@@ -35,7 +38,7 @@ export default class CompanyInvitationRequestWriteRepository {
                 {
                     data: {
                         inviterId,
-                        inviteeId,
+                        invitee,
                         companyId,
                         role,
                         status,
@@ -43,7 +46,7 @@ export default class CompanyInvitationRequestWriteRepository {
                 },
             );
 
-            return res;
+            return res as Omit<typeof res, "invitee"> & { invitee: { id?: string, email?: string } };
 
         } catch (error) {
 

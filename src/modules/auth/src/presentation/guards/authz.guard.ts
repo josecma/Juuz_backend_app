@@ -52,7 +52,10 @@ export class AuthzGuard implements CanActivate {
 
             let payload = await this.jwtService.verifyAsync(token);
 
-            request.user = payload;
+            request.user = {
+                id: payload.sub,
+                email: payload.email,
+            };
 
         } catch {
 

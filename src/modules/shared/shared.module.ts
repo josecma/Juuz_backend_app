@@ -11,7 +11,6 @@ import UUIDAdapter from "./src/infrastructure/adapters/uuid.adapter";
 import ChannelReadRepository from "./src/infrastructure/channel.read.repository";
 import ChannelWriteRepository from "./src/infrastructure/channel.write.repository";
 import { EventDispatcher } from "./src/infrastructure/event.dispatcher";
-import RequestWriteRepository from "./src/infrastructure/repositories/request.write.repository";
 
 @Module({
     imports: [
@@ -30,7 +29,6 @@ import RequestWriteRepository from "./src/infrastructure/repositories/request.wr
         GetPrivateUserChannelByUserIdUseCase,
         ChannelReadRepository,
         ChannelWriteRepository,
-        RequestWriteRepository,
     ],
     exports: [
         S3Adapter,
@@ -43,7 +41,6 @@ import RequestWriteRepository from "./src/infrastructure/repositories/request.wr
         GetPrivateUserChannelByUserIdUseCase,
         ChannelReadRepository,
         ChannelWriteRepository,
-        RequestWriteRepository,
     ],
 })
 export default class SharedModule { };

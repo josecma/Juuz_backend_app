@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserCompanyRole } from '@prisma/client';
+import { CompanyMemberRole } from '@prisma/client';
 export class UserCompanyRoleEntity {
   @ApiProperty({
     description: 'Unique identifier for the user-company-role relationship.',

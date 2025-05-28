@@ -6,7 +6,7 @@ import { CompanyEntity } from '../domain/company.entity';
 import { S3Service } from 'src/s3/aplication/s3.service';
 import { UpdateCompanyDto } from '../domain/company.dtos';
 // import { CompanyOtpDto } from '../domain/companyOtp.dtos';
-import { UserCompanyRolesService } from 'src/appCore/userCompanyRoles/application/userCompanyRoles.service';
+// import { UserCompanyRolesService } from 'src/appCore/userCompanyRoles/application/userCompanyRoles.service';
 import { MailerService } from 'src/_shared/application/nodeMailer.service';
 import { JwtService } from '@nestjs/jwt';
 import { Payload } from 'src/_shared/domain/interface/payload.interface';
@@ -24,7 +24,7 @@ export class CompaniesService extends PrismaGenericService<
     constructor(
         private readonly prismaService: PrismaService,
         private readonly s3Service: S3Service,
-        private readonly userCompanyRolesService: UserCompanyRolesService,
+        // private readonly userCompanyRolesService: UserCompanyRolesService,
         private readonly mailerService: MailerService,
         private jwtService: JwtService
     ) {
@@ -74,7 +74,7 @@ export class CompaniesService extends PrismaGenericService<
         //userCompanyRoles: true,
         payments: true,
         paymentMethod: true,
-        drivers: true,
+        vehicles: true,
     };
 
     async updateCompanies(
@@ -109,7 +109,7 @@ export class CompaniesService extends PrismaGenericService<
                 photos: {
                     connect: dataIds ? dataIds.map((id) => ({ id })) : undefined,
                 },
-                drivers: {
+                vehicles: {
                     deleteMany: existingVehicleOrders
                         ? {
                             id: {

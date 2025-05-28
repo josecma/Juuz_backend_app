@@ -23,7 +23,7 @@ import { RequestUserId } from 'src/_shared/domain/requestId';
 import { $Enums, Prisma } from '@prisma/client';
 import { PaginatedResponse } from 'src/_shared/domain/dtos/paginationResponse.dto';
 import { PositiveNumberStringPipe } from 'src/_shared/infrastructure/validators/paramsPositeNumber.validator';
-import { UserCompanyRolesService } from 'src/appCore/userCompanyRoles/application/userCompanyRoles.service';
+// import { UserCompanyRolesService } from 'src/appCore/userCompanyRoles/application/userCompanyRoles.service';
 import { CompanyOtpDto } from '../domain/companyOtp.dtos';
 // import { AuthService } from 'src/auth/application/auth.service';
 import { UserEntity } from 'src/appCore/users/domain/user.entity';
@@ -39,7 +39,7 @@ const controllerName = 'CompanyDrivers';
 export class CompanyDriversController {
     constructor(
         private readonly service: CompaniesService,
-        private readonly userCompanyRolesService: UserCompanyRolesService,
+        // private readonly userCompanyRolesService: UserCompanyRolesService,
         // private readonly authService: AuthService,
         private readonly s3PhotoService: S3PhotoService
     ) { }
@@ -134,7 +134,7 @@ export class CompanyDriversController {
     ): Promise<PaginatedResponse<CompanyEntity>> {
         const select: Prisma.CompanySelect = {
             id: true,
-            drivers: {
+            vehicles: {
                 select: {
                     id: true,
                     vinNumber: true,
@@ -143,7 +143,7 @@ export class CompanyDriversController {
                     vehicleType: true,
                     serviceId: true,
                     capacity: true,
-                    userId: true,
+                    ownerId: true,
                     year: true,
                     photos: { select: { name: true } },
                     vehicleInfo: {

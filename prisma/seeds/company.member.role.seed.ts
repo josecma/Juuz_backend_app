@@ -1,13 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-import companyRoleData from '../data/company.role.data';
+import companyMemberRoleData from '../data/company.member.role.data';
 
 const prisma = new PrismaClient();
 
 async function seedCompanyRoles() {
     console.log('▶️ Seeding company roles...');
 
-    await prisma.userCompanyRole.createMany({
-        data: companyRoleData,
+    await prisma.companyMemberRole.createMany({
+        data: companyMemberRoleData,
         skipDuplicates: true,
     });
 

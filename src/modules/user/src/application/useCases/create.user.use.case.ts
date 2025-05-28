@@ -94,7 +94,7 @@ export default class CreateUserUseCase {
             this.logger.error(
                 {
                     source: `${CreateUserUseCase.name}`,
-                    message: `${error.message}`,
+                    message: error.message,
                 }
             );
 

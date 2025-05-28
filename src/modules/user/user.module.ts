@@ -17,7 +17,7 @@ import FindOneUserByIdService from "./src/domain/services/find.one.user.by.id.se
 // import CreateUserCredentialAdapter from "./src/infrastructure/adapters/create.user.credential.adapter";
 // import CreateIdentityAdapter from "./src/infrastructure/adapters/create.user.identity.adapter";
 import FindCompanyByOwnerIdAdapter from "./src/infrastructure/adapters/find.company.by.owner.id.adapter";
-import RequestAdapter from "./src/infrastructure/adapters/request.adapter";
+// import RequestAdapter from "./src/infrastructure/adapters/request.adapter";
 import UserOtpSecretReadRepository from "./src/infrastructure/repositories/user.otp.secret.read.repository";
 import UserOtpSecretWriteRepository from "./src/infrastructure/repositories/user.otp.secret.write.repository";
 import UserRepository from "./src/infrastructure/repositories/user.write.repository";
@@ -27,7 +27,6 @@ import UserWriteRepository from "./src/infrastructure/repositories/user.write.re
 import CreateUserUseCase from "./src/application/useCases/create.user.use.case";
 // import FindUserEmailByUserIdAdapter from "./src/infrastructure/adapters/find.user.email.by.user.id.adapter";
 // import InviteJoinCompanyByEmailUseCase from "./src/application/useCases/invite.join.company.by.email.use.case";
-import AcceptJoinCompanyUseCase from "./src/application/useCases/respond.to.company.invitation.use.case";
 import FindUserByIdUseCase from "./src/application/useCases/find.user.by.id.use.case";
 import CreateUserService from "./src/domain/services/create.user.service";
 import UserIdentityReadRepository from "./src/infrastructure/repositories/user.identity.read.repository";
@@ -47,6 +46,9 @@ import CompanyInvitationRequestWriteRepository from "./src/infrastructure/reposi
 import InviteUserToCompanyUseCase from "./src/application/useCases/invite.user.to.company.use.case";
 import CreateOrUpdateUserNotificationTokenUseCase from "./src/application/useCases/create.or.update.user.notification.token.use.case";
 import UserNotificationTokenWriteRepository from "./src/infrastructure/repositories/user.notification.token.write.repository";
+import FindUserByEmailService from "./src/domain/services/find.user.by.email.service";
+import AcceptCompanyInvitationUseCase from "./src/application/useCases/accept.company.invitation.use.case";
+import RespondToCompanyInvitationUseCase from "./src/application/useCases/respond.to.company.invitation.use.case";
 
 @Module({
         imports: [
@@ -77,13 +79,13 @@ import UserNotificationTokenWriteRepository from "./src/infrastructure/repositor
                 CreateUserUseCase,
                 GetUserDetailUseCase,
                 FindCompanyByOwnerIdAdapter,
-                RequestAdapter,
                 HotpAdapter,
                 OtpSecretAdapter,
                 UserOtpSecretReadRepository,
                 UserOtpSecretWriteRepository,
                 UserReadRepository,
-                AcceptJoinCompanyUseCase,
+                AcceptCompanyInvitationUseCase,
+                RespondToCompanyInvitationUseCase,
                 FindUserByIdUseCase,
                 CreateUserService,
                 GetUserOtpSecretService,
@@ -96,6 +98,7 @@ import UserNotificationTokenWriteRepository from "./src/infrastructure/repositor
                 CompleteEmailIdvUseCase,
                 InviteUserToCompanyUseCase,
                 CreateOrUpdateUserNotificationTokenUseCase,
+                FindUserByEmailService,
         ],
         exports: [
                 UserRepository,
