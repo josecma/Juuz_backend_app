@@ -458,7 +458,6 @@ model Company {
   payments           Payment[]
   paymentMethod      PaymentMethod[]
   vehicles           Driver[]
-  score              Json?
 }
 
 model Payment {
@@ -589,6 +588,16 @@ model CompanyMember {
   @@index([companyId])
   @@index([roleId])
   @@map("company_members")
+}
+
+model CompanyScore {
+  id        String @id @default(uuid())
+  companyId String @unique @map("company_id")
+  lastDiv   Float  @map("last_dev")
+  lastAvg   Float  @map("last_avg")
+
+  @@index([companyId])
+  @@map("company_scores")
 }
 
 model CompanyMemberRole {
