@@ -148,7 +148,7 @@ export class VehicleOrderDto implements VehicleOrderId {
   })
   @IsOptional()
   @IsInt()
-  modelId: number;
+  modelId: string;
 }
 
 export class UpdateVehicleOrderDto extends PartialType(VehicleOrderDto) {
@@ -159,5 +159,5 @@ export class UpdateVehicleOrderDto extends PartialType(VehicleOrderDto) {
   @IsNumber()
   @IsPositive({ message: 'Id must be a positive number.' })
   @IsOptional()
-  id: number;
+  id: string;
 }

@@ -6,12 +6,15 @@ import IEventDispatcher from "../shared/src/application/contracts/i.event.dispat
 import IEventHandler from "../shared/src/application/contracts/i.event.handler";
 import { EventDispatcher } from "../shared/src/infrastructure/event.dispatcher";
 import UserEvaluationCreatedHandler from "./src/application/eventHandlers/user.evaluation.created.handler";
-import UserCompanyRepository from "../user/src/infrastructure/repositories/user.company.repository";
+import AddMemberToCompanyUseCase from "./src/application/useCases/add.member.to.company.use.case";
+import FindCompanyByOwnerIdUseCase from "./src/application/useCases/find.company.by.owner.use.case";
 import UpdateCompanyScoreService from "./src/domain/services/update.company.score.service";
-import DoesCompanyExistRepository from "./src/infrastructure/repositories/does.company.exist.repository";
+import CompanyMemberReadRepository from "./src/infrastructure/repositories/company.member.read.repository";
+import CompanyMemberWriteRepository from "./src/infrastructure/repositories/company.member.write.repository";
 import CompanyReadRepository from "./src/infrastructure/repositories/company.read.repository";
+import CompanyRoleReadRepository from "./src/infrastructure/repositories/company.role.read.repository";
 import CompanyWriteRepository from "./src/infrastructure/repositories/company.write.repository";
-import FindCompanyByOwnerIdService from "./src/domain/services/find.user.company.by.user.id.service";
+import DoesCompanyExistRepository from "./src/infrastructure/repositories/does.company.exist.repository";
 
 @Module(
     {
@@ -21,18 +24,22 @@ import FindCompanyByOwnerIdService from "./src/domain/services/find.user.company
         ],
         controllers: [],
         providers: [
+            CompanyMemberReadRepository,
+            CompanyRoleReadRepository,
+            CompanyMemberWriteRepository,
             UserEvaluationCreatedHandler,
             UpdateCompanyScoreService,
-            UserCompanyRepository,
             DoesCompanyExistRepository,
             CompanyReadRepository,
             CompanyWriteRepository,
-            FindCompanyByOwnerIdService,
+            FindCompanyByOwnerIdUseCase,
+            AddMemberToCompanyUseCase,
         ],
         exports: [
             CompanyReadRepository,
             CompanyWriteRepository,
-            FindCompanyByOwnerIdService,
+            FindCompanyByOwnerIdUseCase,
+            AddMemberToCompanyUseCase,
         ]
     }
 )

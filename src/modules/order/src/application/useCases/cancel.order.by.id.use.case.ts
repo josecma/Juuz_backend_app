@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import FindOneUserByIdService from "src/modules/user/src/domain/services/find.one.user.by.id.service";
 import FindOneOrderByIdService from "../../domain/services/find.one.order.by.id.service";
-import ChangeOrderStatusUseCase from "./change.order.status.use.case";
+import OrderRepository from "../../infrastructure/order.repository";
 
 @Injectable({})
 export default class CancelOrderByIdUseCase {
@@ -11,7 +11,8 @@ export default class CancelOrderByIdUseCase {
         private readonly findOneUserByIdService: FindOneUserByIdService,
         @Inject(FindOneOrderByIdService)
         private readonly findOneOrderByIdService: FindOneOrderByIdService,
-        private readonly changeOrderStatusUseCase: ChangeOrderStatusUseCase,
+        @Inject(OrderRepository)
+        private readonly orderRepository: OrderRepository,
     ) { };
 
     public async execute(
@@ -19,12 +20,12 @@ export default class CancelOrderByIdUseCase {
             orderId: string;
             userId: string;
         }
-    ) {
+    ): Promise<{
+        msg: string;
+        content: any;
+    }> {
 
-        const {
-            userId,
-            orderId,
-        } = params;
+        const { userId, orderId } = params;
 
         try {
 
@@ -40,13 +41,13 @@ export default class CancelOrderByIdUseCase {
                 }
             );
 
-            if (!(order.ownerId === user.id)) {
+            if (!(order.userId === user.id)) {
 
-                throw new NotFoundException(`order not found`);
+                throw new NotFoundException(`order with id: ${order.id} not found`);
 
             };
 
-            const cancelledOrder = await this.changeOrderStatusUseCase.execute(
+            const cancelledOrder = await this.orderRepository.update(
                 {
                     id: orderId,
                     updateObj: {
@@ -65,11 +66,8 @@ export default class CancelOrderByIdUseCase {
             };
 
         } catch (error) {
-
             throw error;
-
         };
-
     };
 
 };

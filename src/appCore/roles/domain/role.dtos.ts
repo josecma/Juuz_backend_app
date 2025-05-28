@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
-import { $Enums, Role } from '@prisma/client';
+import { $Enums, } from '@prisma/client';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 
 type RoleWithoutId = Omit<
-  Role,
+  {},
   | 'id'
   | 'createdAt'
   | 'updatedAt'
@@ -32,11 +32,10 @@ export class RoleDto implements RoleWithoutId {
 
   @ApiProperty({
     description: 'The name of the service',
-    example: $Enums.RolesEnum.COMPANY,
-    enum: $Enums.RolesEnum,
+    example: '',
   })
-  @IsEnum($Enums.RolesEnum, { message: 'name must be a valid enum value' })
-  type: $Enums.RolesEnum;
+  @IsEnum({}, { message: 'name must be a valid enum value' })
+  type: '';
 
   @ApiProperty({
     description: 'A detailed description of the entity',

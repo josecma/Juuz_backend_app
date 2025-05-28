@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Session } from '@prisma/client';
-export class SessionEntity implements Session {
+export class SessionEntity {
   @ApiProperty({
     description: 'The unique identifier of the session',
     example: 1,

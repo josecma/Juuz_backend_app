@@ -35,7 +35,7 @@ const controllerName = 'PaymentMethods';
   version: '1',
 })
 export class PaymentMethodsController {
-  constructor(private readonly service: PaymentMethodsService) {}
+  constructor(private readonly service: PaymentMethodsService) { }
 
   /**
    * Creates a paymentMethod.
@@ -103,7 +103,7 @@ export class PaymentMethodsController {
   ): Promise<PaymentMethodEntity> {
     return this.service.update(this.service.filter(id), {
       data: updatePaymentMethodDto,
-      where: { id: +id },
+      where: { id: id },
     });
   }
 

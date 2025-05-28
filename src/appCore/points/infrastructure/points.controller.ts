@@ -31,7 +31,7 @@ const controllerName = 'Points';
   version: '1',
 })
 export class PointsController {
-  constructor(private readonly service: PointsService) {}
+  constructor(private readonly service: PointsService) { }
 
   /**
    * Creates a Point.
@@ -46,7 +46,7 @@ export class PointsController {
     @Body() body: PointDto,
     @Request() req: RequestUserId
   ): Promise<any> {
-    return await this.service.create(body, req.user.id);
+    return await this.service.create(body, '' + req.user.id);
   }
 
   /**

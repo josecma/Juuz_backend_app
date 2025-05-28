@@ -8,19 +8,9 @@ import { NegotiationsService } from './application/negotiations.service';
 import { NegotiationsController } from './infrastructure/negotiations.controller';
 import { NegotiationsCarrierController } from './infrastructure/negotiationsCarrier.controller';
 import { NegotiationsShipperController } from './infrastructure/negotiationsShipper.controller';
-import SharedModule from 'src/modules/shared/shared.module';
-import UserModule from 'src/modules/user/user.module';
-import CompanyModule from 'src/modules/company/company.module';
 
 @Module({
-  imports: [
-    MessagesModule,
-    OrderModule,
-    NegotiationModule,
-    SharedModule,
-    UserModule,
-    CompanyModule,
-  ],
+  imports: [MessagesModule, OrderModule, NegotiationModule],
   controllers: [
     NegotiationsController,
     NegotiationsCarrierController,

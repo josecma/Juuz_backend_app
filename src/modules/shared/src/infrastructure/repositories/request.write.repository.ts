@@ -1,98 +1,98 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+// import { Inject, Injectable } from "@nestjs/common";
+// import { PrismaClient } from "@prisma/client";
 
-@Injectable({})
-export default class RequestWriteRepository {
+// @Injectable({})
+// export default class RequestWriteRepository {
 
-    public constructor(
-        @Inject(PrismaClient)
-        private readonly client: PrismaClient,
-    ) { };
+//     public constructor(
+//         @Inject(PrismaClient)
+//         private readonly client: PrismaClient,
+//     ) { };
 
-    public async save(
-        params: {
-            request: {
-                id?: string;
-                source?: {
-                    type: string;
-                    id: string;
-                };
-                target: {
-                    type: string;
-                    id: string;
-                };
-                channel: {
-                    method: string;
-                    target: string;
-                }
-                type: string,
-            };
-        },
-    ) {
+//     public async save(
+//         params: {
+//             request: {
+//                 id?: string;
+//                 source?: {
+//                     type: string;
+//                     id: string;
+//                 };
+//                 target?: {
+//                     type: string;
+//                     id: string;
+//                 };
+//                 channel?: {
+//                     method: string;
+//                     target: string;
+//                 }
+//                 type: string,
+//             };
+//         },
+//     ) {
 
-        const {
-            request,
-        } = params;
+//         const {
+//             request,
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.request.create(
-                {
-                    data: request,
-                }
-            );
+//             const res = await this.client.request.create(
+//                 {
+//                     data: request,
+//                 }
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-    // public async update(
-    //     params: {
-    //         id: string;
-    //         updateObject: {
-    //             source?: {
-    //                 type: "EMAIL" | "PLATFORM";
-    //                 value: string;
-    //             };
-    //             target?: {
-    //                 type: "EMAIL" | "PLATFORM";
-    //                 value: string;
-    //             };
-    //             type?: "JOIN";
-    //         };
-    //     },
-    // ) {
+//     // public async update(
+//     //     params: {
+//     //         id: string;
+//     //         updateObject: {
+//     //             source?: {
+//     //                 type: "EMAIL" | "PLATFORM";
+//     //                 value: string;
+//     //             };
+//     //             target?: {
+//     //                 type: "EMAIL" | "PLATFORM";
+//     //                 value: string;
+//     //             };
+//     //             type?: "JOIN";
+//     //         };
+//     //     },
+//     // ) {
 
-    //     const {
-    //         id,
-    //         updateObject,
-    //     } = params;
+//     //     const {
+//     //         id,
+//     //         updateObject,
+//     //     } = params;
 
-    //     try {
+//     //     try {
 
-    //         const res = await this.client.request.update(
-    //             {
-    //                 where: {
-    //                     id,
-    //                 },
-    //                 data: updateObject,
-    //             }
-    //         );
+//     //         const res = await this.client.request.update(
+//     //             {
+//     //                 where: {
+//     //                     id,
+//     //                 },
+//     //                 data: updateObject,
+//     //             }
+//     //         );
 
-    //         return res;
+//     //         return res;
 
-    //     } catch (error) {
+//     //     } catch (error) {
 
-    //         throw error;
+//     //         throw error;
 
-    //     };
+//     //     };
 
-    // };
+//     // };
 
-};
+// };

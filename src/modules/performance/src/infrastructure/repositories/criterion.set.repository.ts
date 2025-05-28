@@ -22,7 +22,7 @@ export default class CriterionSetRepository {
             const { id, name } = params;
 
             const criterionSetWhereUniqueInput: Prisma.CriterionSetWhereUniqueInput = {
-                ...(id && { id: Number(id) }),
+                ...(id && { id: id }),
                 ...(name && { name }),
             };
 
@@ -105,7 +105,7 @@ export default class CriterionSetRepository {
                         data: criteria.map(([order, id]) => {
                             return {
                                 setId: criterionSet.id,
-                                criterionId: Number(id),
+                                criterionId: id,
                                 order,
                             }
                         })

@@ -9,7 +9,7 @@ export default class FindOrderService {
         private readonly orderRepository: OrderRepository,
     ) { };
 
-    public async execute(params: { ids: number[]; }) {
+    public async execute(params: { ids: string[]; }) {
 
         const { ids } = params;
 

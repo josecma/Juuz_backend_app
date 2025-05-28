@@ -1,5 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import { IdentityEnum } from "../../domain/enums/identity.enum";
+import Email from "../../domain/valueObjects/email";
 
 @Injectable()
 export default class UserIdentityReadRepository {
@@ -15,7 +17,7 @@ export default class UserIdentityReadRepository {
 
         try {
 
-            const res = await this.client.userIdentity.findMany(
+            const res = await this.client.identity.findMany(
                 {
                     where: {
                         userId,
@@ -35,8 +37,8 @@ export default class UserIdentityReadRepository {
 
     public async findOneBy(
         params: {
-            type: string;
-            value: string;
+            type: string,
+            value: string,
         }
     ) {
 
@@ -47,7 +49,7 @@ export default class UserIdentityReadRepository {
 
         try {
 
-            const res = await this.client.userIdentity.findUnique(
+            const res = await this.client.identity.findUnique(
                 {
                     where: {
                         type_value: {
@@ -84,7 +86,7 @@ export default class UserIdentityReadRepository {
 
         try {
 
-            const res = await this.client.userIdentity.findUnique(
+            const res = await this.client.identity.findUnique(
                 {
                     where: {
                         userId,
@@ -105,5 +107,65 @@ export default class UserIdentityReadRepository {
         };
 
     };
+
+    public async findEmailSet(
+        emails: Array<Email>,
+    ) {
+
+        try {
+
+            const res = await this.client.identity.findMany(
+                {
+                    where: {
+                        type: IdentityEnum.EMAIL,
+                        value: {
+                            in: emails.map((email) => email.toString()),
+                        }
+                    }
+                },
+            );
+
+            return res;
+
+        } catch (error) {
+
+            throw error;
+
+        };
+
+    };
+
+    public async findUserEmails(
+        userId: string,
+    ) {
+
+        try {
+
+            const res = await this.client.identity.findMany(
+                {
+                    where: {
+                        type: IdentityEnum.EMAIL,
+                        userId,
+                    }
+                },
+            );
+
+            return res.map(
+                (identity) => {
+                    return {
+                        value: identity.value,
+                        metadata: identity.metadata as Record<string, unknown>,
+                    };
+                }
+            );
+
+        } catch (error) {
+
+            throw error;
+
+        };
+
+    };
+
 
 };

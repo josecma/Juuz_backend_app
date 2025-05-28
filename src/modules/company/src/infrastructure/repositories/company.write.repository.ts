@@ -31,7 +31,7 @@ export default class CompanyWriteRepository {
 
             const res = await this.prisma.company.update({
                 where: {
-                    id: Number(companyId),
+                    id: companyId,
                 },
                 data: {
                     score

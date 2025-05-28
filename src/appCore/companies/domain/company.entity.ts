@@ -6,7 +6,7 @@ export class CompanyEntity implements Company {
     example: 1,
     description: 'The unique identifier of the company.',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'Unique identifier for the carrier',
@@ -106,18 +106,17 @@ export class CompanyEntity implements Company {
   stripeAccountId: string;
 
   @ApiProperty({
-    enum: ['$Enums.ComapanyStatus'],
     description: 'The status the comunication.',
-    example: $Enums.CompanyStatus.NON_VERIFIED,
+    example: 'NON_VERIFIED',
   })
-  companyStatus: $Enums.CompanyStatus;
+  status: string;
 
-  @ApiProperty({
-    enum: ['$Enums.CompanyType'],
-    description: 'The status the comunication.',
-    example: $Enums.CompanyType.COMPANY,
-  })
-  companyType: $Enums.CompanyType;
+  // @ApiProperty({
+  //   enum: ['$Enums.CompanyType'],
+  //   description: 'The status the comunication.',
+  //   example: "",
+  // })
+  // companyType: "";
 
   @ApiProperty({
     description: 'The credit card number',
@@ -166,7 +165,7 @@ export class CompanyEntity implements Company {
     example: 'Acme Inc.',
     description: 'The official registered name of the company.',
   })
-  companyName: string;
+  name: string;
 
   @ApiProperty({
     type: [String],
@@ -185,7 +184,7 @@ export class CompanyEntity implements Company {
     description:
       "The details of the insurance covering the company's operation.",
   })
-  insuranceDetailsId: number;
+  insuranceDetailsId: string;
 
   @ApiProperty({
     example: 'Commercial',
@@ -250,12 +249,12 @@ export class CompanyEntity implements Company {
     description: 'Identifier of the owner of the entity.',
     example: 2,
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiPropertyOptional({
     type: Number,
     description: 'Identifier of the company associated with the entity.',
     example: 3,
   })
-  companyId: number;
+  companyId: string;
 }

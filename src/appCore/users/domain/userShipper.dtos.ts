@@ -32,7 +32,7 @@ type UserWithoutId = Omit<
   | 'pointId'
 >;
 
-export class UserShipperDto implements UserWithoutId {
+export class UserShipperDto {
   @ApiProperty({
     example: '323 2032',
     description: 'Phone of the user',

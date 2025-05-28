@@ -1,36 +1,36 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+// import { Inject, Injectable } from "@nestjs/common";
+// import { PrismaClient } from "@prisma/client";
 
-@Injectable()
-export default class SourceReadRepository {
+// @Injectable()
+// export default class SourceReadRepository {
 
-    public constructor(
-        @Inject(PrismaClient)
-        private readonly client: PrismaClient,
-    ) { };
+//     public constructor(
+//         @Inject(PrismaClient)
+//         private readonly client: PrismaClient,
+//     ) { };
 
-    public async findOneById(
-        sourceId: string,
-    ) {
+//     public async findOneById(
+//         sourceId: string,
+//     ) {
 
-        try {
+//         try {
 
-            const res = await this.client.source.findUnique(
-                {
-                    where: {
-                        id: sourceId,
-                    }
-                },
-            );
+//             const res = await this.client.source.findUnique(
+//                 {
+//                     where: {
+//                         id: sourceId,
+//                     }
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

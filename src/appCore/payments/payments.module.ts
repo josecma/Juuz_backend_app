@@ -7,9 +7,9 @@ import { StripeModule } from 'src/_shared/providers/stripe/stripe.module';
 import { PaymentsCarrierController } from './infrastructure/paymentsCarrier.controller';
 
 @Module({
-  imports: [OrdersModule, forwardRef(() => StripeModule)],
-  controllers: [PaymentsController, PaymentsCarrierController],
-  providers: [PaymentsService, PrismaService],
-  exports: [PaymentsService],
+    imports: [OrdersModule, forwardRef(() => StripeModule)],
+    controllers: [PaymentsController, PaymentsCarrierController],
+    providers: [PaymentsService, PrismaService],
+    exports: [PaymentsService],
 })
-export class PaymentsModule {}
+export class PaymentsModule { }

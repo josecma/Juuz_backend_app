@@ -17,7 +17,7 @@ export default class EvidenceMapper {
         }>,
         storage: IStoragePort,
     ): Promise<{
-        id: number;
+        id: string;
         description: string;
         status: boolean;
         type: string;

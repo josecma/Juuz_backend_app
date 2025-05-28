@@ -59,8 +59,8 @@ export default class CreateEvidenceService {
             const order = await this.findOneOrderByIdService.find({ id: orderId });
 
             const departure = {
-                longitude: +order.departure.longitude,
-                latitude: +order.departure.latitude,
+                longitude: Number(order.departure.longitude),
+                latitude: Number(order.departure.latitude),
             };
 
             const distance = this.geoAdapter.distance({
@@ -68,7 +68,7 @@ export default class CreateEvidenceService {
                 p2: coordinates
             });
 
-            if (order.driverId !== user.id && order.userId !== user.id) {
+            if (order.driverId.toString() !== user.id && order.userId !== user.id) {
 
                 throw new NotFoundException(`order with id ${orderId} not found.`);
 

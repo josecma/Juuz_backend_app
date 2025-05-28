@@ -5,14 +5,14 @@ export class SubServiceEntity implements SubService {
     example: 1,
     description: 'The unique identifier of the subService',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'The ID of the service this entity belongs to',
     example: 1,
     type: Number,
   })
-  serviceId: number;
+  serviceId: string;
 
   @ApiProperty({
     enum: ['$Enums.SubServiceEnum'],
@@ -74,12 +74,12 @@ export class SubServiceEntity implements SubService {
     example: 1,
     description: 'The unique identifier of the owner of the subService',
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     example: 1,
     description:
       'The unique identifier of the company associated with the subService',
   })
-  companyId: number;
+  companyId: string;
 }

@@ -2,14 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import { VehicleInfo } from '@prisma/client';
 export class VehicleInfoEntity implements VehicleInfo {
   @ApiProperty({ example: 1, description: 'The unique identifier of the car' })
-  id: number;
+  id: string;
 
   @ApiProperty({
     description: 'The ID of the model detail associated with this vehicle',
     example: 1001,
     type: Number,
   })
-  modelId: number;
+  modelId: string;
 
   @ApiProperty({
     example: '2024-04-07T10:00:00Z',
@@ -58,11 +58,11 @@ export class VehicleInfoEntity implements VehicleInfo {
     example: 1,
     description: 'The unique identifier of the owner of the car',
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     example: 1,
     description: 'The unique identifier of the company associated with the car',
   })
-  companyId: number;
+  companyId: string;
 }

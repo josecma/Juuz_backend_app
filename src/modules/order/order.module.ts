@@ -13,11 +13,6 @@ import OrderRepository from "./src/infrastructure/order.repository";
 import FindOneOrderByIdService from "./src/domain/services/find.one.order.by.id.service";
 import CancelOrderByIdUseCase from "./src/application/useCases/cancel.order.by.id.use.case";
 import OrderReadRepository from "./src/infrastructure/repositories/order.read.repository";
-import GetOrderNegotiationsUseCase from "./src/application/useCases/get.order.negotiations.use.case";
-import NegotiationReadRepository from "./src/infrastructure/repositories/negotiation.read.repository";
-import StartOrderUseCase from "./src/application/useCases/start.order.use.case";
-import ChangeOrderStatusUseCase from "./src/application/useCases/change.order.status.use.case";
-import UpdateOrderUseCase from "./src/application/useCases/update.order.use.case";
 
 @Module({
     imports: [
@@ -29,16 +24,11 @@ import UpdateOrderUseCase from "./src/application/useCases/update.order.use.case
     providers: [
         OrderRepository,
         OrderReadRepository,
-        NegotiationReadRepository,
         FindOneOrderByIdUseCase,
         UpdateOrderService,
         FindOneOrderByIdService,
         CancelOrderByIdUseCase,
-        GetOrderNegotiationsUseCase,
         EvidenceCreatedHandler,
-        StartOrderUseCase,
-        UpdateOrderUseCase,
-        ChangeOrderStatusUseCase,
     ],
     exports: [
         OrderRepository,
@@ -47,8 +37,6 @@ import UpdateOrderUseCase from "./src/application/useCases/update.order.use.case
         UpdateOrderService,
         CancelOrderByIdUseCase,
         FindOneOrderByIdService,
-        GetOrderNegotiationsUseCase,
-        StartOrderUseCase,
     ],
 })
 export default class OrderModule implements OnModuleInit {

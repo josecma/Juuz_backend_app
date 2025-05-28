@@ -45,7 +45,7 @@ export default class CategoryRepository implements CategoryRepositoryContract {
 
             const category = await this.client.category.findUnique({
                 where: {
-                    id: id as unknown as number,
+                    id: id,
                 },
             });
 
@@ -93,7 +93,7 @@ export default class CategoryRepository implements CategoryRepositoryContract {
 
                     const parentCategory = await tx.category.findUnique({
                         where: {
-                            id: categoryId as unknown as number,
+                            id: categoryId,
                         },
                     });
 

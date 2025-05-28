@@ -78,8 +78,8 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
         const { userId, type, orderId, status } = findByObj;
 
         const evidenceWhereInput: Prisma.EvidenceWhereInput = {
-            ...(userId && { userId: Number(userId) }),
-            ...(orderId && { orderId: Number(orderId) }),
+            ...(userId && { userId: userId }),
+            ...(orderId && { orderId: orderId }),
             ...(type && { type }),
             ...(status !== undefined && { status }),
         };
@@ -134,8 +134,8 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
                         coordinates: geoPoint,
                         type,
                         status,
-                        userId: Number(userId),
-                        orderId: Number(orderId),
+                        userId: userId,
+                        orderId: orderId,
                     },
                 });
 
@@ -197,7 +197,7 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
             await this.client.evidence.update({
                 data: updateObj,
                 where: {
-                    id: Number(id),
+                    id: id,
                 },
             });
 
@@ -221,7 +221,7 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
 
             return await this.client.evidence.findUnique({
                 where: {
-                    id: Number(id),
+                    id: id,
                 },
                 include: {
                     order: true,

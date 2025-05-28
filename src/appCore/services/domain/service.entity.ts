@@ -5,7 +5,7 @@ export class ServiceEntity implements Service {
     example: 1,
     description: 'The unique identifier of the service',
   })
-  id: number;
+  id: string;
 
   @ApiProperty({
     enum: ['$Enums.ServiceEnum'],
@@ -66,12 +66,12 @@ export class ServiceEntity implements Service {
     example: 1,
     description: 'The unique identifier of the owner of the service',
   })
-  ownerId: number;
+  ownerId: string;
 
   @ApiProperty({
     example: 1,
     description:
       'The unique identifier of the company associated with the service',
   })
-  companyId: number;
+  companyId: string;
 }

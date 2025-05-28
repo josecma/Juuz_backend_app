@@ -148,5 +148,5 @@ export class VehicleOrderApkDto implements VehicleOrderId {
   })
   @IsOptional()
   @IsInt()
-  modelId: number;
+  modelId: string;
 }

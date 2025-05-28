@@ -20,7 +20,7 @@ export default class PointRepository {
 
             const point = await this.client.point.findUnique({
                 where: {
-                    id: id as unknown as number,
+                    id: id,
                 },
             });
 

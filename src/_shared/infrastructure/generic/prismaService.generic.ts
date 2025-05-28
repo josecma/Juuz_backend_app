@@ -8,11 +8,11 @@ export class PrismaGenericService<T, C, R, U, D, F> {
   badRequestException = 'The id does not exist';
   model;
   filter = (id: string) => {
-    return { where: { id: +id } };
+    return { where: { id: id } };
   };
 
-  companyFilter = (id: string, companyId: number) => {
-    return { where: { id: +id, companyId } };
+  companyFilter = (id: string, companyId: string) => {
+    return { where: { id: id, companyId } };
   };
 
   constructor(model) {

@@ -17,7 +17,7 @@ export default class CategoryRepository {
 
             const object = await this.prisma.category.findUnique({
                 where: {
-                    id: Number(id)
+                    id: id
                 },
             });
 
@@ -68,7 +68,7 @@ export default class CategoryRepository {
         try {
 
             const categories = await this.prisma.category.findMany({
-                where: { id: Number(id) },
+                where: { id: id },
             });
 
             return categories;

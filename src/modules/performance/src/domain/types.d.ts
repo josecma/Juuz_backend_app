@@ -28,7 +28,7 @@ export type CriterionWithoutIdJSON = Omit<CriterionJSON, "id">;
 
 export type UserEvaluation = {
     user: {
-        id: number;
+        id: string;
         firstName: string;
         lastName: string;
         email: string;

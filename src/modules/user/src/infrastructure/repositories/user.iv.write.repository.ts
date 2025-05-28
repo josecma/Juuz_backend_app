@@ -1,83 +1,80 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+// import { Inject, Injectable } from "@nestjs/common";
+// import { PrismaClient } from "@prisma/client";
 
-@Injectable()
-export default class UserIdentityVerificationWriteRepository {
+// @Injectable()
+// export default class UserIdentityVerificationWriteRepository {
 
-    public constructor(
-        @Inject(PrismaClient)
-        private readonly client: PrismaClient,
-    ) { };
+//     public constructor(
+//         @Inject(PrismaClient)
+//         private readonly client: PrismaClient,
+//     ) { };
 
-    public async save(
-        params: {
-            identityId: string;
-            requestId: string;
-            keyId: string;
-        },
-    ) {
+//     public async save(
+//         params: {
+//             identityId: string;
+//             keyId: string;
+//         },
+//     ) {
 
-        const {
-            identityId,
-            requestId,
-            keyId,
-        } = params;
+//         const {
+//             identityId,
+//             keyId,
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.userIdentityVerification.create(
-                {
-                    data: {
-                        identityId,
-                        keyId,
-                        requestId,
-                    },
-                },
-            );
+//             const res = await this.client.identityVerification.create(
+//                 {
+//                     data: {
+//                         identityId,
+//                         keyId,
+//                     },
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-    public async update(
-        params: {
-            id: string;
-            updateObject: {
-                status?: string;
-            };
-        },
-    ) {
+//     public async update(
+//         params: {
+//             id: string;
+//             updateObject: {
+//                 status?: string;
+//             };
+//         },
+//     ) {
 
-        const {
-            id,
-            updateObject,
-        } = params;
+//         const {
+//             id,
+//             updateObject,
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.userIdentityVerification.update(
-                {
-                    where: {
-                        id
-                    },
-                    data: updateObject,
-                },
-            );
+//             const res = await this.client.identityVerification.update(
+//                 {
+//                     where: {
+//                         id
+//                     },
+//                     data: updateObject,
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

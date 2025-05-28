@@ -98,10 +98,10 @@ export class OrderDto implements OrderWithoutId {
     description: 'Photo Ids',
   })
   @IsArray()
-  @IsInt({ each: true })
-  @Type(() => Number)
+  @IsString({ each: true })
+  @Type(() => String)
   @IsOptional()
-  photoIds: number[];
+  photoIds: string[];
 
   @ApiProperty({
     example: 'true',
@@ -114,24 +114,20 @@ export class OrderDto implements OrderWithoutId {
   @ApiProperty({
     description: 'The ID of the subService this entity belongs to',
     example: 1,
-    type: Number,
+    type: String,
   })
-  @IsInt({ message: 'subServiceId must be an integer' })
-  @Min(1, { message: 'subServiceId must be a positive integer' })
+  @IsString()
   @IsNotEmpty({ message: 'subServiceId is required' })
-  @IsNotEmpty()
-  subServiceId: number;
+  subServiceId: string;
 
   @ApiProperty({
     description: 'The ID of the subService this entity belongs to',
     example: 1,
-    type: Number,
+    type: String,
   })
-  @IsInt({ message: 'serviceId must be an integer' })
-  @Min(1, { message: 'serviceId must be a positive integer' })
-  @IsNotEmpty({ message: 'serviceId is required' })
+  @IsString()
   @IsNotEmpty()
-  serviceId: number;
+  serviceId: string;
 
   @ApiProperty({
     example: '323 2032',
@@ -289,7 +285,7 @@ export class UpdateOrderDto {
   @IsInt({ each: true })
   @Type(() => Number)
   @IsOptional()
-  photoIds: number[];
+  photoIds: string[];
 
   @ApiProperty({
     example: 'John',
@@ -355,7 +351,7 @@ export class UpdateOrderDto {
   @IsInt({ message: 'subServiceId must be an integer' })
   @Min(1, { message: 'subServiceId must be a positive integer' })
   @IsOptional()
-  subServiceId: number;
+  subServiceId: string;
 
   @ApiProperty({
     description: 'The ID of the subService this entity belongs to',
@@ -365,7 +361,7 @@ export class UpdateOrderDto {
   @IsInt({ message: 'serviceId must be an integer' })
   @Min(1, { message: 'serviceId must be a positive integer' })
   @IsOptional()
-  serviceId: number;
+  serviceId: string;
 
   @ApiProperty({
     example: '323 2032',
@@ -460,9 +456,7 @@ export class UpdateOrderDto {
     example: 1001,
   })
   @IsOptional()
-  @IsInt()
-  @Min(1, { message: 'The userId must be a positive integer.' })
-  userId: number;
+  userId: string;
 
   @ApiProperty({
     description:
@@ -524,5 +518,5 @@ export class UpdateReferedOrderDto {
   @IsOptional()
   @IsInt()
   @Min(1, { message: 'The userId must be a positive integer.' })
-  userId: number;
+  userId: string;
 }

@@ -15,87 +15,144 @@ import { PointEntity } from '../domain/point.entity';
 import { Order } from '../domain/types';
 import { S3Service } from 'src/s3/aplication/s3.service';
 import { toCamelCase } from '../../../utils/to.camel.case';
+import UUIDAdapter from 'src/modules/shared/src/infrastructure/adapters/uuid.adapter';
 
 @Injectable()
 export class PointsService {
-  constructor(private prisma: PrismaService, private readonly s3Service: S3Service) { }
+  constructor(
+    private prisma: PrismaService, private readonly s3Service: S3Service,
+  ) { }
 
   async create(
     data: PointDto,
-    ownerId: number,
+    ownerId: string,
     typePoint?: TypePointEnum,
     isActive: boolean = true // Default value if not provided
   ) {
+
     const query = `
-    INSERT INTO "Point" (
-      "coords", "order_id", "driver_id", "created_at", "updated_at", "created_by", "updated_by", "deleted_at", "deleted_by", "version", 
-      "owner_id", "company_id", "point_name", "longitude", "latitude", "user_id", "address", "city", "state", "type", "is_active"
-    )
-    VALUES (
-      ST_SetSRID(ST_MakePoint(\$2, \$1), 4326),
-      \$3,
-      \$4,
-      NOW(),
-      NOW(),
-      \$5,
-      \$6,
-      \$7,
-      \$8,
-      \$9,
-      \$10,
-      \$11,
-      \$12,
-      \$13,
-      \$14,
-      \$15,
-      \$16,
-      \$17,
-      \$18,
-      \$19::public."TypePointEnum",
-      \$20  -- is_active
-    )
-    RETURNING id;
-    `;
+  INSERT INTO "Point" (
+    "id",
+    "coords", 
+    "point_name", 
+    "longitude", 
+    "latitude", 
+    "address", 
+    "city", 
+    "state", 
+    "type", 
+    "is_active", 
+    "created_by", 
+    "owner_id", 
+    "user_id",
+    "version"
+  )
+  VALUES (
+    $14,
+    ST_SetSRID(ST_MakePoint($1, $2), 4326),
+    $3,  -- point_name (required, non-null)
+    $4,  -- longitude (string)
+    $5,  -- latitude (string)
+    $6,  -- address
+    $7,  -- city
+    $8,  -- state
+    $9::public."TypePointEnum",  -- type
+    $10, -- is_active (boolean)
+    $11, -- created_by
+    $12, -- owner_id
+    $13, -- user_id
+    0  
+  )
+  RETURNING id;
+`;
 
     const result = await this.prisma.$queryRawUnsafe(
       query,
-      // coords
-      data.coords.latitude, // \$1
-      data.coords.longitude, // \$2
-      // orderId
-      null, // \$3
-      // driverId
-      data.driverId, // \$4
-      // created_by, updated_by
-      ownerId, // \$5
-      null, // \$6
-      // deleted_at, deleted_by
-      null, // \$7
-      null, // \$8
-      // version
-      1, // \$9
-      // owner_id
-      ownerId, // \$10
-      // company_id
-      null, // \$11
-      data.pointName, // \$12
-      // coords
-      data.coords.longitude, // \$13
-      data.coords.latitude, // \$14
-      ownerId, // \$15
-      data.address, // \$16
-      data.city, // \$17
-      data.state, // \$18
-      typePoint + '', // \$19
-      isActive // \$20
+      data.coords.longitude,  // $1 (longitude for ST_MakePoint)
+      data.coords.latitude,   // $2 (latitude)
+      data.pointName || '',   // $3 (ensure non-null)
+      String(data.coords.longitude), // $4 (longitude as string)
+      String(data.coords.latitude),  // $5 (latitude as string)
+      data.address || '',      // $6
+      data.city || '',         // $7
+      data.state || '',        // $8
+      typePoint,  // $9 (fallback to default)
+      isActive,               // $10
+      ownerId || '',                // $11 (created_by)
+      ownerId || '',                // $12 (owner_id)
+      ownerId || '',            // $13 (user_id)
+      UUIDAdapter.get(),
     );
+    // const query = `
+    // INSERT INTO "Point" (
+    //   "coords", "order_id", "driver_id", "created_at", "updated_at", "created_by", "updated_by", "deleted_at", "deleted_by", "version", 
+    //   "owner_id", "company_id", "point_name", "longitude", "latitude", "user_id", "address", "city", "state", "type", "is_active"
+    // )
+    // VALUES (
+    //   ST_SetSRID(ST_MakePoint(\$2, \$1), 4326),
+    //   \$3,
+    //   \$4,
+    //   NOW(),
+    //   NOW(),
+    //   \$5,
+    //   \$6,
+    //   \$7,
+    //   \$8,
+    //   \$9,
+    //   \$10,
+    //   \$11,
+    //   \$12,
+    //   \$13,
+    //   \$14,
+    //   \$15,
+    //   \$16,
+    //   \$17,
+    //   \$18,
+    //   \$19::public."TypePointEnum",
+    //   \$20  -- is_active
+    // )
+    // RETURNING id;
+    // `;
+
+    // const result = await this.prisma.$queryRawUnsafe(
+    //   query,
+    //   // coords
+    //   data.coords.latitude, // \$1
+    //   data.coords.longitude, // \$2
+    //   // orderId
+    //   null, // \$3
+    //   // driverId
+    //   data.driverId, // \$4
+    //   // created_by, updated_by
+    //   ownerId, // \$5
+    //   null, // \$6
+    //   // deleted_at, deleted_by
+    //   null, // \$7
+    //   null, // \$8
+    //   // version
+    //   1, // \$9
+    //   // owner_id
+    //   ownerId, // \$10
+    //   // company_id
+    //   null, // \$11
+    //   data.pointName, // \$12
+    //   // coords
+    //   data.coords.longitude, // \$13
+    //   data.coords.latitude, // \$14
+    //   ownerId, // \$15
+    //   data.address, // \$16
+    //   data.city, // \$17
+    //   data.state, // \$18
+    //   typePoint + '', // \$19
+    //   isActive // \$20
+    // );
 
     const newPointId = result[0].id;
     return newPointId;
   }
   async findOnePointByUserId(user_id: number): Promise<Point | null> {
     try {
-      const point_by_user_id = await this.prisma.point.findFirst({ where: { userId: user_id } });
+      const point_by_user_id = await this.prisma.point.findFirst({ where: { userId: '' + user_id } });
       return point_by_user_id;
     } catch (error) {
       console.error(error);
@@ -235,7 +292,7 @@ export class PointsService {
   }
 
   async updatePoint(
-    pointId: number,
+    pointId: string,
     updateData: UpdatePointDto,
     isActive?: boolean
   ) {
@@ -418,7 +475,7 @@ export class PointsService {
       JOIN 
           "Driver" AS d ON p.driver_id = d.id
       JOIN 
-          "User" AS u ON d.user_id = u.id
+          "users" AS u ON d.user_id = u.id
       JOIN 
           "AblyChannel" AS a ON d.user_id = a.id
       WHERE 
@@ -443,7 +500,7 @@ export class PointsService {
 
   async findOrdersWithinDistance(
     paginationOrderAroundDto: PaginationOrderAroundDto
-  ): Promise<PaginatedResponse<OrderEntity>> {
+  ): Promise<PaginatedResponse<any>> {
     paginationOrderAroundDto['latitude'] = 1;
     paginationOrderAroundDto.longitude = 1;
     paginationOrderAroundDto.radiusInMilles = 10;
@@ -633,7 +690,7 @@ export class PointsService {
       AND dep.coords IS NOT NULL
       AND dep.type = \$5::text::"TypePointEnum"
       GROUP BY o.id, dep.id, dest.id, u.id
-      ORDER BY o.created_at DESC;`;
+      ORDER BY o.id ASC;`;
 
       //LIMIT \$6 OFFSET \$7
 

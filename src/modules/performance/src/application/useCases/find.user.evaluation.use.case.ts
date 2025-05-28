@@ -26,7 +26,7 @@ export default class FindUserEvaluationUseCase {
             userId: string;
             role: RoleType;
         }
-    ): Promise<UserEvaluation> {
+    ) {
 
         const { userId, role } = params;
 
@@ -60,8 +60,6 @@ export default class FindUserEvaluationUseCase {
                     id: user.id,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    phone: user.phone,
-                    email: user.email,
                 },
                 evaluation: {
                     avg: averageEvaluationByRole.avg,

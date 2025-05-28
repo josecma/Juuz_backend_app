@@ -1,80 +1,80 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+// import { Inject, Injectable } from "@nestjs/common";
+// import { PrismaClient } from "@prisma/client";
 
-@Injectable()
-export default class UserHotpCounterWriteRepository {
+// @Injectable()
+// export default class UserHotpCounterWriteRepository {
 
-    public constructor(
-        @Inject(PrismaClient)
-        private readonly client: PrismaClient,
-    ) { };
+//     public constructor(
+//         @Inject(PrismaClient)
+//         private readonly client: PrismaClient,
+//     ) { };
 
-    public async save(
-        params: {
-            userOtpSecretId: string;
-            counter: number;
-        },
-    ) {
+//     public async save(
+//         params: {
+//             userOtpSecretId: string;
+//             counter: number;
+//         },
+//     ) {
 
-        const {
-            userOtpSecretId,
-            counter,
-        } = params;
+//         const {
+//             userOtpSecretId,
+//             counter,
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.userHotpCounter.create(
-                {
-                    data: {
-                        userOtpSecretId,
-                        counter,
-                    },
-                },
-            );
+//             const res = await this.client.userHotpCounter.create(
+//                 {
+//                     data: {
+//                         userOtpSecretId,
+//                         counter,
+//                     },
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-    public async update(
-        params: {
-            id: string;
-            updateObject: {
-                counter?: number;
-            };
-        },
-    ) {
+//     public async update(
+//         params: {
+//             id: string;
+//             updateObject: {
+//                 counter?: number;
+//             };
+//         },
+//     ) {
 
-        const {
-            id,
-            updateObject,
-        } = params;
+//         const {
+//             id,
+//             updateObject,
+//         } = params;
 
-        try {
+//         try {
 
-            const res = await this.client.userHotpCounter.update(
-                {
-                    where: {
-                        id
-                    },
-                    data: updateObject,
-                },
-            );
+//             const res = await this.client.userHotpCounter.update(
+//                 {
+//                     where: {
+//                         id
+//                     },
+//                     data: updateObject,
+//                 },
+//             );
 
-            return res;
+//             return res;
 
-        } catch (error) {
+//         } catch (error) {
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

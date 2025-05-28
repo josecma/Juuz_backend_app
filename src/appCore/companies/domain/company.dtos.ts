@@ -32,7 +32,7 @@ type CompanyWithoutId = Omit<
   | 'rating'
   | 'infoUrl'
   | 'stripeAccountId'
-  | 'companyStatus'
+  | 'status'
   | 'companyType'
 >;
 export class CompanyDto implements CompanyWithoutId {
@@ -44,7 +44,7 @@ export class CompanyDto implements CompanyWithoutId {
   })
   @IsString()
   @IsNotEmpty()
-  companyName: string;
+  name: string;
 
   @ApiProperty({
     description: 'Unique identifier for the carrier',
@@ -224,7 +224,7 @@ export class CompanyDto implements CompanyWithoutId {
   })
   @IsNumber()
   @IsNotEmpty({ message: 'The insurance details are required.' })
-  insuranceDetailsId: number;
+  insuranceDetailsId: string;
 
   @ApiProperty({
     example: 'insurance_details.pdf',
@@ -242,9 +242,9 @@ export class UpdateCompanyDto extends PartialType(CompanyDto) {
     description: 'Data Ids',
   })
   @IsInt({ each: true })
-  @Type(() => Number)
+  @Type(() => String)
   @IsOptional()
-  dataIds: number[];
+  dataIds: string[];
 
   @ApiProperty({ type: [UpdateCarrierDto] })
   @ValidateNested({ each: true })
@@ -255,10 +255,10 @@ export class UpdateCompanyDto extends PartialType(CompanyDto) {
 
 export class UpdateStatusCompanyDto {
   @ApiProperty({
-    enum: ['$Enums.CompanyStatus'],
+    type: String,
     description: 'The status the comunication.',
-    example: $Enums.CompanyStatus.NON_VERIFIED,
+    example: 'NON_VERIFIED',
   })
   @IsOptional()
-  companyStatus: $Enums.CompanyStatus;
+  status: string;
 }

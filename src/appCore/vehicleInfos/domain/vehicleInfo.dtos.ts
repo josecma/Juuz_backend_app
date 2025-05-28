@@ -25,7 +25,7 @@ export class VehicleInfoDto implements VehicleInfoWithoutId {
   @IsInt({ message: 'modelId must be an integer' })
   @Min(1, { message: 'modelId must be a positive integer' })
   @IsNotEmpty({ message: 'modelId is required' })
-  modelId: number;
+  modelId: string;
 
   @ApiProperty({
     description: 'The ID of the driver detail associated with this vehicle',
@@ -35,7 +35,7 @@ export class VehicleInfoDto implements VehicleInfoWithoutId {
   @IsInt({ message: 'driverId must be an integer' })
   @Min(1, { message: 'driverId must be a positive integer' })
   @IsNotEmpty({ message: 'driverId is required' })
-  driverId: number;
+  driverId: string;
 }
 
-export class UpdateVehicleInfoDto extends PartialType(VehicleInfoDto) {}
+export class UpdateVehicleInfoDto extends PartialType(VehicleInfoDto) { }

@@ -27,8 +27,8 @@ export default class NegotiationRepository {
         const { orderId, userId } = findByObj;
 
         const evidenceWhereInput: Prisma.NegotiationWhereInput = Object.assign(
-            userId ? { userId: Number(userId) } : {},
-            orderId ? { orderId: Number(orderId) } : {},
+            userId ? { userId: userId } : {},
+            orderId ? { orderId: orderId } : {},
         );
 
         try {
@@ -37,41 +37,41 @@ export default class NegotiationRepository {
                 {
                     where: evidenceWhereInput,
                     include: {
-                        driver: {
-                            select: {
-                                userCompanyRoles: {
-                                    select: {
-                                        company: {
-                                            select: {
-                                                id: true,
-                                                rating: true,
-                                                companyName: true,
-                                                phone: true,
-                                                hours: true,
-                                            },
-                                        },
-                                    },
-                                },
-                                driver: {
-                                    select: {
-                                        vehicleInfo: {
-                                            select: {
-                                                model: {
-                                                    select: {
-                                                        name: true,
-                                                        brand: {
-                                                            select: {
-                                                                name: true,
-                                                            },
-                                                        },
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                        },
+                        // driver: {
+                        //     select: {
+                        //         // userCompanyRoles: {
+                        //         //     select: {
+                        //         //         company: {
+                        //         //             select: {
+                        //         //                 id: true,
+                        //         //                 rating: true,
+                        //         //                 companyName: true,
+                        //         //                 phone: true,
+                        //         //                 hours: true,
+                        //         //             },
+                        //         //         },
+                        //         //     },
+                        //         // },
+                        //         driver: {
+                        //             select: {
+                        //                 vehicleInfo: {
+                        //                     select: {
+                        //                         model: {
+                        //                             select: {
+                        //                                 name: true,
+                        //                                 brand: {
+                        //                                     select: {
+                        //                                         name: true,
+                        //                                     },
+                        //                                 },
+                        //                             },
+                        //                         },
+                        //                     },
+                        //                 },
+                        //             },
+                        //         },
+                        //     },
+                        // },
                         order: true,
                     },
                     skip: pagination ? pagination.skip : undefined,

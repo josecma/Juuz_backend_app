@@ -31,7 +31,7 @@ export class InformationDto implements InformationWithoutId {
   })
   @IsNotEmpty({ message: 'Order ID is required' })
   @IsInt({ message: 'Order ID must be an integer' })
-  orderId: number;
+  orderId: string;
 
   @ApiProperty({
     description:
@@ -41,7 +41,7 @@ export class InformationDto implements InformationWithoutId {
   })
   @IsNotEmpty({ message: 'Point ID is required' })
   @IsInt({ message: 'Point ID must be an integer' })
-  pointId: number;
+  pointId: string;
 }
 
-export class UpdateInformationDto extends PartialType(InformationDto) {}
+export class UpdateInformationDto extends PartialType(InformationDto) { }

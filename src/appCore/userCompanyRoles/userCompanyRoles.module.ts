@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
-import { UserCompanyRolesService } from './application/userCompanyRoles.service';
+// import { UserCompanyRolesService } from './application/userCompanyRoles.service';
 
 @Module({
-  providers: [UserCompanyRolesService, PrismaService],
-  exports: [UserCompanyRolesService],
+  providers: [
+    // UserCompanyRolesService,
+    PrismaService
+  ],
+  exports: [
+    // UserCompanyRolesService
+  ],
 })
-export class UserCompanyRolesModule {}
+export class UserCompanyRolesModule { }

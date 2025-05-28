@@ -6,5 +6,5 @@ export class DriverAcceptOrderFilterDto {
   @IsInt({ message: 'User Id must be an integer' })
   @Min(1, { message: 'User Id must be at least 1' })
   @IsNotEmpty()
-  driverId: number;
+  driverId: string;
 }

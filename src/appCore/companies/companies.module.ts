@@ -10,8 +10,14 @@ import { S3PhotoService } from 'src/s3/aplication/s3Photo.service';
 import { MailerService } from 'src/_shared/application/nodeMailer.service';
 
 @Module({
-  imports: [UserCompanyRolesModule, forwardRef(() => AuthModule)],
-  controllers: [CompaniesController, CompanyDriversController],
+  imports: [
+    UserCompanyRolesModule,
+    forwardRef(() => AuthModule),
+  ],
+  controllers: [
+    CompaniesController,
+    CompanyDriversController
+  ],
   providers: [
     CompaniesService,
     PrismaService,
@@ -19,6 +25,8 @@ import { MailerService } from 'src/_shared/application/nodeMailer.service';
     MailerService,
     S3PhotoService,
   ],
-  exports: [CompaniesService],
+  exports: [
+    CompaniesService
+  ],
 })
-export class CompaniesModule {}
+export class CompaniesModule { }

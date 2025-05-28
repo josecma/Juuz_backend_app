@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { $Enums, Role } from '@prisma/client';
-export class RoleEntity implements Role {
+import { $Enums, } from '@prisma/client';
+export class RoleEntity {
   @ApiProperty({ example: 1, description: 'The unique identifier of the role' })
   id: number;
 
@@ -11,7 +11,7 @@ export class RoleEntity implements Role {
     enum: ['$Enums.RolesEnum'],
     description: 'The name of the role',
   })
-  type: $Enums.RolesEnum;
+  type: string;
 
   @ApiProperty({
     description: 'The ID of the company.',

@@ -27,7 +27,6 @@ import {
 import { ApiResponseSwagger } from 'src/_shared/infrastructure/swagger/response.swagger';
 import { PointsService } from 'src/appCore/points/application/points.service';
 import CancelOrderByIdUseCase from 'src/modules/order/src/application/useCases/cancel.order.by.id.use.case';
-import OrderReadRepository from 'src/modules/order/src/infrastructure/repositories/order.read.repository';
 import { OrdersService } from '../application/orders.service';
 import { DriverAcceptOrderFilterDto } from '../domain/driverAcceptOrderFilterDto.dto';
 import { OrderDto, UpdateOrderDto } from '../domain/order.dtos';
@@ -47,7 +46,6 @@ export class OrdersShipperController {
     private readonly service: OrdersService,
     private readonly pointsService: PointsService,
     private readonly cancelOrderByIdUseCase: CancelOrderByIdUseCase,
-    private readonly orderReadRepository: OrderReadRepository,
   ) { }
 
   /**
@@ -63,7 +61,7 @@ export class OrdersShipperController {
     @Body() body: OrderDto,
     @Request() req: RequestUserId
   ): Promise<OrderEntity> {
-    return this.service.createOrder(body, req.user.id, req.user.companyId);
+    return this.service.createOrder(body, '' + req.user.id, '');
   }
 
   /**
@@ -83,8 +81,8 @@ export class OrdersShipperController {
     body['subStatus'] = $Enums.OrderSubStatus.UPCOMING;
     return await this.service.createOrder(
       body,
-      req.user.id,
-      req.user.companyId
+      '' + req.user.id,
+      ''
     );
   }
 
@@ -116,48 +114,10 @@ export class OrdersShipperController {
   @HttpCode(HttpStatus.OK)
   @ApiResponseSwagger(findSwagger(OrderEntity, controllerName))
   @Get('applyings')
-  public async shiepersApplyings(
+  shiepersApplyings(
     @Query() pagination: PaginationOrderCarrierDto,
     @Request() req: RequestUserId
-  )
-  //: Promise<PaginatedResponse<OrderEntity>>
-  {
-
-    // const orderStatusMap = new Map<string, number>(
-    //   [
-    //     ['IN_TRANSIT', 1],
-    //     ['ASSIGNED', 3],
-    //     ['PENDING', 2],
-    //   ]
-    // );
-
-    // const orderSubstatusMap = new Map<string, number>(
-    //   [
-    //     ['PICKUP', 1],
-    //     ['STARTED', 2],
-    //     ['ASSIGNED', 3],
-    //   ]
-    // );
-
-    // try {
-
-    //   const res = await this.orderReadRepository.findUserOrders(
-    //     {
-    //       userId: req.user.id.toString(),
-    //       role: 'SHIPPER',
-    //       page: pagination.page,
-    //       perPage: pagination.perPage,
-    //     }
-    //   );
-
-    //   return res;
-
-    // } catch (error) {
-
-    //   throw error;
-
-    // };
-
+  ): Promise<PaginatedResponse<OrderEntity>> {
     const find: Prisma.OrderFindManyArgs = {
       skip: pagination.page,
       take: pagination.perPage,
@@ -166,7 +126,7 @@ export class OrdersShipperController {
         status: pagination.status,
         Negotiation: {
           some: {
-            userId: req.user.id,
+            userId: req.user.id.toString(),
           },
         },
       },
@@ -176,52 +136,30 @@ export class OrdersShipperController {
     };
 
     return this.service.findAll(find);
-
   }
 
   @HttpCode(HttpStatus.OK)
   @ApiResponseSwagger(findSwagger(OrderEntity, controllerName))
   @Get()
-  async shieperOrders(
+  shieperOrders(
     @Query() pagination: PaginationOrderShieperDto,
     @Request() req: RequestUserId
-  )
-  // : Promise<PaginatedResponse<OrderEntity>>
-  {
+  ): Promise<PaginatedResponse<OrderEntity>> {
 
-    try {
+    const skip = (pagination.page - 1) * pagination.perPage;
 
-      const res = await this.orderReadRepository.findUserOrders(
-        {
-          userId: req.user.id.toString(),
-          role: 'SHIPPER',
-          status: pagination.status,
-          page: pagination.page,
-          perPage: pagination.perPage,
-        }
-      );
-
-      return res;
-
-    } catch (error) {
-
-      throw error;
-
-    };
-    // const skip = (pagination.page - 1) * pagination.perPage;
-
-    // return this.service.findAll({
-    //   skip,
-    //   take: pagination.perPage,
-    //   select: this.service.select,
-    //   where: {
-    //     status: pagination.status,
-    //     userId: req.user.id,
-    //   },
-    //   orderBy: {
-    //     createdAt: 'desc',
-    //   },
-    // });
+    return this.service.findAll({
+      skip,
+      take: pagination.perPage,
+      select: this.service.select,
+      where: {
+        status: pagination.status,
+        userId: req.user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
   /**
@@ -240,8 +178,8 @@ export class OrdersShipperController {
     return this.service.findOne({
       select: this.service.select,
       where: {
-        id: +id,
-        userId: req.user.id,
+        id: id,
+        userId: req.user.id.toString(),
       },
     });
   }
@@ -274,7 +212,7 @@ export class OrdersShipperController {
     return this.service.updateAcceptOrder(
       id,
       req.user.id,
-      req.user.logType,
+      //req.user.logType,
       filter,
       req.user.companyId
     );
@@ -417,7 +355,7 @@ export class OrdersShipperController {
               create: {
                 ...voData,
                 model: modelId ? { connect: { id: modelId } } : undefined,
-                ownerId: req.user.id,
+                ownerId: req.user.id.toString(),
                 companyId: req.user.companyId,
               },
               update: {
@@ -430,7 +368,7 @@ export class OrdersShipperController {
             ? newVehicleOrders.map(({ modelId, ...voData }) => ({
               ...voData,
               model: { connect: { id: modelId } },
-              ownerId: req.user.id,
+              ownerId: req.user.id.toString(),
               companyId: req.user.companyId,
             }))
             : undefined,
@@ -443,7 +381,7 @@ export class OrdersShipperController {
             : undefined,
         },
       },
-      where: { id: +id, status: OrderStatusEnum.PENDING },
+      where: { id: id, status: OrderStatusEnum.PENDING },
       select: this.service.select,
     };
 

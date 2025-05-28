@@ -4,8 +4,8 @@ import { PointsController } from './infrastructure/points.controller';
 import { PointsService } from './application/points.service';
 import { PointsDriversController } from './infrastructure/pointDrivers.controller';
 import { OrdersModule } from 'src/appCore/orders/orders.module';
-import { PointCacheProvider } from './domain/pointboard.cache';
-import { PointCacheService } from './application/pointCache.service';
+// import { PointCacheProvider } from './domain/pointboard.cache';
+// import { PointCacheService } from './application/pointCache.service';
 import { PointsShippersController } from './infrastructure/pointShippers.controller';
 import { AWSModule } from 'src/s3/aws.module';
 import UserModule from 'src/modules/user/user.module';
@@ -20,8 +20,8 @@ import UserModule from 'src/modules/user/user.module';
   providers: [
     PointsService,
     PrismaService,
-    PointCacheService,
-    PointCacheProvider,
+    // PointCacheService,
+    // PointCacheProvider,
   ],
   exports: [PointsService],
 })

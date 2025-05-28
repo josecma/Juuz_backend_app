@@ -1,49 +1,49 @@
-import { InternalErrorException } from "@aws-sdk/client-sns";
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
-import FindOneUserByIdService from "../../domain/services/find.one.user.by.id.service";
+// import { InternalErrorException } from "@aws-sdk/client-sns";
+// import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+// import FindOneUserByIdService from "../../domain/services/find.one.user.by.id.service";
 
-@Injectable()
-export default class FindUserLocationUseCase {
+// @Injectable()
+// export default class FindUserLocationUseCase {
 
-    public constructor(
-        @Inject(FindOneUserByIdService)
-        private readonly findOneUserByIdService: FindOneUserByIdService,
-    ) { };
+//     public constructor(
+//         @Inject(FindOneUserByIdService)
+//         private readonly findOneUserByIdService: FindOneUserByIdService,
+//     ) { };
 
-    public async execute(params: { id: string; }) {
+//     public async execute(params: { id: string; }) {
 
-        const { id } = params;
+//         const { id } = params;
 
-        try {
+//         try {
 
-            const user = await this.findOneUserByIdService.find({ id });
+//             const user = await this.findOneUserByIdService.find({ id });
 
-            if (!user.userPoint) {
+//             if (!user.userPoint) {
 
-                throw new NotFoundException(`coordinates not found`);
+//                 throw new NotFoundException(`coordinates not found`);
 
-            };
+//             };
 
-            return {
-                share: user.userPoint?.share,
-                coordinates: {
-                    latitude: user.userPoint?.point.latitude,
-                    longitude: user.userPoint?.point.longitude,
-                },
-            };
+//             return {
+//                 share: user.userPoint?.share,
+//                 coordinates: {
+//                     latitude: user.userPoint?.point.latitude,
+//                     longitude: user.userPoint?.point.longitude,
+//                 },
+//             };
 
-        } catch (error) {
+//         } catch (error) {
 
-            if (error instanceof NotFoundException) {
+//             if (error instanceof NotFoundException) {
 
-                throw error;
+//                 throw error;
 
-            };
+//             };
 
-            throw new InternalErrorException(error);
+//             throw new InternalErrorException(error);
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

@@ -2,14 +2,12 @@ import { BullModule } from '@nestjs/bullmq';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule, loggingMiddleware } from 'nestjs-prisma';
 import { SendmailService } from './_shared/application/sendEmail.service';
-import { CustomThrottleGuard } from './_shared/infrastructure/guard/customThrottle.guard';
 import { RefreshTokenStrategy } from './_shared/infrastructure/strategies/refreshToken.strategies';
 import { AblyModule } from './_shared/providers/ably/ably.module';
 import { DownloadModule } from './_shared/providers/download/download.module';
@@ -28,19 +26,22 @@ import { InformationsModule } from './appCore/informations/informations.module';
 import { MessagesModule } from './appCore/messages/messages.module';
 import { NegotiationsModule } from './appCore/negotiations/negotiations.module';
 import { OrdersModule } from './appCore/orders/orders.module';
-import { PaymentsModule } from './appCore/payments/payments.module';
+// import { PaymentsModule } from './appCore/payments/payments.module';
 import { PointsModule } from './appCore/points/points.module';
 import { RolesModule } from './appCore/roles/roles.module';
 import { ServicesModule } from './appCore/services/services.module';
 import { SubServicesModule } from './appCore/subServices/subServices.module';
 import { UserCompanyRolesModule } from './appCore/userCompanyRoles/userCompanyRoles.module';
-import { UsersModule } from './appCore/users/users.module';
 import { VehicleInfosModule } from './appCore/vehicleInfos/vehicleInfos.module';
-import { AuthGuard } from './auth/application/auth.guard';
-import { RolesGuard } from './auth/application/roles.guard';
-import { AuthModule } from './auth/auth.module';
+// import { RolesGuard } from './auth/application/roles.guard';
+// import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
 import { DashboardModule } from './dashboard/dashboard.module';
+import AuthModule from './modules/auth/auth.module';
+import { AuthzGuard } from './modules/auth/src/presentation/guards/authz.guard';
+import CompanyModule from './modules/company/company.module';
 import EvidenceModule from './modules/evidence/evidence.module';
+import NegotiationModule from './modules/negotiation/negotiation.module';
 import OrderModule from './modules/order/order.module';
 import PerformanceModule from './modules/performance/performance.module';
 import PointModule from './modules/point/point.module';
@@ -48,8 +49,6 @@ import SharedModule from './modules/shared/shared.module';
 import UserModule from './modules/user/user.module';
 import VehicleModule from './modules/vehicle/vehicle.module';
 import { AWSModule } from './s3/aws.module';
-import NegotiationModule from './modules/negotiation/negotiation.module';
-import CompanyModule from './modules/company/company.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -97,8 +96,8 @@ import CompanyModule from './modules/company/company.module';
     }),
     ScheduleModule.forRoot(),
     AblyModule,
-    UsersModule,
-    AuthModule,
+    //UsersModule,
+    // AuthModule,
     InformationsModule,
     PointsModule,
     OrdersModule,
@@ -115,7 +114,7 @@ import CompanyModule from './modules/company/company.module';
     WebCrawlerModule,
     DownloadModule,
     ValidationModule,
-    PaymentsModule,
+    // PaymentsModule,
     BrandsModule,
     NegotiationsModule,
     StripeModule,
@@ -127,11 +126,12 @@ import CompanyModule from './modules/company/company.module';
     PointModule,
     UserModule,
     OrderModule,
-    //VehicleModule,
+    VehicleModule,
     CompanyModule,
     EvidenceModule,
     PerformanceModule,
     NegotiationModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -140,16 +140,16 @@ import CompanyModule from './modules/company/company.module';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useClass: AuthzGuard,
     },
     // {
     //   provide: APP_GUARD,
     //   useClass: RolesGuard,
     // },
-    {
-      provide: APP_GUARD,
-      useClass: CustomThrottleGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: CustomThrottleGuard,
+    // },
   ],
 })
 export class AppModule { }

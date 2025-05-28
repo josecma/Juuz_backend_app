@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ShipperPerformancesModule } from './old/shipperPerformance/shipperPerformances.module';
 import { CarrierPerformancesModule } from './old/carrierPerformances/carrierPerformances.module';
-import { LoaderBoardsModule } from './old/loardBoards /loardBoards.module';
+// import { LoaderBoardsModule } from './old/loardBoards /loardBoards.module';
 import { TripsModule } from './old/trips/trips.module';
 import { CompaniesModule } from './companies/companies.module';
 import { OrdersModule } from './orders/orders.module';
@@ -13,7 +13,7 @@ import { DriversModule } from './drivers/drivers.module';
     ShipperPerformancesModule,
     CarrierPerformancesModule,
     TripsModule,
-    LoaderBoardsModule,
+    // LoaderBoardsModule,
     CompaniesModule,
     OrdersModule,
     CarriesModule,
@@ -23,11 +23,11 @@ import { DriversModule } from './drivers/drivers.module';
     ShipperPerformancesModule,
     CarrierPerformancesModule,
     TripsModule,
-    LoaderBoardsModule,
+    // LoaderBoardsModule,
     CompaniesModule,
     OrdersModule,
     CarriesModule,
     DriversModule,
   ],
 })
-export class DashboardModule {}
+export class DashboardModule { }

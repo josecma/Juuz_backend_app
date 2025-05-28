@@ -52,7 +52,7 @@ export class ServiceDto implements ServiceWithoutId {
   @IsInt({ each: true, message: 'Each item in subServices must be an integer' })
   @ArrayNotEmpty({ message: 'subServices should not be empty' })
   @IsOptional()
-  subServices: number[];
+  subServices: string[];
 }
 
 export class UpdateServiceDto extends OmitType(PartialType(ServiceDto), [
@@ -70,7 +70,7 @@ export class UpdateServiceDto extends OmitType(PartialType(ServiceDto), [
   })
   @ArrayNotEmpty({ message: 'subServicesToAdd should not be empty' })
   @IsOptional()
-  subServicesToAdd: number[];
+  subServicesToAdd: string[];
 
   @ApiProperty({
     description: 'IDs of sub-services to remove from the service',
@@ -84,7 +84,7 @@ export class UpdateServiceDto extends OmitType(PartialType(ServiceDto), [
   })
   @ArrayNotEmpty({ message: 'subServicesToRemove should not be empty' })
   @IsOptional()
-  subServicesToRemove: number[];
+  subServicesToRemove: string[];
 }
 
 // @ApiProperty({

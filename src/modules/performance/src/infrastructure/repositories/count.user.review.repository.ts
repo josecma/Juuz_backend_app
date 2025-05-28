@@ -24,7 +24,7 @@ export default class CountUserReviewRepository {
                 {
                     where: {
                         AND: {
-                            evaluatedId: Number(userId),
+                            evaluatedId: userId,
                             role: role.toString(),
                         },
                     }

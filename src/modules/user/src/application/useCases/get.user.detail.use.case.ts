@@ -9,18 +9,19 @@ import { RoleType } from "src/modules/shared/src/domain/enums/role.type";
 import BadRequestDomainException from "src/modules/shared/src/domain/exceptions/bad.request.domain.exception";
 import { UserRoleEnum } from "../../domain/enums/user.role.enum";
 import FindOneUserByIdService from "../../domain/services/find.one.user.by.id.service";
-import UserCompanyRepository from "../../infrastructure/repositories/user.company.repository";
-import UserVehicleRepository from "../../infrastructure/repositories/user.vehicle.repository";
+import CompanyReadRepository from "src/modules/company/src/infrastructure/repositories/company.read.repository";
+import FindCompanyByOwnerIdAdapter from "../../infrastructure/adapters/find.company.by.owner.id.adapter";
+import VehicleReadRepository from "src/modules/vehicle/src/infrastructure/vehicle.read.repository";
 
 export default class GetUserDetailUseCase {
 
     public constructor(
         @Inject(FindOneUserByIdService)
         private readonly findOneUserByIdService: FindOneUserByIdService,
-        @Inject(UserCompanyRepository)
-        private readonly userCompanyRepository: UserCompanyRepository,
-        @Inject(UserVehicleRepository)
-        private readonly userVehicleRepository: UserVehicleRepository,
+        @Inject(FindCompanyByOwnerIdAdapter)
+        private readonly findCompanyByOwnerIdAdapter: FindCompanyByOwnerIdAdapter,
+        @Inject(VehicleReadRepository)
+        private readonly vehicleReadRepository: VehicleReadRepository,
         @Inject(AverageEvaluationByRoleRepository)
         private readonly averageEvaluationByRoleRepository: AverageEvaluationByRoleRepository,
         @Inject(AverageEvaluationByEvaluationRepository)
@@ -76,11 +77,11 @@ export default class GetUserDetailUseCase {
 
             const userById = await this.findOneUserByIdService.find({ id: userId });
 
-            const userCompany = await this.userCompanyRepository.findUserCompanyByUserId({ userId });
+            const userCompany = await this.findCompanyByOwnerIdAdapter.find(userId);
 
-            const { score, ...userCompanyRes } = userCompany[0];
+            const { score, ...userCompanyRes } = userCompany;
 
-            const { userPoint, channels, ...userRes } = userById;
+            const { ...userRes } = userById;
 
             const groupAndCountOrderStatusRes =
                 await this.orderReadRepository.groupAndCountStatesByUserId(
@@ -101,7 +102,7 @@ export default class GetUserDetailUseCase {
                     }
                 },
                 (!include || include?.vehicles === true) && {
-                    vehicles: await this.userVehicleRepository.findUserVehicleByUserId({ userId }),
+                    vehicles: await this.vehicleReadRepository.findByOwnerId(userId),
                 },
                 (!include || include?.averageEvaluationByRole === true) && {
                     averageEvaluationByRole: (reviewCounter > 0) ? await this.averageEvaluationByRoleRepository.find({ userId, role }) : null,

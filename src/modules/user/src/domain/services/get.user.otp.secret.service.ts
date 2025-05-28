@@ -1,6 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
-import OtpSecretPort from "src/modules/shared/src/application/ports/otp.secret.port";
-import CryptoAdapter from "src/modules/shared/src/infrastructure/adapters/crypto.adapter";
+import { Injectable } from "@nestjs/common";
 import { OtpSecretAdapter } from "src/modules/shared/src/infrastructure/adapters/otp.secret.adapter";
 import UserOtpSecretReadRepository from "../../infrastructure/repositories/user.otp.secret.read.repository";
 import UserOtpSecretWriteRepository from "../../infrastructure/repositories/user.otp.secret.write.repository";
@@ -9,14 +7,9 @@ import UserOtpSecretWriteRepository from "../../infrastructure/repositories/user
 export default class GetUserOtpSecretService {
 
     public constructor(
-        @Inject(UserOtpSecretReadRepository)
         private readonly userOtpSecretReadRepository: UserOtpSecretReadRepository,
-        @Inject(UserOtpSecretWriteRepository)
         private readonly userOtpSecretWriteRepository: UserOtpSecretWriteRepository,
-        @Inject(OtpSecretAdapter)
-        private readonly otpSecretAdapter: OtpSecretPort,
-        // @Inject(CryptoAdapter)
-        // private readonly cryptoAdapter: CryptoAdapter,
+        private readonly otpSecretAdapter: OtpSecretAdapter,
     ) { };
 
     public async get(
@@ -27,9 +20,6 @@ export default class GetUserOtpSecretService {
             id: string;
             userId: string;
             secret: string;
-            algorithm: string | null;
-            isActive: boolean;
-            createdAt: Date;
         } = null;
 
         try {
@@ -43,8 +33,6 @@ export default class GetUserOtpSecretService {
             if (!otpSecret) {
 
                 const newSecret = this.otpSecretAdapter.generate();
-
-                // const encryptedSecret = this.cryptoAdapter.encrypt(newSecret)
 
                 otpSecret = await this.userOtpSecretWriteRepository.save(
                     {

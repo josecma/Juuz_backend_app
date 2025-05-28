@@ -16,7 +16,7 @@ export default class FindCompanyByOwnerIdService {
 
         try {
 
-            const company = await this.companyReadRepository.findOneByOwnerId(
+            const company = await this.companyReadRepository.findOneById(
                 ownerId
             );
 
@@ -28,8 +28,6 @@ export default class FindCompanyByOwnerIdService {
                     }
                 );
             };
-
-            return company;
 
         } catch (error) {
 

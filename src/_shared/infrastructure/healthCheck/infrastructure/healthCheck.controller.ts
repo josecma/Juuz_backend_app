@@ -24,7 +24,7 @@ export class HealthController {
     private db: DiskHealthIndicator,
     private disk: DiskHealthIndicator,
     private memory: MemoryHealthIndicator,
-  ) {}
+  ) { }
   @Public()
   @Get('db')
   @HealthCheck()

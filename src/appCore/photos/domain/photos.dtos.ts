@@ -25,7 +25,7 @@ export class PhotoDto implements PhotoWithoutId {
     description: 'The unique identifier for the photo',
     example: 1,
   })
-  id: number; // Unique identifier for the photo
+  id: string; // Unique identifier for the photo
 
   @ApiProperty({
     description: 'The URL of the photo stored in S3',
@@ -41,7 +41,7 @@ export class PhotoDto implements PhotoWithoutId {
   })
   @IsInt() // Validates that the orderId is an integer
   @IsOptional() // Ensures the orderId is not empty
-  orderId: number; // ID of the associated order
+  orderId: string; // ID of the associated order
 }
 
-export class UpdatePhotoDto extends PartialType(PhotoDto) {}
+export class UpdatePhotoDto extends PartialType(PhotoDto) { }

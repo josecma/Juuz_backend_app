@@ -24,7 +24,7 @@ export default class DoesCompanyExistRepository {
             const count = await this.client.company.count(
                 {
                     where: {
-                        id: Number(companyId),
+                        id: companyId,
                     },
                 }
             );

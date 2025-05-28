@@ -5,14 +5,14 @@ import BuildChannelNameService from "src/modules/shared/src/domain/services/buil
 import AblyAdapter from "src/modules/shared/src/infrastructure/adapters/ably.adapter";
 import ChannelReadRepository from "src/modules/shared/src/infrastructure/channel.read.repository";
 import ChannelWriteRepository from "src/modules/shared/src/infrastructure/channel.write.repository";
-import DoesUserExistRepository from "src/modules/user/src/infrastructure/repositories/does.user.exist.repository";
+import UserReadRepository from "src/modules/user/src/infrastructure/repositories/user.read.repository";
 
 @Injectable({})
 export default class GetPrivateUserChannelByUserIdUseCase {
 
     public constructor(
-        @Inject(DoesUserExistRepository)
-        private readonly doesUserExistRepository: DoesUserExistRepository,
+        @Inject(UserReadRepository)
+        private readonly userReadRepository: UserReadRepository,
         @Inject(AblyAdapter)
         private readonly ablyAdapter: AblyAdapter,
         @Inject(ChannelWriteRepository)
@@ -40,10 +40,8 @@ export default class GetPrivateUserChannelByUserIdUseCase {
                 );
             };
 
-            const exist = await this.doesUserExistRepository.exist(
-                {
-                    userId,
-                }
+            const exist = await this.userReadRepository.exist(
+                userId
             );
 
             if (!exist) {

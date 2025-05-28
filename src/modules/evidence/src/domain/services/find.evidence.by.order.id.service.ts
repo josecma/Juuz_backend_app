@@ -35,7 +35,7 @@ export default class FindEvidenceByOrderIdService {
 
             const order = await this.findOneOrderByIdService.find({ id: orderId });
 
-            if (order.userId != user.id && order.driverId != user.id) {
+            if (order.userId != user.id && order.driverId.toString() != user.id) {
 
                 throw new NotFoundException(`evidences not found`);
 
