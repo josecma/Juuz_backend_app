@@ -11,42 +11,92 @@ export default class CompanyWriteRepository {
         private readonly prisma: PrismaClient,
     ) { };
 
-    public async update(
+    public async save(
         params: {
-            companyId: string;
-            updateObj: {
-                score: {
-                    lastAvg: number;
-                    lastDiv: number;
-                };
-            };
+            ownerId: string,
+            companyMemberRoleId: string,
+            company: {}
         }
     ) {
 
-        const { companyId, updateObj } = params;
-
-        const { score } = updateObj;
+        const {
+            ownerId,
+            companyMemberRoleId,
+            company,
+        } = params;
 
         try {
 
-            const res = await this.prisma.company.update({
-                where: {
-                    id: companyId,
-                },
-                data: {
-                    score
-                },
-            });
+            const res = await this.prisma.$transaction(
+                async (tx) => {
+                    const savedCompany = await tx.company.create(
+                        {
+                            data: company,
+                        }
+                    );
+
+                    await tx.companyMember.create(
+                        {
+                            data: {
+                                companyId: savedCompany.id,
+                                memberId: ownerId,
+                                roleId: companyMemberRoleId,
+                            },
+                        }
+                    );
+
+                    return savedCompany;
+                }
+            );
 
             return res;
 
         } catch (error) {
 
             this.logger.error(error);
+
             throw error;
 
         };
 
     };
+
+    // public async update(
+    //     params: {
+    //         companyId: string;
+    //         updateObj: {
+    //             score: {
+    //                 lastAvg: number;
+    //                 lastDiv: number;
+    //             };
+    //         };
+    //     }
+    // ) {
+
+    //     const { companyId, updateObj } = params;
+
+    //     const { score } = updateObj;
+
+    //     try {
+
+    //         const res = await this.prisma.company.update({
+    //             where: {
+    //                 id: companyId,
+    //             },
+    //             data: {
+    //                 score
+    //             },
+    //         });
+
+    //         return res;
+
+    //     } catch (error) {
+
+    //         this.logger.error(error);
+    //         throw error;
+
+    //     };
+
+    // };
 
 };
