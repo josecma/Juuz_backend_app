@@ -2,9 +2,9 @@ import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 
 @Injectable()
-export default class CompanyRoleReadRepository {
+export default class CompanyMemberRoleReadRepository {
 
-    private readonly logger = new Logger(CompanyRoleReadRepository.name);
+    private readonly logger = new Logger(CompanyMemberRoleReadRepository.name);
 
     public constructor(
         @Inject(PrismaClient)
@@ -17,7 +17,7 @@ export default class CompanyRoleReadRepository {
 
         try {
 
-            const companyRole = await this.client.companyMemberRole.findUnique(
+            const companyMemberRole = await this.client.companyMemberRole.findUnique(
                 {
                     where: {
                         name
@@ -25,11 +25,17 @@ export default class CompanyRoleReadRepository {
                 }
             );
 
-            return companyRole;
+            return companyMemberRole;
 
         } catch (error) {
 
-            this.logger.error(error);
+            this.logger.error(
+                {
+                    source: `${CompanyMemberRoleReadRepository.name}`,
+                    message: error.message
+                }
+            );
+
             throw error;
 
         };

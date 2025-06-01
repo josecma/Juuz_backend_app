@@ -29,11 +29,11 @@ export default class S3Adapter implements IStoragePort {
 
     public async uploadFiles(
         files: {
-            fileName: string;
-            key: string;
-            buffer: Buffer;
-            mimeType: string;
-            metadata?: Record<string, any>;
+            fileName: string,
+            key: string,
+            buffer: Buffer,
+            mimeType: string,
+            metadata?: Record<string, any>,
         }[]
     ): Promise<Map<string, string>> {
 
@@ -54,13 +54,15 @@ export default class S3Adapter implements IStoragePort {
                     Metadata: metadata
                 });
 
-                const putObjectCommandOutput: PutObjectCommandOutput = await this.s3Client.send(command);
+                const putObjectCommandOutput = await this.s3Client.send(command);
 
                 const { ETag } = putObjectCommandOutput;
 
                 dataKeyMap.set(key, ETag);
 
             }));
+
+            this.logger.log("files uploaded successfully");
 
             return dataKeyMap;
 
@@ -76,8 +78,8 @@ export default class S3Adapter implements IStoragePort {
 
     public async getFileUrls(
         params: {
-            keys: string[];
-            expiresIn?: number;
+            keys: string[],
+            expiresIn?: number,
         }
     ): Promise<Map<string, string>> {
 
@@ -87,18 +89,34 @@ export default class S3Adapter implements IStoragePort {
 
         try {
 
-            await Promise.all(keys.map(async (key) => {
+            await Promise.all(
 
-                const command = new GetObjectCommand({
-                    Bucket: this.bucketName,
-                    Key: key,
-                });
+                keys.map(
 
-                const signedUrl = await getSignedUrl(this.s3Client, command, { expiresIn: expiresIn });
+                    async (key) => {
 
-                urlKeyMap.set(key, signedUrl);
+                        const command = new GetObjectCommand(
+                            {
+                                Bucket: this.bucketName,
+                                Key: key,
+                            }
+                        );
 
-            }));
+                        const signedUrl = await getSignedUrl(
+                            this.s3Client,
+                            command,
+                            {
+                                expiresIn: expiresIn
+                            }
+                        );
+
+                        urlKeyMap.set(key, signedUrl);
+
+                    }
+                )
+            );
+
+            this.logger.log("file urls obtained successfully");
 
             return urlKeyMap;
 
@@ -107,6 +125,52 @@ export default class S3Adapter implements IStoragePort {
             this.logger.error("error getting S3 URLs:", error);
 
             throw new Error(`error getting S3 URLs: ${error.message}`);
+
+        };
+
+    };
+
+    public async getFileUrl(
+        params: {
+            key: string,
+            expiresIn?: number,
+        }
+    ) {
+
+        const {
+            key,
+            expiresIn
+        } = params;
+
+        try {
+
+            const command = new GetObjectCommand(
+                {
+                    Bucket: this.bucketName,
+                    Key: key,
+                }
+            );
+
+            const signedUrl = await getSignedUrl(
+                this.s3Client,
+                command,
+                {
+                    expiresIn: expiresIn,
+                }
+            );
+
+            this.logger.log("file url obtained successfully");
+
+            return {
+                key,
+                signedUrl,
+            };
+
+        } catch (error) {
+
+            this.logger.error("error getting S3 URL:", error);
+
+            throw new Error(`error getting S3 URL: ${error.message}`);
 
         };
 
@@ -123,7 +187,9 @@ export default class S3Adapter implements IStoragePort {
                 },
             });
 
-            const r = await this.s3Client.send(command);
+            await this.s3Client.send(command);
+
+            this.logger.log("files deleted successfully");
 
         } catch (error) {
 

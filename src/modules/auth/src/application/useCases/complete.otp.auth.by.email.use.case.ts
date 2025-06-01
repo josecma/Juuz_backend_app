@@ -46,10 +46,8 @@ export default class CompleteOtpAuthByEmailUseCase {
             id: string,
             firstName?: string,
             lastName?: string,
-            emails: Array<{
-                value: string,
-                metadata: Record<string, unknown>,
-            }>,
+        } & {
+            [key: string]: unknown
         } = null;
 
         try {
@@ -157,8 +155,16 @@ export default class CompleteOtpAuthByEmailUseCase {
 
             return {
                 accessToken,
+                expiresIn: this.configService.get<string>('EXPIRESIN'),
                 refreshToken,
-                user,
+                user: {
+                    id: user.id,
+                    firstName: user?.firstName,
+                    lastName: user?.lastName,
+                    email,
+                    company: user?.company,
+                },
+
             };
 
         } catch (error) {

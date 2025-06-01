@@ -9,6 +9,7 @@ import CreateUserUseCase from "../../application/useCases/create.user.use.case";
 import DeleteUserUseCase from "../../application/useCases/delete.user.use.case";
 import GetAllUsersUseCase from "../../application/useCases/get.all.users.use.case";
 import GetOneUserUseCase from "../../application/useCases/get.one.user.use.case";
+import GetUserProfileUseCase from "../../application/useCases/get.user.profile.use.case";
 import InitiateEmailIdvUseCase from "../../application/useCases/initiate.email.idv.use.case";
 import InviteUserToCompanyUseCase from "../../application/useCases/invite.user.to.company.use.case";
 import RespondToCompanyInvitationUseCase from "../../application/useCases/respond.to.company.invitation.use.case";
@@ -17,14 +18,14 @@ import acceptCompanyInvitationBodyOptions from "../docs/bodies/accept.company.in
 import completeIdvBodyOptions from "../docs/bodies/complete.idv.body.options";
 import createUserBodyOptions from "../docs/bodies/create.user.body.options";
 import initiateIdvBodyOptions from "../docs/bodies/initiate.idv.body.options";
-import inviteUserToCompanyBodyOptions from "../docs/bodies/invite.user.to.company.body.options";
 import respondToCompanyInvitationBodyOptions from "../docs/bodies/respond.to.company.invitation.body.options";
 import setUserNotificationTokenBodyOptions from "../docs/bodies/set.user.notification.token.body.options";
+import { ApiCompanyInvitationDoc } from "../docs/decorators/api.company.invitation.doc";
 import { ApiCompleteIdvProcessResponse } from "../docs/decorators/api.complete.idv.process.response";
 import { ApiGetAllUsersResponse } from "../docs/decorators/api.get.all.users.response";
+import { ApiGetUserProfileDoc } from "../docs/decorators/api.get.user.profile.doc";
 import { ApiInitiateIdvProcessResponse } from "../docs/decorators/api.initiate.idv.process.response";
 import { ApiSetUserNotificationTokenResponse } from "../docs/decorators/api.set.user.notification.token.response";
-import { ApiInviteUserToCompanyResponse } from "../docs/decorators/invite.user.to.company.response";
 import { ApiRespondToCompanyInvitationResponse } from "../docs/decorators/respond.to.company.invitation.response";
 import acceptCompanyInvitationOperationOptions from "../docs/operations/accept.company.invitation.operation.options";
 import completeIdvOperationOptions from "../docs/operations/complete.idv.operation.options";
@@ -33,7 +34,6 @@ import deleteUserOperationOptions from "../docs/operations/delete.user.operation
 import getAllUsersOperationOptions from "../docs/operations/get.all.users.operation.options";
 import getOneUserOperationOptions from "../docs/operations/get.one.user.operation.options";
 import initiateIdvOperationOptions from "../docs/operations/initiate.idv.operation.options";
-import inviteUserToCompanyOperationOptions from "../docs/operations/invite.user.to.company.operation.options";
 import respondToCompanyInvitationOperationOptions from "../docs/operations/respond.to.company.invitation.operation.options";
 import setUserNotificationTokenOperationOptions from "../docs/operations/set.user.notification.token.operation.options";
 import userIdParamOptions from "../docs/params/user.id.param.options";
@@ -47,6 +47,7 @@ import InitiateUserIdvRequestBody from "../dtos/initiate.user.idv.request.body";
 import InviteJoinCompanyRequestBody from "../dtos/invite.user.to.company.request.body";
 import RespondToCompanyInvitationRequestBody from "../dtos/respond.to.company.invitation.request.body";
 import SetUserNotificationTokenRequestBody from "../dtos/set.user.notification.token.request.body";
+import { Public } from "src/modules/auth/src/presentation/decorators/public.route.decorator";
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -66,22 +67,67 @@ export default class UserController {
         private readonly respondToCompanyInvitationUseCase: RespondToCompanyInvitationUseCase,
         private readonly acceptCompanyInvitationUseCase: AcceptCompanyInvitationUseCase,
         private readonly createOrUpdateUserNotificationTokenUseCase: CreateOrUpdateUserNotificationTokenUseCase,
+        private readonly getUserProfileUseCase: GetUserProfileUseCase,
+
     ) { };
 
     @ApiOperation(getAllUsersOperationOptions)
     @ApiGetAllUsersResponse()
     @Get('')
-    public async getUsers() {
+    public async getAll(
+        @Res() res: Response,
+    ) {
 
         try {
 
-            const res = await this.getAllUsersUseCase.execute();
+            const getAllUsersResponse = await this.getAllUsersUseCase.execute();
 
-            return res;
+            return res
+                .status(200)
+                .json(
+                    {
+                        message: "users obtained successfully",
+                        payload: getAllUsersResponse,
+                    }
+                );
 
         } catch (error) {
 
-            throw error;
+            return res
+                .status(500)
+                .json({ error });
+
+        };
+
+    };
+
+    @ApiGetUserProfileDoc()
+    @Get('/me')
+    public async getProfile(
+        @Req() req: Request,
+        @Res() res: Response,
+    ) {
+
+        const userId = req.user.id;
+
+        try {
+
+            const getUserProfileResponse = await this.getUserProfileUseCase.execute(userId);
+
+            return res
+                .status(200)
+                .json(
+                    {
+                        message: "profile obtained successfully",
+                        payload: getUserProfileResponse,
+                    }
+                );
+
+        } catch (error) {
+
+            return res
+                .status(500)
+                .json({ error });
 
         };
 
@@ -91,8 +137,9 @@ export default class UserController {
     @ApiParam(userIdParamOptions)
     @ApiGetOneUserResponse()
     @Get('/:id')
-    public async getUser(
+    public async getOne(
         @Param('id') userId: string,
+        @Res() res: Response,
     ) {
 
         try {
@@ -103,7 +150,9 @@ export default class UserController {
 
         } catch (error) {
 
-            throw error;
+            return res
+                .status(500)
+                .json({ error });
 
         };
 
@@ -115,6 +164,7 @@ export default class UserController {
     @Post('')
     public async create(
         @Body() body: CreateUserDto,
+        @Res() res: Response,
     ) {
 
         const {
@@ -137,7 +187,9 @@ export default class UserController {
 
         } catch (error) {
 
-            throw error;
+            return res
+                .status(500)
+                .json({ error });
 
         };
 
@@ -149,6 +201,7 @@ export default class UserController {
     @Delete('/:id')
     public async delete(
         @Param('id') userId: string,
+        @Res() res: Response,
     ) {
 
         try {
@@ -159,7 +212,9 @@ export default class UserController {
 
         } catch (error) {
 
-            throw error;
+            return res
+                .status(500)
+                .json({ error });
 
         };
 
@@ -169,7 +224,7 @@ export default class UserController {
     @ApiBody(initiateIdvBodyOptions)
     @ApiInitiateIdvProcessResponse()
     @Post('/idv/initiate')
-    public async initiateUserIdv(
+    public async initiateIdv(
         @Req() req: Request,
         @Body() body: InitiateUserIdvRequestBody,
         @Res() res: Response,
@@ -203,7 +258,9 @@ export default class UserController {
 
         } catch (error) {
 
-            throw error;
+            return res
+                .status(500)
+                .json({ error });
 
         };
 
@@ -213,7 +270,7 @@ export default class UserController {
     @ApiBody(completeIdvBodyOptions)
     @ApiCompleteIdvProcessResponse()
     @Post('/idv/complete')
-    public async completeUserIdv(
+    public async completeIdv(
         @Req() req: Request,
         @Body() body: CompleteUserIdvRequestBody,
         @Res() res: Response,
@@ -249,15 +306,15 @@ export default class UserController {
 
         } catch (error) {
 
-            throw error;
+            return res
+                .status(500)
+                .json({ error });
 
         };
 
     };
 
-    @ApiOperation(inviteUserToCompanyOperationOptions)
-    @ApiBody(inviteUserToCompanyBodyOptions)
-    @ApiInviteUserToCompanyResponse()
+    @ApiCompanyInvitationDoc()
     @Post('/companies/invitations')
     public async joinCompanyInvitation(
         @Req() req: Request,
@@ -341,6 +398,7 @@ export default class UserController {
 
     @ApiOperation(acceptCompanyInvitationOperationOptions)
     @ApiBody(acceptCompanyInvitationBodyOptions)
+    @Public()
     @Post('/companies/invitations/accept')
     public async acceptCompanyInvitation(
         @Body() body: AcceptCompanyInvitationRequestBody,

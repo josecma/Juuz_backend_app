@@ -12,7 +12,7 @@ export class PhotoEntity implements Photo {
         example: 'afgxvnbgyes23',
     })
     name: string;
-
+    vehicleId: string;
     @ApiProperty({
         description: 'The ID of the associated order',
         example: 1,

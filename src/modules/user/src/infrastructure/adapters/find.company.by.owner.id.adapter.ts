@@ -12,7 +12,7 @@ export default class FindCompanyByOwnerIdAdapter implements FindCompanyByOwnerId
 
     public async find(
         ownerId: string
-    ): Promise<any> {
+    ) {
 
         try {
 

@@ -1,4 +1,6 @@
-import { IsEmail, IsNotEmpty, IsNumberString, IsOptional, IsPhoneNumber, IsString, Length, Matches, MaxLength } from "class-validator";
+import { Type } from "class-transformer";
+import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString, Length, Matches, MaxLength, ValidateNested } from "class-validator";
+import Address from "src/modules/shared/src/presentation/dtos/address";
 
 export default class CreateCompanyRequestBody {
 
@@ -6,9 +8,13 @@ export default class CreateCompanyRequestBody {
     @IsString()
     name: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     carrierIdentifier: string;
+
+    @IsNotEmpty()
+    @IsEmail()
+    email: string;
 
     @IsNotEmpty()
     @IsString()
@@ -31,78 +37,13 @@ export default class CreateCompanyRequestBody {
     @Length(8)
     mc: string;
 
-    @IsOptional()
-    @IsEmail()
-    primaryAdminEmail: string;
-
-    @IsOptional()
-    @IsString()
-    @Length(2, 2)
-    countryCode: string;
-
-    @IsOptional()
+    @IsNotEmpty()
     @IsPhoneNumber()
     phoneNumber: string;
 
-    @IsOptional()
-    @IsString()
-    extension: string;
-
-    @IsOptional()
-    @IsString()
-    addressLine1: string;
-
-    @IsOptional()
-    @IsString()
-    addressLine2: string;
-
-    @IsOptional()
-    @IsString()
-    city: string;
-
-    @IsOptional()
-    @IsString()
-    @Length(2, 2)
-    state: string;
-
-    @IsOptional()
-    @IsString()
-    zipCode: string;
-
-    @IsOptional()
-    @IsString()
-    country: string;
-
-    @IsOptional()
-    @IsString()
-    cardNumber: string;
-
-    @IsOptional()
-    @IsString()
-    expMonth: string;
-
-    @IsOptional()
-    @IsString()
-    expYear: string;
-
-    @IsOptional()
-    @IsString()
-    dotNumber: string;
-
-    @IsOptional()
-    @IsString()
-    phone: string;
-
-    @IsOptional()
-    @IsString()
-    hours: string;
-
-    @IsOptional()
-    @IsNumberString()
-    insuranceDetailsId: string;
-
-    @IsOptional()
-    @IsString()
-    licenseType: string;
+    @IsNotEmpty()
+    @ValidateNested()
+    @Type(() => Address)
+    address: Address;
 
 };

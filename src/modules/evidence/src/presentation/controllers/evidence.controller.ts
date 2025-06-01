@@ -1,6 +1,6 @@
 import { Body, Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Post, Query, Request, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
-import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { extname } from "path";
 import { RequestUserId } from "src/_shared/domain/requestId";
 import IdDto from "src/modules/shared/src/presentation/dtos/id.dto";
@@ -11,8 +11,13 @@ import VerifyEvidenceUseCase from "../../application/useCases/verify.evidence.us
 import CreateEvidenceDto from "../dtos/create.evidence.dto";
 import FormDataInterceptor from "../interceptors/form.data.interceptor";
 
-@ApiTags('evidences')
-@Controller({ path: 'evidences' })
+@ApiBearerAuth()
+@ApiTags("evidences")
+@Controller(
+    {
+        path: "evidences"
+    }
+)
 export default class EvidenceController {
 
     public constructor(

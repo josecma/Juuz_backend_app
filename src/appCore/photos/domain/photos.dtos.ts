@@ -26,7 +26,7 @@ export class PhotoDto implements PhotoWithoutId {
     example: 1,
   })
   id: string; // Unique identifier for the photo
-
+  vehicleId: string;
   @ApiProperty({
     description: 'The URL of the photo stored in S3',
     example: 'https://example.com/photo.jpg',

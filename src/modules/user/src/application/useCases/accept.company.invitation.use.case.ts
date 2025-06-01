@@ -38,23 +38,23 @@ export default class AcceptCompanyInvitationUseCase {
         try {
 
             const payload: {
-                companyInvitationRequestId: string,
+                companyInvitationId: string,
                 userId?: string,
                 email: string,
             } = await this.jwtService.verifyAsync(token);
 
             const {
-                companyInvitationRequestId,
+                companyInvitationId,
                 userId,
                 email,
             } = payload;
 
-            const companyInvitationRequest = await this.companyInvitationRequestReadRepository.findOneById(payload.companyInvitationRequestId);
+            const companyInvitationRequest = await this.companyInvitationRequestReadRepository.findOneById(companyInvitationId);
 
             if (
                 !companyInvitationRequest
                 ||
-                companyInvitationRequest.id !== companyInvitationRequestId
+                companyInvitationRequest.id !== companyInvitationId
             ) {
 
                 throw new NotFoundException('company invitation request not found');

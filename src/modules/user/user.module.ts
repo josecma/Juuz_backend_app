@@ -9,7 +9,7 @@ import HotpAdapter from "../shared/src/infrastructure/adapters/hotp.adapter";
 import { OtpSecretAdapter } from "../shared/src/infrastructure/adapters/otp.secret.adapter";
 import VehicleModule from "../vehicle/vehicle.module";
 // import FindUserLocationUseCase from "./src/application/useCases/find.user.location.use.case";
-import GetUserDetailUseCase from "./src/application/useCases/get.user.detail.use.case";
+// import GetUserDetailUseCase from "./src/application/useCases/get.user.detail.use.case";
 // import InviteUserToMyCompanyUseCase from "./src/application/useCases/join.company.request.by.email.use.case";
 // import ToggleAndReturnUserLocationUseCase from "./src/application/useCases/toggle.and.return.user.location.use.case";
 // import UpdateAndReturnUserUseCase from "./src/application/useCases/update.and.return.user.use.case";
@@ -49,6 +49,7 @@ import UserNotificationTokenWriteRepository from "./src/infrastructure/repositor
 import FindUserByEmailService from "./src/domain/services/find.user.by.email.service";
 import AcceptCompanyInvitationUseCase from "./src/application/useCases/accept.company.invitation.use.case";
 import RespondToCompanyInvitationUseCase from "./src/application/useCases/respond.to.company.invitation.use.case";
+import GetUserProfileUseCase from "./src/application/useCases/get.user.profile.use.case";
 
 @Module({
         imports: [
@@ -77,7 +78,7 @@ import RespondToCompanyInvitationUseCase from "./src/application/useCases/respon
                 UserNotificationTokenWriteRepository,
                 FindOneUserByIdService,
                 CreateUserUseCase,
-                GetUserDetailUseCase,
+                // GetUserDetailUseCase,
                 FindCompanyByOwnerIdAdapter,
                 HotpAdapter,
                 OtpSecretAdapter,
@@ -99,11 +100,12 @@ import RespondToCompanyInvitationUseCase from "./src/application/useCases/respon
                 InviteUserToCompanyUseCase,
                 CreateOrUpdateUserNotificationTokenUseCase,
                 FindUserByEmailService,
+                GetUserProfileUseCase,
         ],
         exports: [
                 UserRepository,
                 FindOneUserByIdService,
-                GetUserDetailUseCase,
+                // GetUserDetailUseCase,
                 UserReadRepository,
                 FindUserByIdUseCase,
                 UserIdentityReadRepository,

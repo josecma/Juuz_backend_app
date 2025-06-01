@@ -1,7 +1,8 @@
 import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import CompanyMemberReadRepository from "../../infrastructure/repositories/company.member.read.repository";
 import CompanyReadRepository from "../../infrastructure/repositories/company.read.repository";
-import CompanyRoleReadRepository from "../../infrastructure/repositories/company.role.read.repository";
+import CompanyRoleReadRepository from "../../infrastructure/repositories/company.member.role.read.repository";
+import { CompanyMemberRoleEnum } from "../../domain/enums/company.member.role.enum";
 
 @Injectable()
 export default class FindCompanyByOwnerIdUseCase {
@@ -23,14 +24,16 @@ export default class FindCompanyByOwnerIdUseCase {
 
         try {
 
-            const role = await this.companyRoleReadRepository.findOneByName('OWNER');
+            const role = await this.companyRoleReadRepository.findOneByName(CompanyMemberRoleEnum.OWNER);
 
             if (!role) {
+
                 throw new NotFoundException(
                     {
                         message: 'role not found',
                     }
                 );
+
             };
 
             const companyOwner = await this.companyMemberReadRepository.findOneBy(
@@ -41,11 +44,9 @@ export default class FindCompanyByOwnerIdUseCase {
             );
 
             if (!companyOwner) {
-                throw new NotFoundException(
-                    {
-                        message: 'company owner not found',
-                    }
-                );
+
+                return null;
+
             };
 
             const company = await this.companyReadRepository.findOneById(companyOwner.companyId);

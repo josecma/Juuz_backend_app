@@ -33,4 +33,50 @@ export default class CompanyInvitationRequestReadRepository {
 
     };
 
+    public async findPendingCompanyInvitationByEmail(
+        params: {
+            inviterId: string,
+            email: string,
+        }
+    ) {
+
+        const {
+            inviterId,
+            email,
+        } = params;
+
+        try {
+
+            const res = await this.client.companyInvitationRequest.findFirst(
+                {
+                    where: {
+                        inviterId,
+                        status: 'PENDING',
+                        invitee: {
+                            path: ['email'],
+                            equals: email,
+                        }
+                    },
+                }
+            );
+
+            return res as unknown as {
+                id: string,
+                status: string,
+                companyId: string,
+                role: string,
+                invitee: {
+                    id?: string,
+                    email: string,
+                }
+            };
+
+        } catch (error) {
+
+            throw error;
+
+        };
+
+    };
+
 };

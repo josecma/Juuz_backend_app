@@ -1,29 +1,20 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Prisma, PrismaClient } from "@prisma/client";
-import IStoragePort from "src/modules/shared/src/application/ports/i.storage.port";
-import S3Adapter from "src/modules/shared/src/infrastructure/adapters/s3.adapter";
-import EvidenceRepositoryContract from "../domain/contracts/repositories/evidence.repository.contract";
 import Evidence from "../domain/evidence";
 import { UpdateEvidenceJSON } from "../domain/types";
 import EvidenceMapper from "./mappers/evidence.mapper";
 
 @Injectable({})
-export default class EvidenceRepository implements EvidenceRepositoryContract {
+export default class EvidenceRepository {
 
     public constructor(
         @Inject(PrismaClient)
         private readonly client: PrismaClient,
-        @Inject(S3Adapter)
-        private readonly storage: IStoragePort,
     ) { };
 
     public async findByFileKeys(
-        params: {
-            keys: Array<string>;
-        }
+        keys: Array<string>,
     ) {
-
-        const { keys } = params;
 
         try {
 
@@ -48,7 +39,7 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
                 }
             });
 
-            return await Promise.all(res.map((e) => EvidenceMapper.to({ ...e }, this.storage)));
+            return res.map((e) => EvidenceMapper.to({ ...e }));
 
         } catch (error) {
 
@@ -102,7 +93,7 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
                 take: take,
             });
 
-            return await Promise.all(res.map((e) => EvidenceMapper.to({ ...e }, this.storage)));
+            return res.map((e) => EvidenceMapper.to({ ...e }));
 
         } catch (error) {
 
@@ -117,12 +108,20 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
             userId: string;
             orderId: string;
             evidence: Evidence;
+            files: Array<{
+                fileName: string,
+                key: string,
+                eTag: string,
+                mimeType: string,
+                size: number,
+                metadata?: Record<string, unknown>,
+            }>,
         }
     ): Promise<void> {
 
-        const { userId, orderId, evidence } = params;
+        const { userId, orderId, evidence, files } = params;
 
-        const { description, geoPoint, status, type, files } = evidence.toJSON();
+        const { description, geoPoint, status, type } = evidence.toJSON();
 
         try {
 
@@ -139,28 +138,32 @@ export default class EvidenceRepository implements EvidenceRepositoryContract {
                     },
                 });
 
-                const savedFiles = await Promise.all(files.map(async (file) => {
+                const savedFiles = await Promise.all(
+                    files.map(
+                        async (file) => {
 
-                    const { key, mimeType, metadata, size } = file;
+                            const { key, mimeType, metadata, size, eTag } = file;
 
-                    return await tx.file.upsert({
-                        where: {
-                            key: key
-                        },
-                        update: {
-                            key,
-                            mimeType: mimeType,
-                            metadata: metadata,
-                            size: size.toString()
-                        },
-                        create: {
-                            key,
-                            mimeType: mimeType,
-                            metadata: metadata,
-                            size: size.toString()
-                        }
-                    });
-                }));
+                            return await tx.file.upsert({
+                                where: {
+                                    key: key
+                                },
+                                update: {
+                                    key,
+                                    eTag,
+                                    mimeType: mimeType,
+                                    metadata: metadata as Prisma.JsonValue,
+                                    size: size.toString()
+                                },
+                                create: {
+                                    key,
+                                    eTag,
+                                    mimeType: mimeType,
+                                    metadata: metadata as Prisma.JsonValue,
+                                    size: size.toString()
+                                }
+                            });
+                        }));
 
                 const evidenceId = evidence.id;
 

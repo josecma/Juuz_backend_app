@@ -24,7 +24,6 @@ export default class EvidenceTransformPipe implements PipeTransform<any, CreateE
             type: type as EvidenceType,
             coords: JSON.parse(coords),
         }
-        console.log(dto);
 
         return dto;
 

@@ -1,8 +1,5 @@
 import { Prisma } from "@prisma/client";
-import IStoragePort from "src/modules/shared/src/application/ports/i.storage.port";
-import CoordinateMapper from "src/modules/shared/src/infrastructure/mappers/coordinate.mapper";
-import EvidenceFileMapper from "./evidence.file.mapper";
-
+import GeoPointMapper from "src/modules/shared/src/infrastructure/mappers/geo.point.mapper";
 export default class EvidenceMapper {
 
     static async to(
@@ -15,18 +12,7 @@ export default class EvidenceMapper {
                 };
             };
         }>,
-        storage: IStoragePort,
-    ): Promise<{
-        id: string;
-        description: string;
-        status: boolean;
-        type: string;
-        coordinates: {
-            latitude: number;
-            longitude: number;
-        };
-        files: [string, string][];
-    }> {
+    ) {
 
         const {
             id,
@@ -37,23 +23,15 @@ export default class EvidenceMapper {
             evidenceFiles
         } = obj;
 
-        const urlKeyMap = await Promise.all(
-            await storage.getFileUrls(
-                {
-                    keys: evidenceFiles.map(
-                        (ef) => EvidenceFileMapper.to(ef)
-                    ),
-                }
-            )
-        );
-
         const res = {
             id,
             description,
             status,
             type: type,
-            coordinates: CoordinateMapper.to(coordinates),
-            files: urlKeyMap,
+            coordinates: GeoPointMapper.to(coordinates),
+            files: evidenceFiles.map(
+                (e) => e.file
+            ),
         };
 
         return res;

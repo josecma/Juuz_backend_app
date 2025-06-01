@@ -1,9 +1,12 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { forwardRef, Inject, Module, OnModuleInit } from "@nestjs/common";
 import DatabaseModule from "../database/database.module";
 import UserModule from "../user/user.module";
+import IEventDispatcher from "./src/application/contracts/i.event.dispatcher";
+import IEventHandler from "./src/application/contracts/i.event.handler";
+import FileDeletedHandler from "./src/application/eventHandlers/file.deleted.handler";
 import GetPrivateUserChannelByUserIdUseCase from "./src/application/useCases/get.private.user.channel.by.user.id.use.case";
+import FileDeletedEvent from "./src/domain/events/file.deleted.event";
 import AblyAdapter from "./src/infrastructure/adapters/ably.adapter";
-// import FCMAdapter from "./src/infrastructure/adapters/fcm.adapter";
 import HandlebarsAdapter from "./src/infrastructure/adapters/handlebars.adapter";
 import NodemailerAdapter from "./src/infrastructure/adapters/nodemailer.adapter";
 import S3Adapter from "./src/infrastructure/adapters/s3.adapter";
@@ -29,6 +32,7 @@ import { EventDispatcher } from "./src/infrastructure/event.dispatcher";
         GetPrivateUserChannelByUserIdUseCase,
         ChannelReadRepository,
         ChannelWriteRepository,
+        FileDeletedHandler,
     ],
     exports: [
         S3Adapter,
@@ -43,4 +47,22 @@ import { EventDispatcher } from "./src/infrastructure/event.dispatcher";
         ChannelWriteRepository,
     ],
 })
-export default class SharedModule { };
+export default class SharedModule implements OnModuleInit {
+
+    public constructor(
+        @Inject(EventDispatcher)
+        private readonly eventDispatcher: IEventDispatcher,
+        @Inject(FileDeletedHandler)
+        private readonly fileDeletedHandler: IEventHandler,
+    ) { };
+
+    public onModuleInit() {
+
+        this.eventDispatcher.register(
+            FileDeletedEvent.eventName,
+            this.fileDeletedHandler,
+        );
+
+    };
+
+};

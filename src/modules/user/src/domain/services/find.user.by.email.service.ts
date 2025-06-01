@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import UserIdentityReadRepository from "../../infrastructure/repositories/user.identity.read.repository";
 import UserReadRepository from "../../infrastructure/repositories/user.read.repository";
 import { IdentityEnum } from "../enums/identity.enum";
@@ -28,7 +28,7 @@ export default class FindUserByEmailService {
 
             if (!userEmail) {
 
-                throw new NotFoundException('user email not found');
+                return null;
 
             };
 

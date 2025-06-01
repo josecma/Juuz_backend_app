@@ -1,6 +1,4 @@
-// import { Inject, Injectable } from "@nestjs/common";
-// import BadRequestDomainException from "src/modules/shared/src/domain/exceptions/bad.request.domain.exception";
-// import NotFoundDomainException from "src/modules/shared/src/domain/exceptions/not.found.domain.exception";
+// import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 // import CompanyReadRepository from "../../infrastructure/repositories/company.read.repository";
 // import CompanyWriteRepository from "../../infrastructure/repositories/company.write.repository";
 // import DoesCompanyExistRepository from "../../infrastructure/repositories/does.company.exist.repository";
@@ -25,26 +23,15 @@
 //         }
 //     ) {
 
-//         const { companyId, score } = params;
+//         const {
+//             companyId,
+//             score
+//         } = params;
 
 //         try {
 
-//             if (!companyId) {
-//                 throw new BadRequestDomainException(
-//                     {
-//                         message: "company id is required",
-//                         source: `${UpdateCompanyScoreService.name}`,
-//                     }
-//                 );
-//             };
-
 //             if (!score) {
-//                 throw new BadRequestDomainException(
-//                     {
-//                         message: "score is required",
-//                         source: `${UpdateCompanyScoreService.name}`,
-//                     }
-//                 );
+//                 throw new BadRequestException("score is required");
 //             };
 
 //             const company = await this.companyReadRepository.findOneById(
@@ -52,12 +39,9 @@
 //             );
 
 //             if (!company) {
-//                 throw new NotFoundDomainException(
-//                     {
-//                         message: `company with id:${companyId} not found`,
-//                         source: `${UpdateCompanyScoreService.name}`,
-//                     }
-//                 );
+
+//                 throw new BadRequestException("company not found");
+
 //             };
 
 //             const companyScore = company.score as CompanyScore;

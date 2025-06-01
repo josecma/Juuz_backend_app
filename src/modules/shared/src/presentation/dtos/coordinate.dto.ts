@@ -1,12 +1,26 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmptyNumber } from "../swagger/decorators/is.not.empty.number";
+import { IsNumber } from "class-validator";
 
 export class CoordinateDto {
-    @ApiProperty({ example: "-73.935242", description: "longitude" })
-    @IsNotEmptyNumber()
+
+    @ApiProperty(
+        {
+            example: "-73.935242",
+            description: "longitude",
+            required: true,
+        }
+    )
+    @IsNumber()
     longitude: number;
 
-    @ApiProperty({ example: "40.730610", description: "latitude" })
-    @IsNotEmptyNumber()
+    @ApiProperty(
+        {
+            example: "40.730610",
+            description: "latitude",
+            required: true,
+        }
+    )
+    @IsNumber()
     latitude: number;
+
 };

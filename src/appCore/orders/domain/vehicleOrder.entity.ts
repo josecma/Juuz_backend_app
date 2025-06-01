@@ -10,7 +10,7 @@ export class VehicleOrderEntity implements VehicleOrder {
     example: 1,
   })
   id: string;
-
+  vehicleId: string;
   @ApiProperty({
     description: 'The last number associated with the vehicle',
     example: 'LN-5678',

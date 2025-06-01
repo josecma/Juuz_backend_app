@@ -1,20 +1,23 @@
-import { forwardRef, Inject, Module, OnModuleInit } from "@nestjs/common";
+import { forwardRef, Inject, Module } from "@nestjs/common";
 import DatabaseModule from "../database/database.module";
-import UserEvaluationCreatedEvent from "../performance/src/domain/events/user.evaluation.created.event";
 import SharedModule from "../shared/shared.module";
 import IEventDispatcher from "../shared/src/application/contracts/i.event.dispatcher";
-import IEventHandler from "../shared/src/application/contracts/i.event.handler";
 import { EventDispatcher } from "../shared/src/infrastructure/event.dispatcher";
 // import UserEvaluationCreatedHandler from "./src/application/eventHandlers/user.evaluation.created.handler";
 import AddMemberToCompanyUseCase from "./src/application/useCases/add.member.to.company.use.case";
 import FindCompanyByOwnerIdUseCase from "./src/application/useCases/find.company.by.owner.use.case";
 // import UpdateCompanyScoreService from "./src/domain/services/update.company.score.service";
+import CreateCompanyUseCase from "./src/application/useCases/create.company.use.case";
+import FindOneCompanyByIdUseCase from "./src/application/useCases/find.one.company.by.id.use.case";
 import CompanyMemberReadRepository from "./src/infrastructure/repositories/company.member.read.repository";
+import CompanyRoleReadRepository from "./src/infrastructure/repositories/company.member.role.read.repository";
 import CompanyMemberWriteRepository from "./src/infrastructure/repositories/company.member.write.repository";
 import CompanyReadRepository from "./src/infrastructure/repositories/company.read.repository";
-import CompanyRoleReadRepository from "./src/infrastructure/repositories/company.role.read.repository";
 import CompanyWriteRepository from "./src/infrastructure/repositories/company.write.repository";
 import DoesCompanyExistRepository from "./src/infrastructure/repositories/does.company.exist.repository";
+import CompanyController from "./src/presentation/company.controller";
+import FindCompanyVehiclesUseCase from "./src/application/useCases/find.company.vehicles.use.case";
+import UpdateCompanyUseCase from "./src/application/useCases/update.company.use.case";
 
 @Module(
     {
@@ -22,7 +25,9 @@ import DoesCompanyExistRepository from "./src/infrastructure/repositories/does.c
             DatabaseModule,
             forwardRef(() => SharedModule),
         ],
-        controllers: [],
+        controllers: [
+            CompanyController,
+        ],
         providers: [
             CompanyMemberReadRepository,
             CompanyRoleReadRepository,
@@ -34,6 +39,10 @@ import DoesCompanyExistRepository from "./src/infrastructure/repositories/does.c
             CompanyWriteRepository,
             FindCompanyByOwnerIdUseCase,
             AddMemberToCompanyUseCase,
+            CreateCompanyUseCase,
+            FindOneCompanyByIdUseCase,
+            FindCompanyVehiclesUseCase,
+            UpdateCompanyUseCase,
         ],
         exports: [
             CompanyReadRepository,

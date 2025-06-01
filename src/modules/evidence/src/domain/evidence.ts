@@ -9,24 +9,23 @@ export default class Evidence extends Base {
     private status: boolean;
     type: string;
     geoPoint: GeoPoint;
-    private files: Array<File>;
 
-    public constructor(params: {
-        id?: string;
-        description: string;
-        type: string;
-        geoPoint: GeoPoint;
-        files: Array<File>;
-    }) {
+    public constructor(
+        params: {
+            id?: string,
+            description: string,
+            type: string,
+            geoPoint: GeoPoint,
+        }
+    ) {
 
-        const { id, description, geoPoint, files = [], type } = params;
+        const { id, description, geoPoint, type } = params;
 
         super({ id });
 
         this.description = description;
         this.status = false;
         this.geoPoint = geoPoint;
-        this.files = files;
         this.type = type;
 
     };
@@ -39,20 +38,13 @@ export default class Evidence extends Base {
 
     };
 
-    public getFiles(): Array<File> {
-
-        return this.files;
-
-    };
-
-    public toJSON(): EvidenceJSON {
+    public toJSON() {
         return {
             id: this.id,
             description: this.description,
             status: this.status,
             type: this.type,
             geoPoint: this.geoPoint.toJSON(),
-            files: this.files.map((file) => file.toJSON()),
         };
     };
 

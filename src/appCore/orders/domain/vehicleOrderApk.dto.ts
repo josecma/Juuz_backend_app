@@ -35,6 +35,7 @@ export class VehicleOrderApkDto implements VehicleOrderId {
   @IsEnum(VehicleType, { message: 'Invalid vehicle type' })
   @IsOptional()
   vehicleType: VehicleType;
+  vehicleId: string;
 
   @ApiProperty({
     description: 'The last number associated with the vehicle',

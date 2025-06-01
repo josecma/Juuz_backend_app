@@ -4,6 +4,7 @@ import { FileJSON } from "./shared";
 export default class File extends Base {
 
     key: string;
+    eTag: string;
     mimeType: string;
     size: number;
     metadata?: Record<string, any>;
@@ -11,12 +12,13 @@ export default class File extends Base {
     public constructor(params: {
         id?: string;
         key: string;
+        eTag: string;
         size: number;
         mimeType: string;
         metadata?: Record<string, any>;
     }) {
 
-        const { id, key, mimeType, metadata, size } = params;
+        const { id, key, mimeType, metadata, size, eTag } = params;
 
         super({ id });
 
@@ -24,6 +26,7 @@ export default class File extends Base {
         this.metadata = metadata ?? {};
         this.key = key;
         this.size = size;
+        this.eTag = eTag;
 
     };
 
@@ -31,6 +34,7 @@ export default class File extends Base {
         return {
             id: this.id,
             key: this.key,
+            eTag: this.eTag,
             mimeType: this.mimeType,
             metadata: this.metadata,
             size: this.size,

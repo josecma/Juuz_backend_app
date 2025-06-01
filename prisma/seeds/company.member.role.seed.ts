@@ -3,8 +3,8 @@ import companyMemberRoleData from '../data/company.member.role.data';
 
 const prisma = new PrismaClient();
 
-async function seedCompanyRoles() {
-    console.log('▶️ Seeding company roles...');
+async function seedCompanyMemberRoles() {
+    console.log('▶️ Seeding company member roles...');
 
     await prisma.companyMemberRole.createMany({
         data: companyMemberRoleData,
@@ -14,9 +14,9 @@ async function seedCompanyRoles() {
     console.log('company roles seeded successfully');
 }
 
-seedCompanyRoles()
+seedCompanyMemberRoles()
     .catch((e) => {
-        console.error('Error seeding company roles:', e);
+        console.error('Error seeding company member roles:', e);
         process.exit(1);
     })
     .finally(async () => {

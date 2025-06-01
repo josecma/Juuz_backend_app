@@ -6,6 +6,7 @@ export type BaseParams = BaseJSON;
 
 export type FileJSON = BaseJSON & {
     key: string;
+    eTag: string;
     mimeType: string;
     metadata?: Record<string, any>;
     size: number;

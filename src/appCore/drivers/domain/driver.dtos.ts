@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType, OmitType } from '@nestjs/swagger';
-import { Driver } from '@prisma/client';
+import { Vehicle } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -16,7 +16,7 @@ import {
 import { UpdateVehicleInfoDto } from 'src/appCore/vehicleInfos/domain/vehicleInfo.dtos';
 
 type DriverWithoutId = Omit<
-  Driver,
+  Vehicle,
   | 'id'
   | 'userPhoto'
   | 'createdAt'
@@ -34,7 +34,7 @@ type DriverWithoutId = Omit<
 >;
 
 type CarrierWithoutId = Omit<
-  Driver,
+  Vehicle,
   | 'id'
   | 'userPhoto'
   | 'createdAt'

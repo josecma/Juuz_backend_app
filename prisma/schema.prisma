@@ -83,10 +83,11 @@ model User {
   verified  Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
 
-  profilePicture ProfilePicture? @relation(name: "profile_picture")
-  identities     Identity[]      @relation(name: "user_identities")
-  credentials    Credential[]    @relation(name: "user_credentials")
-  vehicles       Driver[]        @relation(name: "user_vehicles")
+  profilePicture UserProfilePicture? @relation(name: "user_profile_picture")
+  identities     Identity[]          @relation(name: "user_identities")
+  credentials    Credential[]        @relation(name: "user_credentials")
+  vehicles       Vehicle[]           @relation(name: "user_vehicles")
+  companyMembers CompanyMember[]
 
   @@map("users")
 }
@@ -324,27 +325,41 @@ model Score {
 }
 
 model File {
-  id             String          @id @default(uuid())
-  key            String          @unique() @db.VarChar()
-  size           String
-  mimeType       String
-  metadata       Json
-  uploadedAt     DateTime        @default(now()) @map("uploaded_at")
-  evidenceFiles  EvidenceFile[]
-  profilePicture ProfilePicture?
+  id                 String              @id @default(uuid())
+  key                String              @unique()
+  eTag               String              @map("e_tag")
+  size               String
+  mimeType           String              @map("mime_type")
+  metadata           Json
+  uploadedAt         DateTime            @default(now()) @map("uploaded_at")
+  evidenceFiles      EvidenceFile[]
+  userProfilePicture UserProfilePicture?
+  vehiclePictures    VehiclePicture[]
 
   @@index([key])
   @@map("files")
 }
 
-model ProfilePicture {
+model VehiclePicture {
+  vehicleId String  @map("vehicle_id")
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+  fileId    String  @unique() @map("file_id")
+  file      File    @relation(fields: [fileId], references: [id])
+
+  @@id([vehicleId, fileId])
+  @@index([vehicleId])
+  @@map("vehicle_pictures")
+}
+
+model UserProfilePicture {
   userId String @unique() @map("user_id")
-  user   User   @relation(name: "profile_picture", fields: [userId], references: [id])
+  user   User   @relation(name: "user_profile_picture", fields: [userId], references: [id])
   fileId String @unique() @map("file_id")
   file   File   @relation(fields: [fileId], references: [id])
 
   @@id([userId, fileId])
-  @@map("profile_pictures")
+  @@index([userId])
+  @@map("user_profile_pictures")
 }
 
 model EvidenceFile {
@@ -402,36 +417,62 @@ model Category {
   @@map("categories")
 }
 
-model Vehicle {
-  id           String   @id @default(uuid())
-  vin          String   @unique
-  categoryPath String   @map("category_path")
-  year         Int
-  color        String
-  licensePlate String   @map("license_plate")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+// model Vehicle {
+//   id           String   @id @default(uuid())
+//   vin          String   @unique
+//   categoryPath String   @map("category_path")
+//   year         Int
+//   color        String
+//   licensePlate String   @map("license_plate")
+//   createdAt    DateTime @default(now()) @map("created_at")
+//   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  @@index([vin, licensePlate])
-  @@map("vehicles")
+//   @@index([vin, licensePlate])
+//   @@map("vehicles")
+// }
+
+model Address {
+  id             String          @id @default(uuid())
+  city           String
+  state          String
+  zipCode        String
+  country        String
+  street         String
+  location       Json
+  metadata       Json?
+  companyAddress CompanyAddress?
+
+  @@index([location])
+  @@map("addresses")
+}
+
+model CompanyAddress {
+  companyId String  @unique @map("company_id")
+  addressId String  @unique @map("address_id")
+  company   Company @relation(fields: [companyId], references: [id])
+  address   Address @relation(fields: [addressId], references: [id])
+
+  @@id([companyId, addressId])
+  @@index([companyId])
+  @@map("company_addresses")
 }
 
 model Company {
   id                 String          @id @default(uuid())
-  carrierIdentifier  String? // alias de la company
+  carrierIdentifier  String?
   usdot              String?
   mc                 String?
-  primaryAdminEmail  String? // company email
+  email              String?
+  primaryAdminEmail  String?
   countryCode        String?
   phoneNumber        String?
   extension          String?
-  addressLine1       String? // sede
-  addressLine2       String? // sedes 11 y2 y3 
+  addressLine1       String?
+  addressLine2       String?
   city               String?
   state              String?
   zipCode            String?
   country            String?
-  rating             Int?            @default(0)
   dotNumber          String?         @unique
   stripeAccountId    String?         @map("stripe_account_id")
   expMonth           String?         @map("exp_month")
@@ -449,15 +490,13 @@ model Company {
   transfers          Transfer[]
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
-  createdBy          String?         @map("created_by")
-  updatedBy          String?         @map("updated_by")
-  deletedAt          DateTime?       @map("deleted_at")
-  deletedBy          String?         @map("deleted_by")
-  version            Int?            @default(0)
   ownerId            String?         @unique @map("owner_id")
   payments           Payment[]
   paymentMethod      PaymentMethod[]
-  vehicles           Driver[]
+  companyAddress     CompanyAddress?
+  companyMembers     CompanyMember[]
+
+  @@map("companies")
 }
 
 model Payment {
@@ -578,10 +617,12 @@ model UserPoint {
 }
 
 model CompanyMember {
-  id        String @id @default(uuid())
-  memberId  String @map("user_id")
-  companyId String @map("company_id")
-  roleId    String @map("role_id")
+  id        String  @id @default(uuid())
+  memberId  String  @map("user_id")
+  companyId String  @map("company_id")
+  roleId    String  @map("role_id")
+  company   Company @relation(fields: [companyId], references: [id])
+  member    User    @relation(fields: [memberId], references: [id])
 
   @@unique([memberId, companyId, roleId])
   @@index([memberId])
@@ -672,49 +713,33 @@ model Session {
 //   @@unique([action, name])
 // }
 
-model Driver {
-  id            String         @id @default(uuid())
-  vinNumber     String         @unique
-  year          Int
+model Vehicle {
+  id            String           @id @default(uuid())
+  vinNumber     String           @unique
+  year          Int?
   insuranceDoc  String?
   faceId        String?
   vehicleType   String?
-  serviceId     String?        @map("service_id")
-  service       Service?       @relation(fields: [serviceId], references: [id])
+  serviceId     String?          @map("service_id")
+  service       Service?         @relation(fields: [serviceId], references: [id])
   vehicleOrder  VehicleOrder[]
-  photos        Photo[]
   capacity      Int?
-  vehicleInfoId String?
-  vehicleInfo   VehicleInfo?   @relation(fields: [vehicleInfoId], references: [id])
-  point         Point?
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-  createdBy     String?        @map("created_by")
-  updatedBy     String?        @map("updated_by")
-  deletedAt     DateTime?      @map("deleted_at")
-  deletedBy     String?        @map("deleted_by")
-  version       Int            @default(0)
-  ownerId       String         @map("owner_id")
+  vehicleInfoId String
+  vehicleInfo   VehicleInfo      @relation(fields: [vehicleInfoId], references: [id])
+  createdAt     DateTime?        @default(now()) @map("created_at")
+  ownerId       String           @map("owner_id")
+  user          User             @relation(name: "user_vehicles", fields: [ownerId], references: [id])
+  pictures      VehiclePicture[]
 
-  user      User     @relation(name: "user_vehicles", fields: [ownerId], references: [id])
-  Company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?
+  @@map("vehicles")
 }
 
 model VehicleInfo {
   id        String    @id @default(uuid())
   model     Model     @relation(fields: [modelId], references: [id])
-  modelId   String
-  driver    Driver[]
+  modelId   String    @map("model_id")
   createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  createdBy String?   @map("created_by")
-  updatedBy String?   @map("updated_by")
-  deletedAt DateTime? @map("deleted_at")
-  deletedBy String?   @map("deleted_by")
-  version   Int       @default(0)
-  ownerId   String    @map("owner_id")
-  companyId String?   @map("company_id")
+  vehicle   Vehicle[]
 }
 
 model Model {
@@ -724,12 +749,6 @@ model Model {
   brand        Brand          @relation(fields: [brandId], references: [id])
   brandId      String         @map("brand_id")
   createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  createdBy    String?        @map("created_by")
-  updatedBy    String?        @map("updated_by")
-  deletedAt    DateTime?      @map("deleted_at")
-  deletedBy    String?        @map("deleted_by")
-  version      Int            @default(0)
   VehicleInfo  VehicleInfo[]
   VehicleOrder VehicleOrder[]
 
@@ -737,16 +756,10 @@ model Model {
 }
 
 model Brand {
-  id        String    @id @default(uuid())
-  name      String    @unique
+  id        String   @id @default(uuid())
+  name      String   @unique
   models    Model[]
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  createdBy String?   @map("created_by")
-  updatedBy String?   @map("updated_by")
-  deletedAt DateTime? @map("deleted_at")
-  deletedBy String?   @map("deleted_by")
-  version   Int       @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
 }
 
 model VehicleOrder {
@@ -769,8 +782,8 @@ model VehicleOrder {
   order                        Order?                 @relation(fields: [orderId], references: [id])
   modelId                      String?                @map("model_id")
   model                        Model?                 @relation(fields: [modelId], references: [id])
-  driverId                     String?
-  driver                       Driver?                @relation(fields: [driverId], references: [id])
+  vehicleId                    String?
+  vehicle                      Vehicle?               @relation(fields: [vehicleId], references: [id])
   createdAt                    DateTime               @default(now()) @map("created_at")
   updatedAt                    DateTime               @updatedAt @map("updated_at")
   createdBy                    String?                @map("created_by")
@@ -787,8 +800,6 @@ model Photo {
   name      String    @unique
   orderId   String?   @map("order_id")
   order     Order?    @relation(fields: [orderId], references: [id])
-  driverId  String?
-  driver    Driver?   @relation(fields: [driverId], references: [id])
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   createdBy String?   @map("created_by")
@@ -911,7 +922,6 @@ model Point {
   destinationOrders Order[]                              @relation("DestinationPoint")
   orderId           String?                              @map("order_id")
   order             Order?                               @relation(fields: [orderId], references: [id])
-  driver            Driver?                              @relation(fields: [driverId], references: [id])
   driverId          String?                              @unique @map("driver_id")
   createdAt         DateTime                             @default(now()) @map("created_at")
   updatedAt         DateTime?                            @updatedAt @map("updated_at")
@@ -923,8 +933,8 @@ model Point {
   ownerId           String?                              @map("owner_id")
   companyId         String?                              @map("company_id")
   userPoint         UserPoint?
-  //user              User?                                @relation(references: [id], fields: [userId])
 
+  //user              User?                                @relation(references: [id], fields: [userId])
   @@index([coords], name: "location_idx", type: Gist)
 }
 
@@ -963,7 +973,6 @@ model Service {
   id          String       @id @default(uuid())
   name        ServiceEnum  @unique()
   description String?
-  driver      Driver[]
   subService  SubService[]
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
@@ -974,6 +983,7 @@ model Service {
   version     Int          @default(0)
   ownerId     String       @map("owner_id")
   companyId   String?      @map("company_id")
+  Vehicle     Vehicle[]
 }
 
 model SubService {

@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import CompanyMemberWriteRepository from "../../infrastructure/repositories/company.member.write.repository";
 import CompanyReadRepository from "../../infrastructure/repositories/company.read.repository";
-import CompanyRoleReadRepository from "../../infrastructure/repositories/company.role.read.repository";
+import CompanyRoleReadRepository from "../../infrastructure/repositories/company.member.role.read.repository";
 
 @Injectable({})
 export default class AddMemberToCompanyUseCase {

@@ -1,20 +1,19 @@
 import { Prisma } from "@prisma/client";
 
-export default class CoordinateMapper {
-    static to(
-        obj: Prisma.JsonValue,
-    ): { latitude: number, longitude: number } {
+export default class GeoPointMapper {
 
-        const { coordinates } = obj as {
+    static to(
+        orm: Prisma.JsonValue,
+    ) {
+
+        return orm as {
             type: "POINT";
             coordinates: {
                 latitude: number,
                 longitude: number,
             };
+
         };
 
-        return coordinates;
-
     };
-
 };

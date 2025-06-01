@@ -7,6 +7,7 @@ import NodemailerAdapter from "src/modules/shared/src/infrastructure/adapters/no
 import { CompanyInvitationRequestStatusEnum } from "../../domain/enums/company.invitation.request.status.enum";
 import FindUserByEmailService from "../../domain/services/find.user.by.email.service";
 import FindCompanyByOwnerIdAdapter from "../../infrastructure/adapters/find.company.by.owner.id.adapter";
+import CompanyInvitationRequestReadRepository from "../../infrastructure/repositories/company.invitation.request.read.repository";
 import CompanyInvitationRequestWriteRepository from "../../infrastructure/repositories/company.invitation.request.write.repository";
 import UserReadRepository from "../../infrastructure/repositories/user.read.repository";
 
@@ -20,6 +21,7 @@ export default class InviteUserToCompanyUseCase {
         private readonly findUserByEmailService: FindUserByEmailService,
         private readonly findCompanyByOwnerIdAdapter: FindCompanyByOwnerIdAdapter,
         private readonly companyInvitationRequestWriteRepository: CompanyInvitationRequestWriteRepository,
+        private readonly companyInvitationRequestReadRepository: CompanyInvitationRequestReadRepository,
         private readonly jwtService: JwtService,
         private readonly nodemailerAdapter: NodemailerAdapter,
         private readonly handlebarsAdapter: HandlebarsAdapter,
@@ -53,6 +55,26 @@ export default class InviteUserToCompanyUseCase {
             };
 
             const invitee = await this.findUserByEmailService.find(email);
+
+            const oldInvitationRequest = await this.companyInvitationRequestReadRepository.findPendingCompanyInvitationByEmail(
+                {
+                    email,
+                    inviterId,
+                }
+            );
+
+            if (oldInvitationRequest) {
+
+                await this.companyInvitationRequestWriteRepository.update(
+                    {
+                        id: oldInvitationRequest.id,
+                        updateObject: {
+                            status: CompanyInvitationRequestStatusEnum.FAILED,
+                        }
+                    }
+                );
+
+            };
 
             const companyInvitation = await this.companyInvitationRequestWriteRepository.save(
                 {
@@ -89,15 +111,40 @@ export default class InviteUserToCompanyUseCase {
                 date.getSeconds()
             ].map(num => String(num).padStart(2, '0')).join(':');
 
+            const inviterName =
+                inviter?.firstName != undefined
+                    &&
+                    inviter?.firstName != null
+                    &&
+                    inviter?.lastName != undefined
+                    &&
+                    inviter?.lastName != null
+                    ?
+                    `${inviter?.firstName} ${inviter?.lastName}`
+                    : "";
+
+            const inviteeName =
+                invitee?.firstName != undefined
+                    &&
+                    invitee?.firstName != null
+                    &&
+                    invitee?.lastName != undefined
+                    &&
+                    invitee?.lastName != null
+                    ?
+                    `${invitee?.firstName} ${invitee?.lastName}`
+                    : email;
+
+
             const template = this.handlebarsAdapter.compile(
                 {
                     templatesDir: './src/modules/user/src/presentation/templates',
                     templateName: 'company.invitation.template',
                     data: {
-                        inviteeName: `${invitee?.firstName} ${invitee?.lastName}`,
+                        inviteeName,
                         inviteeEmail: email,
                         userExists: !!invitee,
-                        inviterName: `${inviter.firstName} ${inviter.lastName}`,
+                        inviterName,
                         companyName: userCompany.name,
                         role: role,
                         platformName: 'juuz',

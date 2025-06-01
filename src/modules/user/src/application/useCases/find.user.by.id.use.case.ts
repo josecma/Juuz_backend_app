@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import GetUserOtpSecretService from "../../domain/services/get.user.otp.secret.service";
+import FindCompanyByOwnerIdAdapter from "../../infrastructure/adapters/find.company.by.owner.id.adapter";
 import UserIdentityReadRepository from "../../infrastructure/repositories/user.identity.read.repository";
 import UserReadRepository from "../../infrastructure/repositories/user.read.repository";
 
@@ -12,6 +13,7 @@ export default class FindUserByIdUseCase {
         private readonly userReadRepository: UserReadRepository,
         private readonly getUserOtpSecretService: GetUserOtpSecretService,
         private readonly userIdentityReadRepository: UserIdentityReadRepository,
+        private readonly findCompanyByOwnerIdAdapter: FindCompanyByOwnerIdAdapter,
     ) { };
 
     public async execute(
@@ -32,6 +34,8 @@ export default class FindUserByIdUseCase {
         }>;
 
         let phoneNumbers: Array<string>;
+
+        let company: any;
 
         let otpSecret: string;
 
@@ -63,18 +67,32 @@ export default class FindUserByIdUseCase {
 
             };
 
+            if (include?.company) {
+
+                const res = await this.findCompanyByOwnerIdAdapter.find(user.id);
+
+                company = res;
+            };
+
             return Object.assign(
                 {},
                 {
                     user,
                     otpSecret,
                     emails,
+                    company,
                 },
             );
 
         } catch (error) {
 
-            this.logger.debug(error.message);
+            this.logger.error(
+                {
+                    source: `${FindUserByIdUseCase.name}`,
+                    message: error.message,
+                }
+            );
+
             throw error;
 
         };

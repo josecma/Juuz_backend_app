@@ -38,6 +38,7 @@ export class VehicleOrderDto implements VehicleOrderId {
   @IsEnum(VehicleType, { message: 'Invalid vehicle type' })
   vehicleType: VehicleType;
 
+  vehicleId: string;
   @ApiProperty({
     description: 'Description of the vehicle problem.',
     example: 'The engine is making a strange noise.',

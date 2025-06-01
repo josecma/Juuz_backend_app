@@ -2,10 +2,10 @@ import { Prisma } from "@prisma/client";
 
 export default class FileMapper {
     static to(
-        obj: Prisma.FileGetPayload<{}>
+        orm: Prisma.FileGetPayload<{}>
     ): string {
 
-        const { key } = obj;
+        const { key } = orm;
 
         return key;
 

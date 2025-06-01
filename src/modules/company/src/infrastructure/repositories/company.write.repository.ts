@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
+import CompanyReadRepository from "./company.read.repository";
 
 @Injectable()
 export default class CompanyWriteRepository {
@@ -9,13 +10,33 @@ export default class CompanyWriteRepository {
     public constructor(
         @Inject(PrismaClient)
         private readonly prisma: PrismaClient,
+        private readonly companyReadRepository: CompanyReadRepository,
     ) { };
 
     public async save(
         params: {
             ownerId: string,
             companyMemberRoleId: string,
-            company: {}
+            company: {
+                name: string,
+                carrierIdentifier: string,
+                email: string,
+                usdot: string,
+                mc: string,
+                phoneNumber: string,
+                address: {
+                    country: string,
+                    city: string,
+                    state: string,
+                    zipCode: string,
+                    street: string,
+                    location: {
+                        latitude: number,
+                        longitude: number,
+                    },
+                    metadata?: Record<string, unknown>
+                },
+            },
         }
     ) {
 
@@ -25,35 +46,105 @@ export default class CompanyWriteRepository {
             company,
         } = params;
 
+        const {
+            address,
+            ...companyRes
+        } = company;
+
+        const {
+            location,
+            metadata,
+            ...addressRes
+        } = address;
+
+        const geoPoint = {
+            type: "Point",
+            coordinates: [
+                location.longitude,
+                location.latitude
+            ],
+        }
+
         try {
 
             const res = await this.prisma.$transaction(
+
                 async (tx) => {
-                    const savedCompany = await tx.company.create(
+
+                    const saveAddressResponse = await tx.address.create(
                         {
-                            data: company,
+                            data: {
+                                ...addressRes,
+                                location: geoPoint,
+                                metadata: metadata as Prisma.JsonValue,
+                            }
+                        }
+                    );
+
+                    const saveCompanyResponse = await tx.company.create(
+                        {
+                            data: companyRes
+                        }
+                    );
+
+                    await tx.companyAddress.create(
+                        {
+                            data: {
+                                companyId: saveCompanyResponse.id,
+                                addressId: saveAddressResponse.id,
+                            }
                         }
                     );
 
                     await tx.companyMember.create(
                         {
                             data: {
-                                companyId: savedCompany.id,
+                                companyId: saveCompanyResponse.id,
                                 memberId: ownerId,
                                 roleId: companyMemberRoleId,
                             },
                         }
                     );
 
-                    return savedCompany;
+                    const fineUniqueCompanyResponse = await tx.company.findUnique(
+                        {
+                            where: {
+                                id: saveCompanyResponse.id,
+                            },
+                            include: {
+                                companyAddress: {
+                                    include: {
+                                        address: true,
+                                    }
+                                },
+                            }
+                        }
+                    );
+
+                    return fineUniqueCompanyResponse;
+
+                }
+
+            );
+
+            const { companyAddress, ...company } = res;
+
+            return Object.assign(
+                {},
+                company,
+                {
+                    address: companyAddress.address,
                 }
             );
 
-            return res;
-
         } catch (error) {
 
-            this.logger.error(error);
+            this.logger.error(
+                {
+                    source: `${CompanyWriteRepository.name}`,
+                    message: error.message,
+                }
+            );
 
             throw error;
 
@@ -61,42 +152,129 @@ export default class CompanyWriteRepository {
 
     };
 
-    // public async update(
-    //     params: {
-    //         companyId: string;
-    //         updateObj: {
-    //             score: {
-    //                 lastAvg: number;
-    //                 lastDiv: number;
-    //             };
-    //         };
-    //     }
-    // ) {
+    public async update(
+        params: {
+            id: string,
+            updateObject?: {
+                name?: string,
+                carrierIdentifier?: string,
+                email?: string,
+                usdot?: string,
+                mc?: string,
+                phoneNumber?: string,
+                address?: {
+                    country?: string,
+                    city?: string,
+                    state?: string,
+                    zipCode?: string,
+                    street?: string,
+                    location?: {
+                        latitude: number,
+                        longitude: number,
+                    },
+                    metadata?: Record<string, unknown>
+                },
+            },
+        }
+    ) {
 
-    //     const { companyId, updateObj } = params;
+        const {
+            id,
+            updateObject,
+        } = params;
 
-    //     const { score } = updateObj;
+        const {
+            address,
+            ...updateObjectRest
+        } = updateObject;
 
-    //     try {
+        try {
 
-    //         const res = await this.prisma.company.update({
-    //             where: {
-    //                 id: companyId,
-    //             },
-    //             data: {
-    //                 score
-    //             },
-    //         });
+            await this.prisma.$transaction(
 
-    //         return res;
+                async (tx) => {
 
-    //     } catch (error) {
+                    const findUniqueCompanyAddressResponse = await tx.companyAddress.findUnique(
+                        {
+                            where: {
+                                companyId: id,
+                            }
+                        }
+                    );
 
-    //         this.logger.error(error);
-    //         throw error;
+                    const {
+                        companyId,
+                        addressId
+                    } = findUniqueCompanyAddressResponse;
 
-    //     };
+                    if (updateObject.address) {
 
-    // };
+                        const {
+                            location,
+                            metadata,
+                            ...addressRest
+                        } = address;
+
+                        let geoPoint: {
+                            type: string,
+                            coordinates: [number, number],
+                        };
+
+                        if (location) {
+
+                            geoPoint = {
+                                type: "Point",
+                                coordinates: [
+                                    location.longitude,
+                                    location.latitude
+                                ],
+                            };
+
+                        };
+
+                        await tx.address.update(
+                            {
+                                where: {
+                                    id: addressId,
+                                },
+                                data: {
+                                    ...addressRest,
+                                    location: geoPoint,
+                                    metadata: metadata as Prisma.JsonValue,
+                                }
+                            }
+                        );
+
+                    }
+
+                    await tx.company.update(
+                        {
+                            where: {
+                                id,
+                            },
+                            data: updateObjectRest,
+                        }
+                    );
+
+                }
+
+            );
+
+            return this.companyReadRepository.findOneById(id);
+
+        } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${CompanyWriteRepository.name}`,
+                    message: error.message,
+                }
+            );
+
+            throw error;
+
+        };
+
+    };
 
 };
