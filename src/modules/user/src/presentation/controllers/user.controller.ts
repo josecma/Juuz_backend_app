@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Req, Res } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
+import { Public } from "src/modules/auth/src/presentation/decorators/public.route.decorator";
+import ConflictDomainException from "src/modules/shared/src/domain/exceptions/conflict.domain.exception";
 import Request from "src/modules/shared/src/types/types";
 import AcceptCompanyInvitationUseCase from "../../application/useCases/accept.company.invitation.use.case";
 import CompleteEmailIdvUseCase from "../../application/useCases/complete.email.idv.use.case";
@@ -47,7 +49,6 @@ import InitiateUserIdvRequestBody from "../dtos/initiate.user.idv.request.body";
 import InviteJoinCompanyRequestBody from "../dtos/invite.user.to.company.request.body";
 import RespondToCompanyInvitationRequestBody from "../dtos/respond.to.company.invitation.request.body";
 import SetUserNotificationTokenRequestBody from "../dtos/set.user.notification.token.request.body";
-import { Public } from "src/modules/auth/src/presentation/decorators/public.route.decorator";
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -406,24 +407,36 @@ export default class UserController {
     ) {
 
         const {
-            token
+            token,
+            status
         } = body;
 
         try {
 
             await this.acceptCompanyInvitationUseCase.execute(
-                token
+                {
+                    token,
+                    status
+                }
             );
 
             return res
                 .status(200)
                 .json(
                     {
-                        message: 'added to company successfully'
+                        message: 'user added to company successfully'
                     }
                 );
 
         } catch (error) {
+
+            if (error instanceof ConflictDomainException) {
+
+                return res
+                    .status(409)
+                    .json(error.message);
+
+            };
 
             return error;
 

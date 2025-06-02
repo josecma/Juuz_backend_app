@@ -1,10 +1,12 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { CompanyMemberRoleEnum } from "src/modules/company/src/domain/enums/company.member.role.enum";
 import { CompanyInvitationRequestStatusEnum } from "../../domain/enums/company.invitation.request.status.enum";
 
 @Injectable({})
 export default class CompanyInvitationRequestWriteRepository {
+
+    private readonly logger = new Logger(CompanyInvitationRequestWriteRepository.name);
 
     public constructor(
         @Inject(PrismaClient)
@@ -46,9 +48,16 @@ export default class CompanyInvitationRequestWriteRepository {
                 },
             );
 
-            return res as Omit<typeof res, "invitee"> & { invitee: { id?: string, email?: string } };
+            return res as Omit<typeof res, "invitee"> & { invitee: { id?: string, email: string } };
 
         } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${CompanyInvitationRequestWriteRepository.name}`,
+                    message: error.message
+                }
+            );
 
             throw error;
 
@@ -72,7 +81,7 @@ export default class CompanyInvitationRequestWriteRepository {
 
         try {
 
-            const res = await this.client.companyInvitationRequest.update(
+            const updateByIdResponse = await this.client.companyInvitationRequest.update(
                 {
                     where: {
                         id,
@@ -81,9 +90,16 @@ export default class CompanyInvitationRequestWriteRepository {
                 },
             );
 
-            return res;
+            return updateByIdResponse;
 
         } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${CompanyInvitationRequestWriteRepository.name}`,
+                    message: error.message
+                }
+            );
 
             throw error;
 

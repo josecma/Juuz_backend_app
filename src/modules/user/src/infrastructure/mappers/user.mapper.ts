@@ -3,7 +3,11 @@ import User from "../../domain/entities/user";
 
 export default class UserMapper {
     static to(
-        orm: Prisma.UserGetPayload<{}>
+        orm: Prisma.UserGetPayload<{
+            include: {
+                identities: true,
+            }
+        }>
     ) {
 
         const {

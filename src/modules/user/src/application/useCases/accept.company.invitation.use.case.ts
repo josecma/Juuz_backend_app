@@ -6,6 +6,7 @@ import { CompanyInvitationRequestStatusEnum } from "../../domain/enums/company.i
 import { IdentityEnum } from "../../domain/enums/identity.enum";
 import CompanyInvitationRequestReadRepository from "../../infrastructure/repositories/company.invitation.request.read.repository";
 import CompanyInvitationRequestWriteRepository from "../../infrastructure/repositories/company.invitation.request.write.repository";
+import UserReadRepository from "../../infrastructure/repositories/user.read.repository";
 import CreateUserUseCase from "./create.user.use.case";
 import FindUserByIdUseCase from "./find.user.by.id.use.case";
 
@@ -19,13 +20,21 @@ export default class AcceptCompanyInvitationUseCase {
         private readonly companyInvitationRequestWriteRepository: CompanyInvitationRequestWriteRepository,
         private readonly addMemberToCompanyUseCase: AddMemberToCompanyUseCase,
         private readonly jwtService: JwtService,
-        private readonly findUserByIdUseCase: FindUserByIdUseCase,
         private readonly createUserUseCase: CreateUserUseCase,
+        private readonly userReadRepository: UserReadRepository,
     ) { };
 
     public async execute(
-        token: string
+        params: {
+            token: string,
+            status: CompanyInvitationRequestStatusEnum,
+        }
     ) {
+
+        const {
+            token,
+            status,
+        } = params;
 
         let user: {
             user: User,
@@ -35,42 +44,48 @@ export default class AcceptCompanyInvitationUseCase {
             }[],
         } = null;
 
+        let payload: {
+            companyInvitationId: string,
+            userId?: string,
+            email: string,
+        } = null;
+
         try {
 
-            const payload: {
-                companyInvitationId: string,
-                userId?: string,
-                email: string,
-            } = await this.jwtService.verifyAsync(token);
+            try {
+
+                payload = await this.jwtService.verifyAsync(token);
+
+            } catch (error) {
+
+                throw new Error("not valid or expired token");
+
+            }
 
             const {
                 companyInvitationId,
-                userId,
                 email,
             } = payload;
 
             const companyInvitationRequest = await this.companyInvitationRequestReadRepository.findOneById(companyInvitationId);
 
             if (
-                !companyInvitationRequest
+                companyInvitationRequest == null
                 ||
                 companyInvitationRequest.id !== companyInvitationId
+                ||
+                companyInvitationRequest.invitee.email !== email
             ) {
 
                 throw new NotFoundException('company invitation request not found');
 
             };
 
-            user = userId
-                ? await this.findUserByIdUseCase.execute(
-                    {
-                        userId,
-                        include: {
-                            emails: true
-                        }
-                    }
-                ) :
-                await this.createUserUseCase.execute(
+            const findUserByEmail = await this.userReadRepository.findOneByEmail(email);
+
+            if (findUserByEmail == null) {
+
+                user = await this.createUserUseCase.execute(
                     {
                         identities: [
                             {
@@ -81,32 +96,26 @@ export default class AcceptCompanyInvitationUseCase {
                     }
                 );
 
-            await this.addMemberToCompanyUseCase.execute(
-                {
-                    memberId: user.user.id,
-                    roleName: companyInvitationRequest.role,
-                    companyId: companyInvitationRequest.companyId,
-                }
-            );
+            };
+
+            if (status === CompanyInvitationRequestStatusEnum.ACCEPTED) {
+
+                await this.addMemberToCompanyUseCase.execute(
+                    {
+                        memberId: findUserByEmail?.id ?? user.user.id,
+                        roleName: companyInvitationRequest.role,
+                        companyId: companyInvitationRequest.companyId,
+                    }
+                );
+
+            };
 
             await this.companyInvitationRequestWriteRepository.update(
                 {
                     id: companyInvitationRequest.id,
                     updateObject: {
-                        status: CompanyInvitationRequestStatusEnum.ACCEPTED,
+                        status,
                     },
-                }
-            );
-
-            return Object.assign(
-                {},
-                {
-                    id: user.user.id,
-                    firstName: user.user.firstName,
-                    lastName: user.user.lastName,
-                },
-                {
-                    emails: user.emails,
                 }
             );
 

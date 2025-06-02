@@ -1,8 +1,11 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import { CompanyInvitationRequestStatusEnum } from "../../domain/enums/company.invitation.request.status.enum";
 
 @Injectable({})
 export default class CompanyInvitationRequestReadRepository {
+
+    private readonly logger = new Logger(CompanyInvitationRequestReadRepository.name);
 
     public constructor(
         @Inject(PrismaClient)
@@ -27,6 +30,13 @@ export default class CompanyInvitationRequestReadRepository {
 
         } catch (error) {
 
+            this.logger.error(
+                {
+                    source: `${CompanyInvitationRequestReadRepository.name}`,
+                    message: error.message,
+                }
+            );
+
             throw error;
 
         };
@@ -47,11 +57,11 @@ export default class CompanyInvitationRequestReadRepository {
 
         try {
 
-            const res = await this.client.companyInvitationRequest.findFirst(
+            const findFirstResponse = await this.client.companyInvitationRequest.findFirst(
                 {
                     where: {
                         inviterId,
-                        status: 'PENDING',
+                        status: CompanyInvitationRequestStatusEnum.PENDING,
                         invitee: {
                             path: ['email'],
                             equals: email,
@@ -60,7 +70,7 @@ export default class CompanyInvitationRequestReadRepository {
                 }
             );
 
-            return res as unknown as {
+            return findFirstResponse as unknown as {
                 id: string,
                 status: string,
                 companyId: string,
@@ -72,6 +82,13 @@ export default class CompanyInvitationRequestReadRepository {
             };
 
         } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${CompanyInvitationRequestReadRepository.name}`,
+                    message: error.message,
+                }
+            );
 
             throw error;
 

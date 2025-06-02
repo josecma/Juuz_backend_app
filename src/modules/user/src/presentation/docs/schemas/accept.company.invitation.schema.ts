@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { CompanyInvitationRequestStatusEnum } from "../../../domain/enums/company.invitation.request.status.enum";
 
 export default class AcceptCompanyInvitationSchema {
 
@@ -10,5 +11,14 @@ export default class AcceptCompanyInvitationSchema {
         }
     )
     token: string;
+
+    @ApiProperty(
+        {
+            enum: CompanyInvitationRequestStatusEnum,
+            example: CompanyInvitationRequestStatusEnum.REJECTED,
+            required: true,
+        }
+    )
+    status: string;
 
 };

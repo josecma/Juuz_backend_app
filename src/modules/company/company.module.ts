@@ -18,6 +18,7 @@ import DoesCompanyExistRepository from "./src/infrastructure/repositories/does.c
 import CompanyController from "./src/presentation/company.controller";
 import FindCompanyVehiclesUseCase from "./src/application/useCases/find.company.vehicles.use.case";
 import UpdateCompanyUseCase from "./src/application/useCases/update.company.use.case";
+import FindCompanyMemberService from "./src/domain/services/find.company.member.service";
 
 @Module(
     {
@@ -37,6 +38,7 @@ import UpdateCompanyUseCase from "./src/application/useCases/update.company.use.
             DoesCompanyExistRepository,
             CompanyReadRepository,
             CompanyWriteRepository,
+            FindCompanyMemberService,
             FindCompanyByOwnerIdUseCase,
             AddMemberToCompanyUseCase,
             CreateCompanyUseCase,

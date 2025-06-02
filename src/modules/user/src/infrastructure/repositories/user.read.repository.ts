@@ -1,5 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import { IdentityEnum } from "../../domain/enums/identity.enum";
 import UserMapper from "../mappers/user.mapper";
 
 @Injectable()
@@ -15,9 +16,54 @@ export default class UserReadRepository {
 
         try {
 
-            const users = await this.client.user.findMany({});
+            const findManyResponse = await this.client.user.findMany(
+                {
+                    include: {
+                        identities: true,
+                    }
+                }
+            );
 
-            return users;
+            return findManyResponse.map(
+                (e) => UserMapper.to(e)
+            );
+
+        } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${UserReadRepository.name}`,
+                    message: `${error.message}`,
+                }
+            );
+
+            throw new error;
+
+        };
+
+    };
+
+    public async findOneByEmail(
+        email: string
+    ) {
+
+        try {
+
+            const findOneByEmailResponse = await this.client.user.findFirst({
+                where: {
+                    identities: {
+                        some: {
+                            type: IdentityEnum.EMAIL,
+                            value: email,
+                        }
+                    },
+                },
+                include: {
+                    identities: true,
+                }
+            });
+
+            return findOneByEmailResponse ? UserMapper.to(findOneByEmailResponse) : null;
 
         } catch (error) {
 
@@ -40,13 +86,16 @@ export default class UserReadRepository {
 
         try {
 
-            const user = await this.client.user.findUnique({
+            const findOneByIdResponse = await this.client.user.findUnique({
                 where: {
                     id: userId,
                 },
+                include: {
+                    identities: true,
+                }
             });
 
-            return UserMapper.to(user);
+            return findOneByIdResponse ? UserMapper.to(findOneByIdResponse) : null;
 
         } catch (error) {
 
@@ -69,17 +118,22 @@ export default class UserReadRepository {
 
         try {
 
-            const users = await this.client.user.findMany(
+            const findManyResponse = await this.client.user.findMany(
                 {
                     where: {
                         id: {
                             in: userIds
                         },
                     },
+                    include: {
+                        identities: true,
+                    }
                 }
             );
 
-            return users;
+            return findManyResponse.map(
+                (e) => UserMapper.to(e)
+            );
 
         } catch (error) {
 
@@ -98,7 +152,7 @@ export default class UserReadRepository {
 
     public async exist(
         userId: string
-    ): Promise<boolean> {
+    ) {
 
         try {
 
@@ -113,6 +167,13 @@ export default class UserReadRepository {
             return count > 0;
 
         } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${UserReadRepository.name}`,
+                    message: `${error.message}`,
+                }
+            );
 
             throw error;
 

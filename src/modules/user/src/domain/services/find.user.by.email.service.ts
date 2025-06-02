@@ -1,7 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import UserIdentityReadRepository from "../../infrastructure/repositories/user.identity.read.repository";
 import UserReadRepository from "../../infrastructure/repositories/user.read.repository";
-import { IdentityEnum } from "../enums/identity.enum";
 
 @Injectable()
 export default class FindUserByEmailService {
@@ -10,7 +8,6 @@ export default class FindUserByEmailService {
 
     public constructor(
         private readonly userReadRepository: UserReadRepository,
-        private readonly userIdentityReadRepository: UserIdentityReadRepository,
     ) { };
 
     public async find(
@@ -19,24 +16,26 @@ export default class FindUserByEmailService {
 
         try {
 
-            const userEmail = await this.userIdentityReadRepository.findOneBy(
-                {
-                    type: IdentityEnum.EMAIL,
-                    value: email,
-                }
-            );
+            if (email == null) {
 
-            if (!userEmail) {
-
-                return null;
+                throw new Error("email is required");
 
             };
 
-            const user = await this.userReadRepository.findOneById(userEmail.userId);
+            const findOneByEmailResponse = await this.userReadRepository.findOneByEmail(email);
 
-            return user;
+            if (findOneByEmailResponse == null) return null;
+
+            return findOneByEmailResponse;
 
         } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${FindUserByEmailService.name}`,
+                    message: error.message,
+                }
+            );
 
             throw error;
 

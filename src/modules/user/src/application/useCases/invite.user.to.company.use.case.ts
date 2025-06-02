@@ -46,9 +46,9 @@ export default class InviteUserToCompanyUseCase {
 
             const inviter = await this.userReadRepository.findOneById(inviterId);
 
-            const userCompany = await this.findCompanyByOwnerIdAdapter.find(inviterId);
+            const findCompanyByOwner = await this.findCompanyByOwnerIdAdapter.find(inviterId);
 
-            if (!userCompany) {
+            if (!findCompanyByOwner) {
 
                 throw new NotFoundException('company not found');
 
@@ -63,7 +63,7 @@ export default class InviteUserToCompanyUseCase {
                 }
             );
 
-            if (oldInvitationRequest) {
+            if (oldInvitationRequest != null) {
 
                 await this.companyInvitationRequestWriteRepository.update(
                     {
@@ -84,7 +84,7 @@ export default class InviteUserToCompanyUseCase {
                         email,
                     },
                     role,
-                    companyId: userCompany.id,
+                    companyId: findCompanyByOwner.id,
                     status: CompanyInvitationRequestStatusEnum.PENDING,
                 }
             );
@@ -139,13 +139,13 @@ export default class InviteUserToCompanyUseCase {
             const template = this.handlebarsAdapter.compile(
                 {
                     templatesDir: './src/modules/user/src/presentation/templates',
-                    templateName: 'company.invitation.template',
+                    templateName: 'one.template',
                     data: {
                         inviteeName,
                         inviteeEmail: email,
                         userExists: !!invitee,
                         inviterName,
-                        companyName: userCompany.name,
+                        companyName: findCompanyByOwner.name,
                         role: role,
                         platformName: 'juuz',
                         platformDomain: 'juuz.com',
