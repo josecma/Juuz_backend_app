@@ -217,42 +217,66 @@ model TrackingChannel {
 }
 
 model Business {
-  id     String @id @default(uuid())
-  status String
+  id           String                @id @default(uuid())
+  status       String
+  bids         StakeholderBid[]      @relation(name: "business_bid")
+  stakeholders BusinessStakeholder[] @relation(name: "business_stakeholder")
+  objects      BusinessObject[]      @relation(name: "business_object")
 
+  @@index([status])
   @@map("businesses")
 }
 
-model Item {
-  itemId     String @map("item_id")
-  businessId String @map("business_id")
-  type       String @map("type")
+model BusinessObject {
+  id          String  @id @default(uuid())
+  objectId    String  @map("item_id")
+  businessId  String  @unique @map("business_id")
+  type        Json // [path , metadata]
+  baseValue   String? @map("base_value")
+  description String?
+  metadata    Json?
 
-  @@id([businessId, itemId])
-  @@index([itemId])
+  business Business         @relation(name: "business_object", fields: [businessId], references: [id])
+  bids     StakeholderBid[] @relation(name: "business_object_bid")
+
   @@index([businessId])
-  @@map("items")
+  @@index([objectId, businessId])
+  @@map("business_objects")
 }
 
 model BusinessStakeholder {
-  role       String
-  businessId String @map("business_id")
-  userId     String @map("user_id")
+  id          String @id @default(uuid())
+  role        String
+  businessId  String @map("business_id")
+  stakeholder Json // [ type, data ]
 
-  @@id([businessId, userId])
+  bids     StakeholderBid[] @relation(name: "stakeholder_bid")
+  business Business         @relation(name: "business_stakeholder", fields: [businessId], references: [id])
+
+  @@unique([businessId, role])
+  @@index([role])
+  @@index([businessId, role])
   @@map("business_stakeholders")
 }
 
-model Bid {
-  id         String @id @default(uuid())
-  bidderId   String @map("bidder_id")
-  itemId     String @map("item_id")
-  businessId String @map("business_id")
-  price      Json
+model StakeholderBid {
+  id               String @id @default(uuid())
+  bidderId         String @map("bidder_id")
+  businessObjectId String @map("business_object_id")
+  businessId       String @map("business_id")
+  offerDetails     Json   @map("offer_details") // [ type, ]
 
-  @@index([itemId, businessId])
+  biddingAt DateTime @default(now()) @map("bidding_at")
+
+  stakeholder    BusinessStakeholder @relation(name: "stakeholder_bid", fields: [bidderId], references: [id])
+  business       Business            @relation(name: "business_bid", fields: [businessId], references: [id])
+  businessObject BusinessObject      @relation(name: "business_object_bid", fields: [businessObjectId], references: [id])
+
+  @@index([biddingAt])
   @@index([bidderId])
-  @@map("bids")
+  @@index([businessId])
+  @@index([businessObjectId, businessId, bidderId])
+  @@map("stakeholder_bids")
 }
 
 model Criterion {
