@@ -7,7 +7,12 @@ import GetTrackingChannelUseCase from "./src/application/useCases/get.tracking.c
 import OrderModule from "../order/order.module";
 
 @Module({
-    imports: [DatabaseModule, SharedModule, UserModule, OrderModule,],
+    imports: [
+        DatabaseModule,
+        SharedModule,
+        UserModule,
+        OrderModule,
+    ],
     controllers: [],
     providers: [
         NegotiationRepository,

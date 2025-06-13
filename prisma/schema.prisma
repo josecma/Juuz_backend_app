@@ -228,13 +228,11 @@ model Business {
 }
 
 model BusinessObject {
-  id          String  @id @default(uuid())
-  objectId    String  @map("item_id")
-  businessId  String  @unique @map("business_id")
-  type        Json // [path , metadata]
-  baseValue   String? @map("base_value")
-  description String?
-  metadata    Json?
+  id         String @id @default(uuid())
+  objectId   String @map("object_id")
+  businessId String @unique @map("business_id")
+  type       String
+  details    Json?
 
   business Business         @relation(name: "business_object", fields: [businessId], references: [id])
   bids     StakeholderBid[] @relation(name: "business_object_bid")
@@ -245,10 +243,11 @@ model BusinessObject {
 }
 
 model BusinessStakeholder {
-  id          String @id @default(uuid())
-  role        String
-  businessId  String @map("business_id")
-  stakeholder Json // [ type, data ]
+  id         String @id @default(uuid())
+  role       String
+  businessId String @map("business_id")
+  type       String
+  details    Json?
 
   bids     StakeholderBid[] @relation(name: "stakeholder_bid")
   business Business         @relation(name: "business_stakeholder", fields: [businessId], references: [id])
@@ -264,7 +263,8 @@ model StakeholderBid {
   bidderId         String @map("bidder_id")
   businessObjectId String @map("business_object_id")
   businessId       String @map("business_id")
-  offerDetails     Json   @map("offer_details") // [ type, ]
+  type             String
+  details          Json   @map("offer_details")
 
   biddingAt DateTime @default(now()) @map("bidding_at")
 
