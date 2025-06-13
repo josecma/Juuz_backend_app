@@ -84,7 +84,7 @@ export class OrderServiceApkDto {
   subServiceName: $Enums.SubServiceEnum;
 }
 
-export class OrderApkDto implements OrderWithoutId {
+export class OrderApkDto {
   @ApiProperty({
     example: 'hello@domain.com',
     description: 'Email of the user',
@@ -92,7 +92,9 @@ export class OrderApkDto implements OrderWithoutId {
   @IsEmail({}, { message: 'Invalid email format' })
   @IsOptional()
   emailSecond: string;
-
+  pickedupAt: Date;
+  cancelledAt: Date;
+  deliveredAt: Date;
   @ApiProperty({
     example: '323 2032',
     description: 'Phone of the user',
@@ -323,15 +325,15 @@ export class UpdateOrderDto extends PartialType(OrderApkDto) {
   status: $Enums.OrderStatusEnum;
 
   @ApiProperty({
-    example: $Enums.OrderSubStatus.COMPLETE,
+    example: "COMPLETE",
     description: 'Name of the main service provided.',
-    enum: $Enums.OrderSubStatus,
+    // enum: $Enums.OrderSubStatus,
   })
-  @IsEnum($Enums.OrderSubStatus, {
-    message: `serviceName must be one of the following values: ${Object.values(
-      $Enums.OrderSubStatus
-    ).join(', ')}`,
-  })
+  // @IsEnum($Enums.OrderSubStatus, {
+  //   message: `serviceName must be one of the following values: ${Object.values(
+  //     $Enums.OrderSubStatus
+  //   ).join(', ')}`,
+  // })
   @Validate(IsValidSubStatusConstraint)
-  subStatus: $Enums.OrderSubStatus;
+  subStatus: string;
 }

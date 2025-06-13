@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Vehicle } from '@prisma/client';
+import { JsonValue } from '@prisma/client/runtime/library';
 export class DriverEntity implements Vehicle {
   @ApiProperty({
     example: 1,
@@ -12,7 +13,8 @@ export class DriverEntity implements Vehicle {
     description: 'The unique identifier of the user who owns the vehicle',
   })
   userId: string;
-
+  metadata: JsonValue;
+  color: string;
   @ApiProperty({
     example: 'ABC123',
     description: 'The VIN (Vehicle Identification Number) of the vehicle',

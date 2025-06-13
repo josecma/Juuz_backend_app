@@ -1,0 +1,12 @@
+export enum OrderSubStatusEnum {
+    DELIVERED = 'DELIVERED',
+    REPORT = 'REPORT',
+    PICKUP = 'PICKUP',
+    STARTED = 'STARTED',
+    COMPLETE = 'COMPLETE',
+    CANCELLED = 'CANCELLED',
+    UPCOMING = 'UPCOMING',
+    ASSIGNED = 'ASSIGNED',
+    OUT_OF_TIME = 'OUT_OF_TIME',
+    LATE_ORDER = 'LATE_ORDER',
+};

@@ -1,27 +1,32 @@
-import DomainException from "./domain.exception";
 
-export default class NotFoundDomainException extends DomainException {
+export default class NotFoundDomainException {
 
-    name: string;
-    source: string;
+    public name: string;
+    public message: string;
 
     constructor(
         params: {
             name?: string;
-            message: string;
-            source: string;
+            message?: string;
         },
     ) {
 
-        const { name = "Not Found Domain Exception", message, source } = params;
+        const {
+            name = "NOT FOUND DOMAIN EXCEPTION",
+            message,
+        } = params;
 
-        super(
-            {
-                name,
-                message,
-                source,
-            }
-        );
+        this.name = name;
+        this.message = message;
+
+    };
+
+    public toJSON() {
+
+        return {
+            name: this.name,
+            message: this.message,
+        }
 
     };
 

@@ -2,14 +2,13 @@ import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import FindOneOrderByIdService from "src/modules/order/src/domain/services/find.one.order.by.id.service";
 import FindOneUserByIdService from "src/modules/user/src/domain/services/find.one.user.by.id.service";
 import EvidenceRepository from "../../infrastructure/evidence.repository";
-import EvidenceRepositoryContract from "../contracts/repositories/evidence.repository.contract";
 
 @Injectable({})
 export default class FindEvidenceByOrderIdService {
 
     public constructor(
         @Inject(EvidenceRepository)
-        private readonly evidenceRepository: EvidenceRepositoryContract,
+        private readonly evidenceRepository: EvidenceRepository,
         @Inject(FindOneUserByIdService)
         private readonly findOneUserByIdService: FindOneUserByIdService,
         @Inject(FindOneOrderByIdService)

@@ -3,6 +3,7 @@ import IEventDispatcher from "src/modules/shared/src/application/contracts/i.eve
 import S3Adapter from "src/modules/shared/src/infrastructure/adapters/s3.adapter";
 import { EventDispatcher } from "src/modules/shared/src/infrastructure/event.dispatcher";
 import VehicleWriteRepository from "../../infrastructure/repositories/vehicle.write.repository";
+import { UploadFile } from "src/modules/shared/src/domain/types/upload.file";
 
 @Injectable()
 export default class CreateVehicleUseCase {
@@ -26,13 +27,7 @@ export default class CreateVehicleUseCase {
                 capacity: number
             },
             modelId: string,
-            files: Array<{
-                fileName: string,
-                key: string,
-                buffer: Buffer,
-                mimeType: string,
-                metadata?: Record<string, unknown>,
-            }>,
+            files: Array<UploadFile>,
         }
     ) {
 
@@ -51,14 +46,13 @@ export default class CreateVehicleUseCase {
 
             const pictures = files.map((file) => {
 
-                const { key, mimeType, metadata, buffer, fileName } = file;
+                const { uniqueName, mimeType, metadata, buffer, originalName } = file;
 
                 return {
-                    key,
-                    eTag: uploadedFiles.get(key),
+                    uniqueName,
+                    eTag: uploadedFiles.get(uniqueName),
                     mimeType,
                     metadata,
-                    fileName,
                     size: buffer.length,
                 };
 

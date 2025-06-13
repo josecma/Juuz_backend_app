@@ -14,6 +14,8 @@ import UUIDAdapter from "./src/infrastructure/adapters/uuid.adapter";
 import ChannelReadRepository from "./src/infrastructure/channel.read.repository";
 import ChannelWriteRepository from "./src/infrastructure/channel.write.repository";
 import { EventDispatcher } from "./src/infrastructure/event.dispatcher";
+import { InfrastructureEventEmitter } from "./src/infrastructure/events/infrastructure.event.emitter";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 
 @Module({
     imports: [
@@ -33,6 +35,8 @@ import { EventDispatcher } from "./src/infrastructure/event.dispatcher";
         ChannelReadRepository,
         ChannelWriteRepository,
         FileDeletedHandler,
+        EventEmitter2,
+        InfrastructureEventEmitter,
     ],
     exports: [
         S3Adapter,
@@ -45,6 +49,7 @@ import { EventDispatcher } from "./src/infrastructure/event.dispatcher";
         GetPrivateUserChannelByUserIdUseCase,
         ChannelReadRepository,
         ChannelWriteRepository,
+        InfrastructureEventEmitter
     ],
 })
 export default class SharedModule implements OnModuleInit {

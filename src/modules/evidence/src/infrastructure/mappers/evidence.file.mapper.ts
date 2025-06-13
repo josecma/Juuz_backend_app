@@ -9,7 +9,7 @@ export default class EvidenceFileMapper {
                 file: true
             }
         }>
-    ): string {
+    ) {
 
         const { file } = obj;
 

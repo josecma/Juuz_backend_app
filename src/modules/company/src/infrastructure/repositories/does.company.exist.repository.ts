@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 @Injectable()
 export default class DoesCompanyExistRepository {
 
-    private readonly loger = new Logger(DoesCompanyExistRepository.name);
+    private readonly logger = new Logger(DoesCompanyExistRepository.name);
 
     public constructor(
         @Inject()
@@ -12,12 +12,8 @@ export default class DoesCompanyExistRepository {
     ) { };
 
     public async exist(
-        params: {
-            companyId: string;
-        },
+        companyId: string,
     ): Promise<boolean> {
-
-        const { companyId } = params;
 
         try {
 
@@ -32,6 +28,13 @@ export default class DoesCompanyExistRepository {
             return count > 0;
 
         } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${DoesCompanyExistRepository.name}`,
+                    message: error.message,
+                }
+            );
 
             throw error;
 

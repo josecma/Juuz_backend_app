@@ -1,5 +1,6 @@
 import { ApiProperty, PartialType, OmitType } from '@nestjs/swagger';
 import { Vehicle } from '@prisma/client';
+import { JsonValue } from '@prisma/client/runtime/library';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -149,7 +150,11 @@ export class VehicleBaseDto {
   vehicleInfo: DriverVehicleInfoDto;
 }
 
-export class DriverDto extends VehicleBaseDto implements DriverWithoutId { }
+export class DriverDto extends VehicleBaseDto implements DriverWithoutId {
+  color: string;
+  capacity: number;
+  metadata: JsonValue;
+}
 
 export class CarrierDto extends VehicleBaseDto implements CarrierWithoutId {
   @ApiProperty({
@@ -161,6 +166,9 @@ export class CarrierDto extends VehicleBaseDto implements CarrierWithoutId {
   //@Min(1, { message: 'userId must be a positive integer' })
   @IsOptional()
   userId: string;
+  color: string;
+  capacity: number;
+  metadata: JsonValue;
 }
 
 export class UpdateDriverDto extends PartialType(

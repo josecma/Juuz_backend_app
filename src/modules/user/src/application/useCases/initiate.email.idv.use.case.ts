@@ -47,7 +47,6 @@ export default class InitiateEmailIdvUseCase {
 
                 throw new NotFoundDomainException(
                     {
-                        source: `${InitiateEmailIdvUseCase.name}`,
                         message: `identity not found`,
                     }
                 );
@@ -58,7 +57,6 @@ export default class InitiateEmailIdvUseCase {
 
                 throw new NotFoundDomainException(
                     {
-                        source: `${InitiateEmailIdvUseCase.name}`,
                         message: `identity not found`,
                     }
                 );

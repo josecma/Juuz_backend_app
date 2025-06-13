@@ -27,7 +27,7 @@ export default class VehicleReadRepository {
                             include: {
                                 model: {
                                     include: {
-                                        brand: true,
+                                        make: true,
                                     }
                                 }
                             }
@@ -78,7 +78,7 @@ export default class VehicleReadRepository {
                             include: {
                                 model: {
                                     include: {
-                                        brand: true,
+                                        make: true,
                                     }
                                 }
                             }
@@ -125,7 +125,7 @@ export default class VehicleReadRepository {
                             include: {
                                 model: {
                                     include: {
-                                        brand: true,
+                                        make: true,
                                     }
                                 }
                             }

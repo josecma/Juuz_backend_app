@@ -1,29 +1,29 @@
-import { Inject, Injectable } from "@nestjs/common";
-import CategoryRepository from "../infrastructure/repositories/category.repository";
+// import { Inject, Injectable } from "@nestjs/common";
+// import CategoryRepository from "../infrastructure/repositories/category.repository";
 
-@Injectable()
-export default class CreateCategoryService {
+// @Injectable()
+// export default class CreateCategoryService {
 
-    public constructor(
-        @Inject()
-        private readonly categoryRepository: CategoryRepository,
-    ) { };
+//     public constructor(
+//         @Inject()
+//         private readonly categoryRepository: CategoryRepository,
+//     ) { };
 
-    public async execute(params: { parentId?: string; name: string; }) {
+//     public async execute(params: { parentId?: string; name: string; }) {
 
-        const { parentId, name } = params;
+//         const { parentId, name } = params;
 
-        try {
+//         try {
 
-            const obj = await this.categoryRepository.save(params);
+//             const obj = await this.categoryRepository.save(params);
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(error);
-            throw error;
+//             console.error(error);
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

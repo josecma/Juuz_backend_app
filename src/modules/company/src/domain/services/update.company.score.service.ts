@@ -1,94 +1,100 @@
-// import { BadRequestException, Inject, Injectable } from "@nestjs/common";
-// import CompanyReadRepository from "../../infrastructure/repositories/company.read.repository";
-// import CompanyWriteRepository from "../../infrastructure/repositories/company.write.repository";
-// import DoesCompanyExistRepository from "../../infrastructure/repositories/does.company.exist.repository";
-// import { CompanyScore } from "../types";
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
+import CompanyScoreRepository from "../../infrastructure/repositories/company.score.repository";
+import DoesCompanyExistRepository from "../../infrastructure/repositories/does.company.exist.repository";
 
-// @Injectable({})
-// export default class UpdateCompanyScoreService {
+@Injectable({})
+export default class UpdateCompanyScoreService {
 
-//     public constructor(
-//         @Inject(CompanyWriteRepository)
-//         private readonly companyWriteRepository: CompanyWriteRepository,
-//         @Inject(CompanyReadRepository)
-//         private readonly companyReadRepository: CompanyReadRepository,
-//         @Inject(DoesCompanyExistRepository)
-//         private readonly doesCompanyExistRepository: DoesCompanyExistRepository,
-//     ) { };
+    private readonly logger = new Logger(UpdateCompanyScoreService.name);
 
-//     public async update(
-//         params: {
-//             companyId: string;
-//             score: number;
-//         }
-//     ) {
+    public constructor(
+        private readonly companyScoreRepository: CompanyScoreRepository,
+        private readonly doesCompanyExistRepository: DoesCompanyExistRepository,
+    ) { };
 
-//         const {
-//             companyId,
-//             score
-//         } = params;
+    public async update(
+        params: {
+            companyId: string,
+            score: number,
+        }
+    ) {
 
-//         try {
+        const {
+            companyId,
+            score
+        } = params;
 
-//             if (!score) {
-//                 throw new BadRequestException("score is required");
-//             };
+        try {
 
-//             const company = await this.companyReadRepository.findOneById(
-//                 companyId
-//             );
+            if (score == null) {
 
-//             if (!company) {
+                throw new BadRequestException("score is required");
 
-//                 throw new BadRequestException("company not found");
+            };
 
-//             };
+            if (
+                !await this.doesCompanyExistRepository.exist(companyId)
+            ) {
 
-//             const companyScore = company.score as CompanyScore;
+                throw new BadRequestException("company not found");
 
-//             let newScore: CompanyScore;
+            };
 
-//             if (companyScore) {
+            const findCompanyScoreResponse = await this.companyScoreRepository.find(companyId);
 
-//                 const lastSum = companyScore.lastAvg * companyScore.lastDiv;
-//                 const currentSum = lastSum + score;
-//                 const currentDiv = companyScore.lastDiv + 1;
-//                 const currentAvg = currentSum / currentDiv;
+            let newScore: {
+                currentAvg: number,
+                currentDiv: number,
+            } = null;
 
-//                 newScore = {
-//                     lastAvg: currentAvg,
-//                     lastDiv: currentDiv
-//                 };
+            if (findCompanyScoreResponse != null) {
 
-//             } else {
+                const {
+                    lastAvg,
+                    lastDiv,
+                } = findCompanyScoreResponse;
 
-//                 newScore = {
-//                     lastAvg: score,
-//                     lastDiv: 1,
-//                 };
+                const lastSum = lastAvg * lastDiv;
+                const currentSum = lastSum + score;
+                const currentDiv = lastDiv + 1;
+                const currentAvg = currentSum / currentDiv;
 
-//             };
+                newScore = {
+                    currentAvg,
+                    currentDiv
+                };
 
-//             const updatedCompany = await this.companyWriteRepository.update(
-//                 {
-//                     companyId,
-//                     updateObj: {
-//                         score: newScore,
-//                     },
-//                 }
-//             );
+            } else {
 
-//             return {
-//                 msg: "company updated successfully",
-//                 content: updatedCompany,
-//             };
+                newScore = {
+                    currentAvg: score,
+                    currentDiv: 1,
+                };
 
-//         } catch (error) {
+            };
 
-//             throw error;
+            const saveCompanyScoreResponse = await this.companyScoreRepository.save(
+                {
+                    companyId,
+                    ...newScore
+                }
+            );
 
-//         };
+            return saveCompanyScoreResponse;
 
-//     };
+        } catch (error) {
 
-// };
+            this.logger.error(
+                {
+                    source: `${UpdateCompanyScoreService.name}`,
+                    message: error.message,
+                }
+            );
+
+            throw error;
+
+        };
+
+    };
+
+};

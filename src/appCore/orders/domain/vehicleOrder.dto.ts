@@ -33,10 +33,14 @@ type VehicleOrderId = Omit<
 export class VehicleOrderDto implements VehicleOrderId {
   @ApiProperty({
     description: 'The type of the vehicle',
-    enum: VehicleType, // Reference to the VehicleType enum
+    // enum: VehicleType, // Reference to the VehicleType enum
   })
-  @IsEnum(VehicleType, { message: 'Invalid vehicle type' })
-  vehicleType: VehicleType;
+  // @IsEnum(VehicleType, { message: 'Invalid vehicle type' })
+  vehicleMakeModelId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  vehicleType: string;
 
   vehicleId: string;
   @ApiProperty({
@@ -67,8 +71,8 @@ export class VehicleOrderDto implements VehicleOrderId {
     description: 'The year of vehicles',
     example: 1,
   })
-  @IsInt()
   @IsNotEmpty()
+  @IsInt()
   year: number;
 
   @ApiProperty({
@@ -148,7 +152,7 @@ export class VehicleOrderDto implements VehicleOrderId {
     example: 1,
   })
   @IsOptional()
-  @IsInt()
+  @IsString()
   modelId: string;
 }
 

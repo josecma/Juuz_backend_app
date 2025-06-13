@@ -57,7 +57,6 @@ export default class CreateEvaluationUseCase {
                 throw new NotFoundDomainException(
                     {
                         message: `${role} default criterion set not found`,
-                        source: `${CreateEvaluationUseCase.name}`
                     }
                 );
             };

@@ -74,15 +74,15 @@ export class MassagesService extends PrismaGenericService<
         email: true,
         note: true,
         phone: true,
-        photos: {
-            select: {
-                id: true,
-                name: true,
-            },
-        },
-        pickUpDate: true,
+        // photos: {
+        //     select: {
+        //         id: true,
+        //         name: true,
+        //     },
+        // },
+        pickUpAt: true,
         pricePerMile: true,
-        deliveryDate: true,
+        deliveryAt: true,
         firstName: true,
         lastName: true,
         carCount: true,
@@ -113,16 +113,16 @@ export class MassagesService extends PrismaGenericService<
         },
         price: true,
         subStatus: true,
-        subService: {
-            select: {
-                name: true,
-                Service: {
-                    select: {
-                        name: true,
-                    },
-                },
-            },
-        },
+        // subService: {
+        //     select: {
+        //         name: true,
+        //         Service: {
+        //             select: {
+        //                 name: true,
+        //             },
+        //         },
+        //     },
+        // },
         VehicleOrder: {
             select: {
                 qty: true,
@@ -131,22 +131,22 @@ export class MassagesService extends PrismaGenericService<
                 lastNumber: true,
                 stateProvince: true,
                 state: true,
-                vehicleType: true,
+                // vehicleType: true,
                 additionalVehicleInformation: true,
                 trailerType: true,
                 wideLoad: true,
-                model: {
-                    select: {
-                        id: true,
-                        name: true,
-                        brand: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        },
-                    },
-                },
+                // model: {
+                //     select: {
+                //         id: true,
+                //         name: true,
+                //         brand: {
+                //             select: {
+                //                 id: true,
+                //                 name: true,
+                //             },
+                //         },
+                //     },
+                // },
             },
         },
         Negotiation: true,

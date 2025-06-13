@@ -1,8 +1,10 @@
 import { Prisma } from "@prisma/client";
 import GeoPointMapper from "src/modules/shared/src/infrastructure/mappers/geo.point.mapper";
+import EvidenceFileMapper from "./evidence.file.mapper";
+
 export default class EvidenceMapper {
 
-    static async to(
+    static to(
         obj: Prisma.EvidenceGetPayload<{
             include: {
                 evidenceFiles: {
@@ -30,7 +32,7 @@ export default class EvidenceMapper {
             type: type,
             coordinates: GeoPointMapper.to(coordinates),
             files: evidenceFiles.map(
-                (e) => e.file
+                (e) => EvidenceFileMapper.to(e)
             ),
         };
 

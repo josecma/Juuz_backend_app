@@ -19,9 +19,10 @@ export class VehicleOrderEntity implements VehicleOrder {
 
   @ApiProperty({
     description: 'The type of the vehicle',
-    enum: VehicleType, // Reference to the VehicleType enum
+    // enum: VehicleType, // Reference to the VehicleType enum
   })
-  vehicleType: VehicleType;
+  vehicleMakeModelId: string;
+  vehicleType: string;
 
   @ApiProperty({
     description: 'The last number associated with the vehicle',

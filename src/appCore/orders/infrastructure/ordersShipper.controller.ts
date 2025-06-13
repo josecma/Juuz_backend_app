@@ -11,10 +11,12 @@ import {
   Patch,
   Post,
   Query,
-  Request
+  Request,
+  Res
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { $Enums, OrderStatusEnum, Prisma } from '@prisma/client';
+import { OrderStatusEnum, Prisma } from '@prisma/client';
+import { Response } from 'express';
 import { PaginatedResponse } from 'src/_shared/domain/dtos/paginationResponse.dto';
 import { RequestUserId } from 'src/_shared/domain/requestId';
 import {
@@ -27,6 +29,7 @@ import {
 import { ApiResponseSwagger } from 'src/_shared/infrastructure/swagger/response.swagger';
 import { PointsService } from 'src/appCore/points/application/points.service';
 import CancelOrderByIdUseCase from 'src/modules/order/src/application/useCases/cancel.order.by.id.use.case';
+import OrderReadRepository from 'src/modules/order/src/infrastructure/repositories/order.read.repository';
 import { OrdersService } from '../application/orders.service';
 import { DriverAcceptOrderFilterDto } from '../domain/driverAcceptOrderFilterDto.dto';
 import { OrderDto, UpdateOrderDto } from '../domain/order.dtos';
@@ -46,6 +49,7 @@ export class OrdersShipperController {
     private readonly service: OrdersService,
     private readonly pointsService: PointsService,
     private readonly cancelOrderByIdUseCase: CancelOrderByIdUseCase,
+    private readonly orderReadRepository: OrderReadRepository,
   ) { }
 
   /**
@@ -59,10 +63,24 @@ export class OrdersShipperController {
   @Post()
   createOrder(
     @Body() body: OrderDto,
-    @Request() req: RequestUserId
-  ): Promise<OrderEntity> {
-    return this.service.createOrder(body, '' + req.user.id, '');
-  }
+    @Request() req: RequestUserId,
+    @Res() res: Response,
+  )
+  // : Promise<OrderEntity>
+  {
+    try {
+
+      return this.service.createOrder(body, req.user.id,);
+
+    } catch (error) {
+
+      res
+        .status(500)
+        .json(error);
+
+    };
+
+  };
 
   /**
    * Creates a order.
@@ -76,14 +94,16 @@ export class OrdersShipperController {
   async createOrderApk(
     @Body() body: OrderApkDto,
     @Request() req: RequestUserId
-  ): Promise<OrderEntity> {
-    body['status'] = $Enums.OrderStatusEnum.PENDING;
-    body['subStatus'] = $Enums.OrderSubStatus.UPCOMING;
-    return await this.service.createOrder(
-      body,
-      '' + req.user.id,
-      ''
-    );
+  )
+  // : Promise<OrderEntity>
+  {
+    body['status'] = "PENDING";
+    body['subStatus'] = "UPCOMING";
+
+    // return await this.service.createOrder(
+    //   body,
+    //   req.user.id,
+    // );
   }
 
   // /**
@@ -141,25 +161,47 @@ export class OrdersShipperController {
   @HttpCode(HttpStatus.OK)
   @ApiResponseSwagger(findSwagger(OrderEntity, controllerName))
   @Get()
-  shieperOrders(
+  async shieperOrders(
     @Query() pagination: PaginationOrderShieperDto,
     @Request() req: RequestUserId
-  ): Promise<PaginatedResponse<OrderEntity>> {
+  )
+  // : Promise<PaginatedResponse<OrderEntity>>
+  {
 
-    const skip = (pagination.page - 1) * pagination.perPage;
 
-    return this.service.findAll({
-      skip,
-      take: pagination.perPage,
-      select: this.service.select,
-      where: {
-        status: pagination.status,
-        userId: req.user.id,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    try {
+
+      const res = await this.orderReadRepository.findUserOrders(
+        {
+          userId: req.user.id.toString(),
+          role: 'SHIPPER',
+          status: pagination.status,
+          page: pagination.page,
+          perPage: pagination.perPage,
+        }
+      );
+
+      return res;
+
+    } catch (error) {
+
+      throw error;
+
+    };
+    // const skip = (pagination.page - 1) * pagination.perPage;
+
+    // return this.service.findAll({
+    //   skip,
+    //   take: pagination.perPage,
+    //   select: this.service.select,
+    //   where: {
+    //     status: pagination.status,
+    //     userId: req.user.id,
+    //   },
+    //   orderBy: {
+    //     createdAt: 'desc',
+    //   },
+    // });
   }
 
   /**
@@ -171,18 +213,44 @@ export class OrdersShipperController {
   @HttpCode(HttpStatus.OK)
   @ApiResponseSwagger(findOneSwagger(OrderEntity, controllerName))
   @Get(':id')
-  findOneShieper(
+  async findOneShieper(
     @Param('id') id: string,
-    @Request() req: RequestUserId
-  ): Promise<OrderEntity> {
-    return this.service.findOne({
-      select: this.service.select,
-      where: {
-        id: id,
-        userId: req.user.id.toString(),
-      },
-    });
+    @Request() req: RequestUserId,
+    @Res() res: Response,
+  )
+  // : Promise<OrderEntity> 
+  {
+
+    try {
+
+      const order: any = await this.service.findOne(
+        {
+          select: this.service.select,
+          where: {
+            id: id,
+            userId: req.user.id,
+          },
+        }
+      );
+
+      const { Negotiation, VehicleOrder, ...orderRest } = order;
+
+      res.status(200).json(
+        {
+          ...orderRest,
+          negotiations: Negotiation,
+          vehicles: VehicleOrder,
+        }
+      );
+
+    } catch (error) {
+
+      res.status(500).json({ error });
+
+    };
+
   }
+
 
   // @HttpCode(HttpStatus.ACCEPTED)
   // @ApiResponseSwagger(updateSwagger(OrderEntity, controllerName))
@@ -338,14 +406,14 @@ export class OrdersShipperController {
     const dataUpdate: Prisma.OrderUpdateArgs = {
       data: {
         ...data,
-        photos: {
-          connect: photoIds ? photoIds.map((id) => ({ id })) : undefined,
-          deleteMany: {
-            id: {
-              notIn: photoIds ? photoIds : undefined,
-            },
-          },
-        },
+        // photos: {
+        //   connect: photoIds ? photoIds.map((id) => ({ id })) : undefined,
+        //   deleteMany: {
+        //     id: {
+        //       notIn: photoIds ? photoIds : undefined,
+        //     },
+        //   },
+        // },
 
         VehicleOrder: {
           upsert: idAndOtherFieldsOrders

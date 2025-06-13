@@ -52,7 +52,6 @@ export default class GetTrackingChannelUseCase {
                 throw new NotFoundDomainException(
                     {
                         message: `order with id:${orderId} not found`,
-                        source: `${GetTrackingChannelUseCase.name}`,
                     }
                 );
 

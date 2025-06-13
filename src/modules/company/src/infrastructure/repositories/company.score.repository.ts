@@ -17,17 +17,23 @@ export default class CompanyScoreRepository {
 
         try {
 
-            const res = await this.client.companyScore.findUnique({
+            const findCompanyScoreResponse = await this.client.companyScore.findUnique({
                 where: {
                     id: companyId,
                 },
             });
 
-            return res;
+            return findCompanyScoreResponse;
 
         } catch (error) {
 
-            this.logger.error(error);
+            this.logger.error(
+                {
+                    source: `${CompanyScoreRepository.name}`,
+                    message: error.message,
+                }
+            );
+
             throw error;
 
         };
@@ -50,7 +56,7 @@ export default class CompanyScoreRepository {
 
         try {
 
-            const res = await this.client.companyScore.upsert(
+            const upsertCompanyScoreResponse = await this.client.companyScore.upsert(
                 {
                     where: {
                         id: companyId,
@@ -67,11 +73,17 @@ export default class CompanyScoreRepository {
                 }
             );
 
-            return res;
+            return upsertCompanyScoreResponse;
 
         } catch (error) {
 
-            this.logger.error(error);
+            this.logger.error(
+                {
+                    source: `${CompanyScoreRepository.name}`,
+                    message: error.message,
+                }
+            );
+
             throw error;
 
         };

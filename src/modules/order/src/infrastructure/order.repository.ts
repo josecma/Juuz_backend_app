@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { OrderStatusEnum, OrderSubStatus, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 @Injectable()
 export default class OrderRepository {
@@ -101,16 +101,19 @@ export default class OrderRepository {
     };
 
     public async update(params: {
-        id: string;
+        id: string,
         updateObj: {
-            status?: string;
-            subStatus?: string;
+            status?: string,
+            subStatus?: string,
+            pickedUpAt?: Date,
+            cancelledAt?: Date,
+            deliveredAt?: Date,
         };
     }): Promise<any> {
 
         const { id, updateObj } = params;
 
-        const { subStatus, status } = updateObj;
+        const { subStatus, status, pickedUpAt, cancelledAt, deliveredAt } = updateObj;
 
         try {
 
@@ -119,8 +122,11 @@ export default class OrderRepository {
                     id: id,
                 },
                 data: {
-                    status: (status as OrderStatusEnum),
-                    subStatus: (subStatus as OrderSubStatus)
+                    status,
+                    subStatus,
+                    pickedUpAt,
+                    deliveredAt,
+                    cancelledAt,
                 },
             });
 

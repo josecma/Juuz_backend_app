@@ -1,11 +1,11 @@
-import { DeleteObjectsCommand, GetObjectCommand, PutObjectCommand, PutObjectCommandOutput, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectsCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import IStoragePort from "../../application/ports/i.storage.port";
+import { UploadFile } from "../../domain/types/upload.file";
 
 @Injectable()
-export default class S3Adapter implements IStoragePort {
+export default class S3Adapter {
 
     private s3Client: S3Client;
     private readonly bucketName: string;
@@ -28,39 +28,46 @@ export default class S3Adapter implements IStoragePort {
     };
 
     public async uploadFiles(
-        files: {
-            fileName: string,
-            key: string,
-            buffer: Buffer,
-            mimeType: string,
-            metadata?: Record<string, any>,
-        }[]
+        files: UploadFile[]
     ): Promise<Map<string, string>> {
 
         const dataKeyMap = new Map<string, string>();
 
         try {
 
-            await Promise.all(files.map(async (file) => {
+            await Promise.all(
 
-                const { buffer, mimeType, metadata, key } = file;
+                files.map(
 
-                const command = new PutObjectCommand({
-                    Bucket: this.bucketName,
-                    Key: key,
-                    Body: buffer,
-                    ContentType: mimeType,
-                    ContentLength: buffer.length,
-                    Metadata: metadata
-                });
+                    async (file) => {
 
-                const putObjectCommandOutput = await this.s3Client.send(command);
+                        const {
+                            buffer,
+                            mimeType,
+                            metadata,
+                            uniqueName,
+                        } = file;
 
-                const { ETag } = putObjectCommandOutput;
+                        const command = new PutObjectCommand(
+                            {
+                                Bucket: this.bucketName,
+                                Key: uniqueName,
+                                Body: buffer,
+                                ContentType: mimeType,
+                                ContentLength: buffer.length,
+                                Metadata: metadata
+                            }
+                        );
 
-                dataKeyMap.set(key, ETag);
+                        const putObjectCommandOutput = await this.s3Client.send(command);
 
-            }));
+                        const { ETag } = putObjectCommandOutput;
+
+                        dataKeyMap.set(uniqueName, ETag);
+
+                    }
+                )
+            );
 
             this.logger.log("files uploaded successfully");
 

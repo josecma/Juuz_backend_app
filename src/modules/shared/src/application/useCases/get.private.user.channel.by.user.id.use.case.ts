@@ -49,7 +49,6 @@ export default class GetPrivateUserChannelByUserIdUseCase {
                 throw new NotFoundDomainException(
                     {
                         message: `user with id:${userId} not found`,
-                        source: `${GetPrivateUserChannelByUserIdUseCase.name}`,
                     }
                 );
 

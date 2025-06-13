@@ -8,11 +8,18 @@ import { EventDispatcher } from "../shared/src/infrastructure/event.dispatcher";
 import UserModule from "../user/user.module";
 import EvidenceCreatedHandler from "./src/application/eventHandlers/evidence.created.handler";
 import UpdateOrderService from "./src/application/update.order.service";
-import FindOneOrderByIdUseCase from "./src/application/useCases/find.one.order.by.id.use.case";
 import OrderRepository from "./src/infrastructure/order.repository";
 import FindOneOrderByIdService from "./src/domain/services/find.one.order.by.id.service";
 import CancelOrderByIdUseCase from "./src/application/useCases/cancel.order.by.id.use.case";
 import OrderReadRepository from "./src/infrastructure/repositories/order.read.repository";
+import FinishOrderUseCase from "./src/application/useCases/finish.order.use.case";
+import ChangeOrderStatusUseCase from "./src/application/useCases/change.order.status.use.case";
+import UpdateOrderUseCase from "./src/application/useCases/update.order.use.case";
+import StartOrderUseCase from "./src/application/useCases/start.order.use.case";
+import FindOneOrderByIdUseCase from "./src/application/useCases/find.one.order.by.id.use.case";
+import OrderController from "./src/presentation/controllers/order.controller";
+import PostOrderUseCase from "./src/application/useCases/post.order.use.case";
+import OrderShipperWriteRepository from "./src/infrastructure/repositories/order.shipper.write.repository";
 
 @Module({
     imports: [
@@ -20,15 +27,23 @@ import OrderReadRepository from "./src/infrastructure/repositories/order.read.re
         forwardRef(() => UserModule),
         forwardRef(() => SharedModule),
     ],
-    controllers: [],
+    controllers: [
+        OrderController,
+    ],
     providers: [
         OrderRepository,
         OrderReadRepository,
+        OrderShipperWriteRepository,
         FindOneOrderByIdUseCase,
         UpdateOrderService,
         FindOneOrderByIdService,
         CancelOrderByIdUseCase,
         EvidenceCreatedHandler,
+        ChangeOrderStatusUseCase,
+        FinishOrderUseCase,
+        UpdateOrderUseCase,
+        StartOrderUseCase,
+        PostOrderUseCase,
     ],
     exports: [
         OrderRepository,
@@ -37,6 +52,8 @@ import OrderReadRepository from "./src/infrastructure/repositories/order.read.re
         UpdateOrderService,
         CancelOrderByIdUseCase,
         FindOneOrderByIdService,
+        FinishOrderUseCase,
+        StartOrderUseCase,
     ],
 })
 export default class OrderModule implements OnModuleInit {

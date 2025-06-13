@@ -30,13 +30,13 @@ type VehicleOrderId = Omit<
 export class VehicleOrderApkDto implements VehicleOrderId {
   @ApiProperty({
     description: 'The type of the vehicle',
-    enum: VehicleType, // Reference to the VehicleType enum
+    // enum: VehicleType, // Reference to the VehicleType enum
   })
-  @IsEnum(VehicleType, { message: 'Invalid vehicle type' })
+  // @IsEnum(VehicleType, { message: 'Invalid vehicle type' })
   @IsOptional()
-  vehicleType: VehicleType;
   vehicleId: string;
-
+  vehicleType: string;
+  vehicleMakeModelId: string;
   @ApiProperty({
     description: 'The last number associated with the vehicle',
     example: 'LN-5678',

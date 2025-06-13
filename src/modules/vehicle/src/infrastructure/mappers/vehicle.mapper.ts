@@ -14,7 +14,7 @@ export default class VehicleMapper {
                     include: {
                         model: {
                             include: {
-                                brand: true,
+                                make: true,
                             }
                         }
                     }
@@ -39,8 +39,8 @@ export default class VehicleMapper {
                     name: vehicleInfo.model.name,
                 },
                 brand: {
-                    id: vehicleInfo.model.brand.id,
-                    name: vehicleInfo.model.brand.name,
+                    id: vehicleInfo.model.makeId,
+                    name: vehicleInfo.model.make.name,
                 },
             },
             {

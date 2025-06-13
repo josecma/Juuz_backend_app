@@ -8,7 +8,7 @@ export class ValidationService {
   constructor(
     private brandsService: BrandsService,
     private readonly prismaService: PrismaService
-  ) {}
+  ) { }
 
   async fetchWithRetry(
     fn: () => Promise<any>,
@@ -51,28 +51,28 @@ export class ValidationService {
 
       if (make && modelName) {
         try {
-          let brand = await this.prismaService.brand.findUnique({
+          let brand = await this.prismaService.vehicleMake.findUnique({
             where: { name: make },
           });
 
           if (!brand) {
-            brand = await this.prismaService.brand.create({
-              data: { name: make },
+            brand = await this.prismaService.vehicleMake.create({
+              data: { name: make, makeId: '' },
             });
           }
 
-          const model = await this.prismaService.model.upsert({
+          const model = await this.prismaService.vehicleMakeModel.upsert({
             where: {
-              name_brandId_year: {
+              name_makeId_year: {
                 name: modelName,
-                brandId: brand.id,
-                year: +vehicleData[i].ModelYear,
+                makeId: brand.id,
+                year: 2
               },
             },
             update: {},
             create: {
               name: modelName,
-              brandId: brand.id,
+              makeId: brand.id,
               year: +vehicleData[i].ModelYear,
             },
           });

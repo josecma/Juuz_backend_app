@@ -3,6 +3,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import Evidence from "../domain/evidence";
 import { UpdateEvidenceJSON } from "../domain/types";
 import EvidenceMapper from "./mappers/evidence.mapper";
+import { SaveFile } from "src/modules/shared/src/domain/types/save.file";
 
 @Injectable({})
 export default class EvidenceRepository {
@@ -108,14 +109,7 @@ export default class EvidenceRepository {
             userId: string;
             orderId: string;
             evidence: Evidence;
-            files: Array<{
-                fileName: string,
-                key: string,
-                eTag: string,
-                mimeType: string,
-                size: number,
-                metadata?: Record<string, unknown>,
-            }>,
+            files: Array<SaveFile>,
         }
     ): Promise<void> {
 
@@ -142,21 +136,21 @@ export default class EvidenceRepository {
                     files.map(
                         async (file) => {
 
-                            const { key, mimeType, metadata, size, eTag } = file;
+                            const { uniqueName, mimeType, metadata, size, eTag } = file;
 
                             return await tx.file.upsert({
                                 where: {
-                                    key: key
+                                    key: uniqueName
                                 },
                                 update: {
-                                    key,
+                                    key: uniqueName,
                                     eTag,
                                     mimeType: mimeType,
                                     metadata: metadata as Prisma.JsonValue,
                                     size: size.toString()
                                 },
                                 create: {
-                                    key,
+                                    key: uniqueName,
                                     eTag,
                                     mimeType: mimeType,
                                     metadata: metadata as Prisma.JsonValue,

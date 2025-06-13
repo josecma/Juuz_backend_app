@@ -24,7 +24,6 @@ export default class FindCompanyByOwnerIdService {
                 throw new NotFoundDomainException(
                     {
                         message: `the owner's company with id:${ownerId} not found`,
-                        source: `${FindCompanyByOwnerIdService.name}`,
                     }
                 );
             };

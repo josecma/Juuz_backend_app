@@ -10,6 +10,7 @@ import EvidenceRepository from "../../infrastructure/evidence.repository";
 import { EvidenceType } from "../enums/evidence.type";
 import EvidenceCreatedEvent from "../events/evidence.created.event";
 import Evidence from "../evidence";
+import { SaveFile } from "src/modules/shared/src/domain/types/save.file";
 
 @Injectable({})
 export default class CreateEvidenceService {
@@ -36,14 +37,7 @@ export default class CreateEvidenceService {
                 longitude: number,
                 latitude: number,
             },
-            files: {
-                fileName: string,
-                key: string,
-                size: number,
-                eTag: string,
-                mimeType: string,
-                metadata?: Record<string, any>,
-            }[],
+            files: SaveFile[],
         }
     ) {
 
@@ -62,41 +56,55 @@ export default class CreateEvidenceService {
 
             const order = await this.findOneOrderByIdService.find({ id: orderId });
 
-            const departure = {
-                longitude: Number(order.departure.longitude),
-                latitude: Number(order.departure.latitude),
-            };
+            if (order.driverId !== user.id && order.userId !== user.id) {
 
-            const distance = this.geoAdapter.distance({
-                p1: departure,
-                p2: coordinates
-            });
-
-            if (
-                order.driverId.toString() !== user.id
-                &&
-                order.userId !== user.id
-            ) {
-
-                throw new NotFoundException("order not found");
+                throw new NotFoundException(`order with id ${orderId} not found.`);
 
             };
 
-            if (distance <= this.radius) {
+            if (type === EvidenceType.DEPARTURE) {
 
-                return {
-                    warning: `You must be at least ${this.radius} meters from the starting point.`
+                const departure = {
+                    longitude: +order.departure.longitude,
+                    latitude: +order.departure.latitude,
+                };
+
+                const distance = this.geoAdapter.distance({
+                    p1: departure,
+                    p2: coordinates
+                });
+
+                if (!(distance <= this.radius)) {
+
+                    return {
+                        warning: `You must be at least ${this.radius} meters from the starting point.`
+                    };
+
                 };
 
             };
 
-            // const evidences = await this.evidenceRepository.findByFileKeys({
-            //     keys: files.map((file) => file.key)
-            // });
+            if (type === EvidenceType.DESTINATION) {
 
-            // const allKeys = evidences.flatMap((e) => e.files.map((f) => f[0]));
+                const destination = {
+                    longitude: +order.destination.longitude,
+                    latitude: +order.destination.latitude,
+                };
 
-            // const filterFiles = files.filter((file) => !allKeys.includes(file.key));
+                const distance = this.geoAdapter.distance({
+                    p1: destination,
+                    p2: coordinates
+                });
+
+                if (!(distance <= this.radius)) {
+
+                    return {
+                        warning: `You must be at least ${this.radius} meters from the delivery point.`
+                    };
+
+                };
+
+            };
 
             const newGeoPoint = new GeoPoint(coordinates);
 

@@ -39,7 +39,6 @@ export default class FindOneOrderByIdService {
                 throw new NotFoundDomainException(
                     {
                         message: `order with id:${id} not found`,
-                        source: `${FindOneOrderByIdService.name}`,
                     }
                 );
 

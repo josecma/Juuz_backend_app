@@ -7,8 +7,6 @@ import {
 import { PrismaService } from 'nestjs-prisma';
 import { PrismaGenericService } from 'src/_shared/infrastructure/generic/prismaService.generic';
 import {
-  OrderStatusEnum,
-  OrderSubStatus,
   PaymentMethodType,
   PaymentStatus,
   Prisma,
@@ -212,7 +210,7 @@ export class PaymentsService extends PrismaGenericService<
       where: {
         id: body.orderId,
         userId: userId,
-        status: OrderStatusEnum.IN_TRANSIT,
+        status: "IN_TRANSIT",
       },
     };
     const order = await this.ordersService.model.findUnique(find);
@@ -227,8 +225,8 @@ export class PaymentsService extends PrismaGenericService<
     );
     const data: Prisma.OrderUpdateArgs = {
       data: {
-        status: OrderStatusEnum.HISTORY,
-        subStatus: OrderSubStatus.COMPLETE,
+        status: "HISTORY",
+        subStatus: "COMPLETE",
         departure: {
           update: {
             isActive: false,
@@ -264,7 +262,7 @@ export class PaymentsService extends PrismaGenericService<
       where: {
         id: orderId,
         userId: userId,
-        status: OrderStatusEnum.IN_TRANSIT,
+        status: "IN_TRANSIT",
       },
     };
     const order = await this.ordersService.model.findUnique(find);
@@ -289,7 +287,7 @@ export class PaymentsService extends PrismaGenericService<
       );
       await this.ordersService.update(find, {
         data: {
-          status: OrderStatusEnum.HISTORY,
+          status: "HISTORY",
           departure: {
             update: {
               isActive: false,

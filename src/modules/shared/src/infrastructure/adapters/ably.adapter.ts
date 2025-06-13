@@ -130,13 +130,17 @@ export default class AblyAdapter {
     public async publishMessage(
         channelName: string,
         message: any,
+        messageName?: string,
     ): Promise<void> {
 
         try {
 
             const channel = this.ably.channels.get(channelName);
 
-            await channel.publish('message', message);
+            await channel.publish(
+                messageName ?? 'message',
+                message
+            );
 
             this.logger.log(`Message published to ${channelName}`);
 

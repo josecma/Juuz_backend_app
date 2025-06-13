@@ -1,0 +1,31 @@
+import { Address } from "src/modules/shared/src/domain/types/address";
+import { OrderItem } from "./order.item";
+
+export type PostOrder = {
+    shipperId: string,
+    price: number,
+    miles: number,
+    serviceId?: string,
+    subServiceId?: string,
+    referredId?: string,
+    note?: string,
+    email?: string,
+    expirationTime: Date,
+    pricePerMile?: number,
+    reason?: string,
+    phone?: string,
+    firstName?: string,
+    lastName?: string,
+    emailSecond?: string,
+    phoneSecond?: string,
+    firstNameSecond?: string,
+    lastNameSecond?: string,
+    isAssistanceRequestForNow: boolean,
+    rute: string,
+    carCount?: number,
+    items: Array<OrderItem>,
+    departure: Address,
+    destination: Address,
+    pickUpAt: Date,
+    deliveryAt: Date,
+};

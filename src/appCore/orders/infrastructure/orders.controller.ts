@@ -56,16 +56,20 @@ export class OrdersController {
     createOrder(
         @Body() body: OrderDto | OrderApkDto,
         @Request() req: RequestUserId
-    ): Promise<OrderEntity> {
-        body['status'] = $Enums.OrderStatusEnum.PENDING;
-        body['subStatus'] = $Enums.OrderSubStatus.UPCOMING;
-        return this.service.createOrder(body, '1', '1');
+    )
+    // : Promise<OrderEntity>
+    {
+        body['status'] = "PENDING";
+        body['subStatus'] = "UPCOMING";
+        // return this.service.createOrder(body, req.user.id,
+        //     // req.user.companyId
+        // );
     }
 
-    @Get('vehicle-types')
-    getAllVehicleTypes(): string[] {
-        return Object.values(VehicleType);
-    }
+    // @Get('vehicle-types')
+    // getAllVehicleTypes(): string[] {
+    //     return Object.values(VehicleType);
+    // }
 
     /**
      * Gets all orders. It allows to filter by any field contained in the DTO object of the order.

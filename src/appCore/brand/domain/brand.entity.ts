@@ -1,14 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Brand } from '@prisma/client';
+import { VehicleMake } from '@prisma/client';
 import { ModelEntity } from './model.entity';
 
-export class BrandEntity implements Brand {
+export class BrandEntity implements VehicleMake {
   @ApiProperty({ description: 'The ID of the brand', example: 1 })
   id: string;
 
   @ApiProperty({ description: 'The name of the brand', example: 'Tesla' })
   name: string;
-
+  makeId: string;
+  manufacturerId: string;
   @ApiProperty({
     description: 'The models that belong to the brand',
     type: [ModelEntity], // Usa el ModelResponseDto aquí

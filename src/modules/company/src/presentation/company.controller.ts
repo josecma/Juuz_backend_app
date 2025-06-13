@@ -12,6 +12,7 @@ import { ApiGetAllCompanyVehiclesDoc } from "./docs/decorators/api.get.all.compa
 import { ApiUpdateCompanyDoc } from "./docs/decorators/api.update.company.doc";
 import CreateCompanyRequestBody from "./dtos/bodies/create.company.request.body";
 import UpdateCompanyRequestBody from "./dtos/bodies/update.company.request.body";
+import FindCompanyDriversUseCase from "../application/useCases/find.company.drivers.use.case";
 
 @ApiBearerAuth()
 @ApiTags("companies")
@@ -28,6 +29,7 @@ export default class CompanyController {
         private readonly findCompanyByOwnerIdUseCase: FindCompanyByOwnerIdUseCase,
         private readonly findCompanyVehiclesUseCase: FindCompanyVehiclesUseCase,
         private readonly updateCompanyUseCase: UpdateCompanyUseCase,
+        private readonly findCompanyDriversUseCase: FindCompanyDriversUseCase,
     ) { };
 
     @ApiCreateCompanyDoc()
@@ -180,6 +182,38 @@ export default class CompanyController {
                     {
                         message: "vehicles found successfully",
                         payload: findCompanyVehiclesResponse,
+                    }
+                );
+
+        } catch (error) {
+
+            return res
+                .status(404)
+                .json(error.message);
+
+        };
+
+    };
+
+    @Get("/:id/drivers")
+    public async findDrivers(
+        @Req() req: Request,
+        @Param("id") id: string,
+        @Res() res: Response,
+    ) {
+
+        const companyId = id;
+
+        try {
+
+            const findCompanyDriversResponse = await this.findCompanyDriversUseCase.execute(companyId);
+
+            return res
+                .status(200)
+                .json(
+                    {
+                        message: "drivers found successfully",
+                        payload: findCompanyDriversResponse,
                     }
                 );
 

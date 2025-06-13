@@ -3,13 +3,28 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule, { cors: true });
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true, // Retain raw request body for Stripe webhook verification
     cors: true,
   });
+
+
+  // // Configura bodyParser específicamente para JSON
+  // app.use(bodyParser.json({ limit: '50mb' }));
+
+  // // Configuración especial para FormData
+  // app.use(bodyParser.urlencoded({
+  //   extended: true,
+  //   limit: '50mb',
+  //   parameterLimit: 10000,
+  // }));
+
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // Transformar automáticamente los payloads a instancias de DTO

@@ -21,7 +21,7 @@ export default class CompanyVehicleMapper {
                                             include: {
                                                 model: {
                                                     include: {
-                                                        brand: true,
+                                                        make: true,
                                                     }
                                                 }
                                             }

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { $Enums, Order } from '@prisma/client';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -17,13 +18,12 @@ import {
   Validate,
   ValidateNested,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
-import { UpdateVehicleOrderDto, VehicleOrderDto } from './vehicleOrder.dto';
 import {
   PointDto,
   UpdatePointWhitIdDto,
 } from 'src/appCore/points/domain/point.dtos';
 import { IsValidSubStatusConstraint } from './order.validation';
+import { UpdateVehicleOrderDto, VehicleOrderDto } from './vehicleOrder.dto';
 
 type OrderWithoutId = Omit<
   Order,
@@ -84,13 +84,13 @@ export class OrderServiceDto {
   subServiceName: $Enums.SubServiceEnum;
 }
 
-export class OrderDto implements OrderWithoutId {
+export class OrderDto {
   @ApiProperty({
     example: 'hello@domain.com',
     description: 'Email of the user',
   })
-  @IsEmail({}, { message: 'Invalid email format' })
   @IsOptional({ message: 'emailSecond is required' })
+  @IsEmail({}, { message: 'Invalid email format' })
   emailSecond: string;
 
   @ApiProperty({
@@ -116,7 +116,7 @@ export class OrderDto implements OrderWithoutId {
     example: 1,
     type: String,
   })
-  @IsString()
+  @IsOptional()
   @IsNotEmpty({ message: 'subServiceId is required' })
   subServiceId: string;
 
@@ -125,7 +125,7 @@ export class OrderDto implements OrderWithoutId {
     example: 1,
     type: String,
   })
-  @IsString()
+  @IsOptional()
   @IsNotEmpty()
   serviceId: string;
 
@@ -496,18 +496,18 @@ export class UpdateOrderDto {
   status: $Enums.OrderStatusEnum;
 
   @ApiProperty({
-    example: $Enums.OrderSubStatus.COMPLETE,
+    example: "COMPLETE",
     description: 'SubStatus of the order.',
-    enum: $Enums.OrderSubStatus,
+    // enum: $Enums.OrderSubStatus,
   })
-  @IsEnum($Enums.OrderSubStatus, {
-    message: `SubStatus must be one of the following values: ${Object.values(
-      $Enums.OrderSubStatus
-    ).join(', ')}`,
-  })
+  // @IsEnum($Enums.OrderSubStatus, {
+  //   message: `SubStatus must be one of the following values: ${Object.values(
+  //     $Enums.OrderSubStatus
+  //   ).join(', ')}`,
+  // })
   @IsOptional()
   @Validate(IsValidSubStatusConstraint)
-  subStatus: $Enums.OrderSubStatus;
+  subStatus: string;
 }
 
 export class UpdateReferedOrderDto {

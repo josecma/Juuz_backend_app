@@ -1,13 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { $Enums, Order } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-export class OrderEntity implements Order {
+export class OrderEntity {
     @ApiProperty({
         example: 'john@example.com',
         description: 'The email address of the user',
     })
     emailSecond: string;
-
+    pickedupAt: Date;
+    cancelledAt: Date;
+    deliveredAt: Date;
     @ApiProperty({
         description: 'The reason for canceling the order.',
         example: 'Customer changed their mind',
@@ -61,8 +63,8 @@ export class OrderEntity implements Order {
     @ApiProperty({ enum: $Enums.OrderStatusEnum })
     status: $Enums.OrderStatusEnum;
 
-    @ApiProperty({ enum: $Enums.OrderSubStatus })
-    subStatus: $Enums.OrderSubStatus;
+    // @ApiProperty({ enum: $Enums.OrderSubStatus })
+    subStatus: string;
 
     @ApiProperty({
         description: 'Payment Method',

@@ -56,7 +56,6 @@ export default class DefaultCriterionSetUseCase {
                 throw new NotFoundDomainException(
                     {
                         message: `criterion set with id:${criterionSetId} not found`,
-                        source: `${DefaultCriterionSetUseCase.name}`,
                     }
                 );
             };

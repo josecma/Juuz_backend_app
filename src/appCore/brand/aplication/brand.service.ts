@@ -8,64 +8,64 @@ import { YearlyInstance } from 'twilio/lib/rest/api/v2010/account/usage/record/y
 
 @Injectable()
 export class BrandsService extends PrismaGenericService<
-  BrandEntity,
-  Prisma.BrandCreateArgs,
-  Prisma.BrandFindUniqueArgs,
-  Prisma.BrandUpdateArgs,
-  Prisma.BrandDeleteArgs,
-  Prisma.BrandFindManyArgs
+    BrandEntity,
+    Prisma.VehicleMakeCreateArgs,
+    Prisma.VehicleMakeFindUniqueArgs,
+    Prisma.VehicleMakeUpdateArgs,
+    Prisma.VehicleMakeDeleteArgs,
+    Prisma.VehicleMakeFindManyArgs
 > {
-  constructor(private readonly prismaService: PrismaService) {
-    super(prismaService.brand);
-  }
+    constructor(private readonly prismaService: PrismaService) {
+        super(prismaService.vehicleMake);
+    }
 
-  async findAllBrands(
-    data: Prisma.BrandFindManyArgs,
-    pagination: PaginationBrandDto
-  ) {
-    const where: Prisma.BrandWhereInput = {
-      ...(pagination.brandNamePrefix
-        ? { name: { startsWith: pagination.brandNamePrefix } }
-        : {}),
-      ...(pagination.modelNamePrefix
-        ? {
+    async findAllBrands(
+        data: Prisma.VehicleMakeFindManyArgs,
+        pagination: PaginationBrandDto
+    ) {
+        const where: Prisma.VehicleMakeWhereInput = {
+            ...(pagination.brandNamePrefix
+                ? { name: { startsWith: pagination.brandNamePrefix } }
+                : {}),
+            ...(pagination.modelNamePrefix
+                ? {
+                    models: {
+                        some: { name: { startsWith: pagination.modelNamePrefix } },
+                    },
+                }
+                : {}),
+            ...(pagination.year
+                ? {
+                    models: {
+                        some: {
+                            year: pagination.year
+                        },
+                    },
+                }
+                : {}),
+        };
+
+        const include: Prisma.VehicleMakeInclude = {
             models: {
-              some: { name: { startsWith: pagination.modelNamePrefix } },
+                where: {
+                    name: {
+                        startsWith: pagination.modelNamePrefix,
+                    },
+                },
+                select: {
+                    name: true,
+                    id: true,
+                    year: true,
+                },
             },
-          }
-        : {}),
-      ...(pagination.year
-        ? {
-            models: {
-              some: {
-                year: pagination.year, // Filtra por el año en los modelos relacionados
-              },
-            },
-          }
-        : {}),
-    };
+        };
 
-    const include: Prisma.BrandInclude = {
-      models: {
-        where: {
-          name: {
-            startsWith: pagination.modelNamePrefix,
-          },
-        },
-        select: {
-          name: true,
-          id: true,
-          year: true,
-        },
-      },
-    };
-
-    return this.findAll({
-      ...data,
-      include,
-      where,
-      take: pagination.perPage,
-      skip: pagination.page,
-    });
-  }
+        return this.findAll({
+            ...data,
+            include,
+            where,
+            take: pagination.perPage,
+            skip: pagination.page,
+        });
+    }
 }

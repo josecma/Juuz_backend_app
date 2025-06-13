@@ -325,13 +325,14 @@ model Score {
 }
 
 model File {
-  id                 String              @id @default(uuid())
-  key                String              @unique()
-  eTag               String              @map("e_tag")
-  size               String
-  mimeType           String              @map("mime_type")
-  metadata           Json
-  uploadedAt         DateTime            @default(now()) @map("uploaded_at")
+  id         String   @id @default(uuid())
+  key        String   @unique()
+  eTag       String   @map("e_tag")
+  size       String
+  mimeType   String   @map("mime_type")
+  metadata   Json?
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
   evidenceFiles      EvidenceFile[]
   userProfilePicture UserProfilePicture?
   vehiclePictures    VehiclePicture[]
@@ -417,30 +418,18 @@ model Category {
   @@map("categories")
 }
 
-// model Vehicle {
-//   id           String   @id @default(uuid())
-//   vin          String   @unique
-//   categoryPath String   @map("category_path")
-//   year         Int
-//   color        String
-//   licensePlate String   @map("license_plate")
-//   createdAt    DateTime @default(now()) @map("created_at")
-//   updatedAt    DateTime @updatedAt @map("updated_at")
-
-//   @@index([vin, licensePlate])
-//   @@map("vehicles")
-// }
-
 model Address {
-  id             String          @id @default(uuid())
-  city           String
-  state          String
-  zipCode        String
-  country        String
-  street         String
-  location       Json
-  metadata       Json?
-  companyAddress CompanyAddress?
+  id                      String          @id @default(uuid())
+  city                    String
+  state                   String
+  zipCode                 String
+  country                 String
+  street                  String
+  location                Json
+  metadata                Json?
+  companyAddress          CompanyAddress?
+  orderDepartureAddress   Order?          @relation(name: "departureAddress")
+  orderDestinationAddress Order?          @relation(name: "destinationAddress")
 
   @@index([location])
   @@map("addresses")
@@ -484,7 +473,7 @@ model Company {
   name               String?         @unique
   insuranceDetailsId String?         @unique
   insuranceDetails   Photo?          @relation("InsuranceDetails", fields: [insuranceDetailsId], references: [id]) // Relación nombrada
-  status             String          @default("NON_VERIFIED")
+  status             String          @default("NON_VERIFIED") // VERIFIED NOT_VERIFIED HOLD 
   licenseType        String?
   photos             Photo[]         @relation("CompanyPhotos")
   transfers          Transfer[]
@@ -617,18 +606,29 @@ model UserPoint {
 }
 
 model CompanyMember {
-  id        String  @id @default(uuid())
-  memberId  String  @map("user_id")
-  companyId String  @map("company_id")
-  roleId    String  @map("role_id")
-  company   Company @relation(fields: [companyId], references: [id])
-  member    User    @relation(fields: [memberId], references: [id])
+  id        String            @id @default(uuid())
+  memberId  String            @map("user_id")
+  companyId String            @map("company_id")
+  roleId    String            @map("role_id")
+  company   Company           @relation(fields: [companyId], references: [id])
+  member    User              @relation(fields: [memberId], references: [id])
+  role      CompanyMemberRole @relation(fields: [roleId], references: [id])
+  driver    CompanyDriver?    @relation(name: "company_drives")
 
   @@unique([memberId, companyId, roleId])
   @@index([memberId])
   @@index([companyId])
   @@index([roleId])
   @@map("company_members")
+}
+
+model CompanyDriver {
+  id          String        @unique
+  status      String        @default("NOT_VERIFIED") // VERIFIED NOT_VERIFIED HOLD 
+  eligibility Boolean
+  member      CompanyMember @relation(name: "company_drives", references: [id], fields: [id])
+
+  @@map("company_drivers")
 }
 
 model CompanyScore {
@@ -642,8 +642,9 @@ model CompanyScore {
 }
 
 model CompanyMemberRole {
-  id   String @id @default(uuid())
-  name String @unique
+  id            String          @id @default(uuid())
+  name          String          @unique
+  companyMember CompanyMember[]
 
   @@index([name])
   @@map("company_member_roles")
@@ -716,14 +717,16 @@ model Session {
 model Vehicle {
   id            String           @id @default(uuid())
   vinNumber     String           @unique
-  year          Int?
-  insuranceDoc  String?
+  year          Int
+  color         String
+  insuranceDoc  String?          @map("insurance_doc")
   faceId        String?
-  vehicleType   String?
+  vehicleType   String?          @map("vehicle_type")
   serviceId     String?          @map("service_id")
+  metadata      Json?
   service       Service?         @relation(fields: [serviceId], references: [id])
   vehicleOrder  VehicleOrder[]
-  capacity      Int?
+  capacity      Int? // y esto 
   vehicleInfoId String
   vehicleInfo   VehicleInfo      @relation(fields: [vehicleInfoId], references: [id])
   createdAt     DateTime?        @default(now()) @map("created_at")
@@ -734,39 +737,84 @@ model Vehicle {
   @@map("vehicles")
 }
 
-model VehicleInfo {
-  id        String    @id @default(uuid())
-  model     Model     @relation(fields: [modelId], references: [id])
-  modelId   String    @map("model_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  vehicle   Vehicle[]
+model VehicleManufacturer {
+  id               String             @id @default(uuid())
+  name             String             @unique
+  manufacturerId   String?            @unique @map("manufacturer_id")
+  manufacturerMake ManufacturerMake[]
+
+  @@index([name, manufacturerId])
+  @@map("vehicle_manufacturers")
 }
 
-model Model {
-  id           String         @id @default(uuid())
-  name         String
-  year         Int?
-  brand        Brand          @relation(fields: [brandId], references: [id])
-  brandId      String         @map("brand_id")
-  createdAt    DateTime       @default(now()) @map("created_at")
+model VehicleType {
+  id   String @id() @default(uuid())
+  name String @unique
+
+  @@index([name])
+  @@map("vehicle_types")
+}
+
+model VehicleInfo {
+  id        String           @id @default(uuid())
+  model     VehicleMakeModel @relation(fields: [modelId], references: [id])
+  modelId   String           @map("model_id")
+  createdAt DateTime         @default(now()) @map("created_at")
+  vehicles  Vehicle[]
+}
+
+// model VehicleYear {
+//   id   String @id @default(uuid())
+//   year Int    @unique
+
+//   @@index([year])
+//   @@map("vehicle_years")
+// }
+
+model VehicleMakeModel {
+  id        String   @id @default(uuid())
+  name      String
+  year      Int
+  makeId    String   @map("make_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  make         VehicleMake    @relation(fields: [makeId], references: [id])
   VehicleInfo  VehicleInfo[]
   VehicleOrder VehicleOrder[]
 
-  @@unique([name, brandId, year])
+  @@unique([name, makeId, year])
+  @@index([name, makeId, year])
+  @@map("vehicle_make_models")
 }
 
-model Brand {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  models    Model[]
-  createdAt DateTime @default(now()) @map("created_at")
+model VehicleMake {
+  id               String             @id @default(uuid())
+  name             String             @unique
+  makeId           String?            @unique @map("make_id")
+  models           VehicleMakeModel[]
+  createdAt        DateTime           @default(now()) @map("created_at")
+  manufacturerMake ManufacturerMake[]
+
+  @@index([name, makeId])
+  @@map("vehicle_makes")
+}
+
+model ManufacturerMake {
+  manufacturerId String              @map("manufacturer_id")
+  manufacturer   VehicleManufacturer @relation(references: [id], fields: [manufacturerId])
+  makeId         String              @map("make_id")
+  make           VehicleMake         @relation(references: [id], fields: [makeId])
+
+  @@unique([manufacturerId, makeId])
+  @@index([makeId, manufacturerId])
+  @@map("manufacturer_makes")
 }
 
 model VehicleOrder {
   id                           String                 @id @default(uuid())
   qty                          Int?
   year                         Int?                   @default(2000)
-  vehicleType                  VehicleType            @default(PASSENGER_CAR) @map("vehicle_type")
+  vehicleType                  String                 @map("vehicle_type")
   state                        VihecleOrderStatusEnum @default(RUNNING)
   vehicleColor                 String?                @map("vehicle_color")
   licensePlate                 String?                @map("license_plate")
@@ -780,8 +828,7 @@ model VehicleOrder {
   wideLoad                     Boolean                @default(false) @map("wide_load")
   orderId                      String?                @map("order_id")
   order                        Order?                 @relation(fields: [orderId], references: [id])
-  modelId                      String?                @map("model_id")
-  model                        Model?                 @relation(fields: [modelId], references: [id])
+  // modelId                      String?                @map("model_id")
   vehicleId                    String?
   vehicle                      Vehicle?               @relation(fields: [vehicleId], references: [id])
   createdAt                    DateTime               @default(now()) @map("created_at")
@@ -793,13 +840,15 @@ model VehicleOrder {
   version                      Int                    @default(0)
   ownerId                      String                 @map("owner_id")
   companyId                    String?                @map("company_id")
+  vehicleMakeModel             VehicleMakeModel?      @relation(fields: [vehicleMakeModelId], references: [id])
+  vehicleMakeModelId           String?
 }
 
 model Photo {
   id        String    @id @default(uuid())
   name      String    @unique
   orderId   String?   @map("order_id")
-  order     Order?    @relation(fields: [orderId], references: [id])
+  // order     Order?    @relation(fields: [orderId], references: [id])
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   createdBy String?   @map("created_by")
@@ -815,42 +864,46 @@ model Photo {
 }
 
 model FleetRecord {
-  id            String      @id @default(uuid())
+  id            String    @id @default(uuid())
   vinNumber     String
-  vehicleType   VehicleType @default(TRUCK)
+  vehicleType   String    @map("vehicle_type")
   vehicleInfoId String?
-  orderId       String?     @unique @map("order_id")
-  order         Order?      @relation(fields: [orderId], references: [id])
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
-  createdBy     String?     @map("created_by")
-  updatedBy     String?     @map("updated_by")
-  deletedAt     DateTime?   @map("deleted_at")
-  deletedBy     String?     @map("deleted_by")
-  version       Int         @default(0)
-  ownerId       String      @map("owner_id")
-  companyId     String?     @map("company_id")
+  orderId       String?   @unique @map("order_id")
+  order         Order?    @relation(fields: [orderId], references: [id])
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  createdBy     String?   @map("created_by")
+  updatedBy     String?   @map("updated_by")
+  deletedAt     DateTime? @map("deleted_at")
+  deletedBy     String?   @map("deleted_by")
+  version       Int       @default(0)
+  ownerId       String    @map("owner_id")
+  companyId     String?   @map("company_id")
 }
 
 model Order {
   id                        String            @id @default(uuid())
-  userId                    String            @map("user_id")
-  serviceId                 String            @map("service_id")
+  userId                    String?           @map("user_id")
+  serviceId                 String?           @map("service_id")
   driverId                  String?           @map("driver_id")
   referredId                String?           @map("referred_id")
   isAssistanceRequestForNow Boolean           @default(false) @map("is_assistance_request_for_now")
   expirationTime            DateTime          @map("expiration_time")
-  pickUpDate                String?           @map("pick_up_date")
+  pickUpAt                  DateTime?         @map("pick_up_at")
+  cancelledAt               DateTime?         @map("cancelled_at")
+  pickedUpAt                DateTime?         @map("picked_up_at")
+  deliveredAt               DateTime?         @map("delivered_at")
   pricePerMile              Decimal           @default(0) @map("price_per_mile")
   aditionalInfo             String            @default("") @map("aditional_info")
-  deliveryDate              String?           @map("delivery_date")
+  deliveryAt                DateTime?         @map("delivery_at")
   paymentMethod             PaymentMethodEnum @default(UNKNOWN) @map("payment_method")
   price                     Int?
-  milles                    Int               @default(0)
+  milles                    Decimal           @default(0.00) @db.Decimal(10, 2)
   note                      String?           @default("")
   email                     String?
   reason                    String?
-  photos                    Photo[]
+  // photos                    Photo[]
+  items                     Json
   phone                     String?
   firstName                 String?           @map("first_name")
   lastName                  String?           @map("last_name")
@@ -858,25 +911,29 @@ model Order {
   phoneSecond               String?           @map("phone_second")
   firstNameSecond           String?           @map("first_name_second")
   lastNameSecond            String?           @map("last_name_second")
-  status                    OrderStatusEnum
-  subStatus                 OrderSubStatus    @map("sub_status")
+  status                    String
+  subStatus                 String            @map("sub_status")
   subServiceId              String?           @map("sub_service_id")
-  subService                SubService?       @relation(fields: [subServiceId], references: [id])
+  // subService                SubService?       @relation(fields: [subServiceId], references: [id])
   departure                 Point?            @relation(name: "DeparturePoint", fields: [departureId], references: [id])
   departureId               String?           @map("departure_id")
   destination               Point?            @relation(name: "DestinationPoint", fields: [destinationId], references: [id])
   destinationId             String?           @map("destination_id")
-  carCount                  Int               @map("car_count")
+  departure1                Address           @relation(name: "departureAddress", fields: [departure1Id], references: [id], map: "departure_address_fkey")
+  departure1Id              String            @unique @map("departure1_id")
+  destination1              Address           @relation(name: "destinationAddress", fields: [destination1Id], references: [id], map: "destination_address_fkey")
+  destination1Id            String            @unique @map("destination1_id")
+  carCount                  Int?              @map("car_count")
   information               Information?
-  rute                      Point[]
+  rute                      String
   createdAt                 DateTime          @default(now()) @map("created_at")
   updatedAt                 DateTime          @updatedAt @map("updated_at")
   createdBy                 String?           @map("created_by")
   updatedBy                 String?           @map("updated_by")
   deletedAt                 DateTime?         @map("deleted_at")
   deletedBy                 String?           @map("deleted_by")
-  version                   Int               @default(0)
-  ownerId                   String            @map("owner_id")
+  // version                   Int               @default(0)
+  ownerId                   String?           @map("owner_id")
   companyId                 String?           @map("company_id")
   ablyChannel               AblyChannel[]     @relation("AblyChannelToOrder")
   Comunication              Comunication?
@@ -886,7 +943,11 @@ model Order {
   payment                   Payment?          @relation
   isActive                  Boolean?          @default(true) @map("is_active")
   FleetRecord               FleetRecord?
+  shipperId                 String            @map("shipperId")
   evidences                 Evidence[]        @relation(name: "evidence_otm_order")
+  // Point                     Point[]
+  // Photo                     Photo[]
+  // SubService                SubService?       @relation(fields: [subServiceId], references: [id])
 }
 
 model Negotiation {
@@ -921,7 +982,7 @@ model Point {
   departureOrders   Order[]                              @relation("DeparturePoint")
   destinationOrders Order[]                              @relation("DestinationPoint")
   orderId           String?                              @map("order_id")
-  order             Order?                               @relation(fields: [orderId], references: [id])
+  // order             Order?                               @relation(fields: [orderId], references: [id])
   driverId          String?                              @unique @map("driver_id")
   createdAt         DateTime                             @default(now()) @map("created_at")
   updatedAt         DateTime?                            @updatedAt @map("updated_at")
@@ -992,7 +1053,7 @@ model SubService {
   description String?
   serviceId   String?        @map("service_id")
   Service     Service?       @relation(fields: [serviceId], references: [id])
-  order       Order[]
+  // order       Order[]
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
   createdBy   String?        @map("created_by")
@@ -1104,6 +1165,14 @@ model Trip {
   userId    String?
 }
 
+model Seed {
+  name   String  @id
+  status Boolean
+
+  @@index([name])
+  @@map("seeds")
+}
+
 enum PaymentEnum {
   MASTERCARD
   VISA
@@ -1213,17 +1282,17 @@ enum OrderSubStatus {
   DELIVERED
 }
 
-enum VehicleType {
-  PASSENGER_CAR // Automóvil de pasajeros
-  MULTIPURPOSE_VEHICLE // Vehículo multipropósito (SUV, camionetas)
-  TRUCK // Camión
-  BUS // Autobús
-  MOTORCYCLE // Motocicleta
-  TRAILER // Remolque
-  LOW_SPEED_VEHICLE // Vehículo de baja velocidad
-  VAN // Furgoneta
-  MULTIPURPOSE_PASSENGER_VEHICLE
-}
+// enum VehicleType {
+//   PASSENGER_CAR // Automóvil de pasajeros
+//   MULTIPURPOSE_VEHICLE // Vehículo multipropósito (SUV, camionetas)
+//   TRUCK // Camión
+//   BUS // Autobús
+//   MOTORCYCLE // Motocicleta
+//   TRAILER // Remolque
+//   LOW_SPEED_VEHICLE // Vehículo de baja velocidad
+//   VAN // Furgoneta
+//   MULTIPURPOSE_PASSENGER_VEHICLE
+// }
 
 enum TransactionType {
   INCOME // Entrada de dinero

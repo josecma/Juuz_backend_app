@@ -1,85 +1,85 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+// import { Inject, Injectable } from '@nestjs/common';
+// import { PrismaClient } from '@prisma/client';
 
-@Injectable()
-export default class CategoryRepository {
+// @Injectable()
+// export default class CategoryRepository {
 
-    public constructor(
-        @Inject()
-        private readonly prisma: PrismaClient,
-    ) { };
+//     public constructor(
+//         @Inject()
+//         private readonly prisma: PrismaClient,
+//     ) { };
 
-    public async findOneBy(params: { id: string; }) {
+//     public async findOneBy(params: { id: string; }) {
 
-        const { id } = params;
+//         const { id } = params;
 
-        try {
+//         try {
 
-            const object = await this.prisma.category.findUnique({
-                where: {
-                    id: id
-                },
-            });
+//             const object = await this.prisma.category.findUnique({
+//                 where: {
+//                     id: id
+//                 },
+//             });
 
-            return object;
+//             return object;
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(error);
+//             console.error(error);
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-    public async save(params: { parentId?: string; name: string; }) {
+//     public async save(params: { parentId?: string; name: string; }) {
 
-        const { parentId, name } = params;
+//         const { parentId, name } = params;
 
-        try {
+//         try {
 
-            const parentCategory = parentId ? await this.findOneBy({ id: parentId }) : null;
+//             const parentCategory = parentId ? await this.findOneBy({ id: parentId }) : null;
 
-            const newCategory = await this.prisma.category.create({
-                data: {
-                    name: name,
-                    categoryId: parentCategory?.id,
-                    path: parentCategory ? `${parentCategory.path}/${Date.now()}` : `${Date.now()}`,
-                }
-            });
+//             const newCategory = await this.prisma.category.create({
+//                 data: {
+//                     name: name,
+//                     categoryId: parentCategory?.id,
+//                     path: parentCategory ? `${parentCategory.path}/${Date.now()}` : `${Date.now()}`,
+//                 }
+//             });
 
-            return newCategory;
+//             return newCategory;
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(error);
+//             console.error(error);
 
-            throw error;
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-    public async get(params: { id?: string; maxDepth?: number; }) {
+//     public async get(params: { id?: string; maxDepth?: number; }) {
 
-        const { id, maxDepth } = params;
+//         const { id, maxDepth } = params;
 
-        try {
+//         try {
 
-            const categories = await this.prisma.category.findMany({
-                where: { id: id },
-            });
+//             const categories = await this.prisma.category.findMany({
+//                 where: { id: id },
+//             });
 
-            return categories;
+//             return categories;
 
-        } catch (error) {
+//         } catch (error) {
 
-            console.error(error);
-            throw error;
+//             console.error(error);
+//             throw error;
 
-        };
+//         };
 
-    };
+//     };
 
-};
+// };

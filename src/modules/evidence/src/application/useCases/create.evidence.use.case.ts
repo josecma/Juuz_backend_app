@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import S3Adapter from "src/modules/shared/src/infrastructure/adapters/s3.adapter";
 import { EvidenceType } from "../../domain/enums/evidence.type";
 import CreateEvidenceService from "../../domain/services/create.evidence.service";
+import { UploadFile } from "src/modules/shared/src/domain/types/upload.file";
 
 @Injectable({})
 export default class CreateEvidenceUseCase {
@@ -21,13 +22,7 @@ export default class CreateEvidenceUseCase {
                 longitude: number,
                 latitude: number,
             };
-            files: {
-                fileName: string,
-                key: string,
-                buffer: Buffer,
-                mimeType: string,
-                metadata?: Record<string, unknown>,
-            }[],
+            files: UploadFile[],
         }
     ) {
 
@@ -49,19 +44,17 @@ export default class CreateEvidenceUseCase {
             const fileData = files.map((file) => {
 
                 const {
-                    key,
+                    uniqueName,
                     mimeType,
                     metadata,
                     buffer,
-                    fileName,
                 } = file;
 
                 return {
-                    key,
-                    eTag: uploadedFiles.get(key),
+                    uniqueName,
+                    eTag: uploadedFiles.get(uniqueName),
                     mimeType,
                     metadata,
-                    fileName,
                     size: buffer.length,
                 };
 

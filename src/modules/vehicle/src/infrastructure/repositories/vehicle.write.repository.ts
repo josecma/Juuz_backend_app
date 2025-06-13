@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Prisma, PrismaClient } from "@prisma/client";
+import { SaveFile } from "src/modules/shared/src/domain/types/save.file";
 
 @Injectable({})
 export default class VehicleWriteRepository {
@@ -84,14 +85,7 @@ export default class VehicleWriteRepository {
                 vehicleType: string,
                 capacity: number
             },
-            pictures: Array<{
-                fileName: string,
-                key: string,
-                eTag: string,
-                mimeType: string,
-                size: number,
-                metadata?: Record<string, unknown>,
-            }>,
+            pictures: Array<SaveFile>,
             modelId: string,
         }
     ) {
@@ -136,7 +130,7 @@ export default class VehicleWriteRepository {
                             async (picture) => {
 
                                 const {
-                                    key,
+                                    uniqueName,
                                     mimeType,
                                     metadata,
                                     eTag,
@@ -146,7 +140,7 @@ export default class VehicleWriteRepository {
                                 return await tx.file.create(
                                     {
                                         data: {
-                                            key,
+                                            key: uniqueName,
                                             eTag,
                                             mimeType,
                                             size: size.toString(),
@@ -217,14 +211,7 @@ export default class VehicleWriteRepository {
                 capacity?: number
             },
             fileIdsToDelete: Array<string>,
-            pictures?: Array<{
-                fileName: string,
-                key: string,
-                eTag: string,
-                mimeType: string,
-                size: number,
-                metadata?: Record<string, unknown>,
-            }>,
+            pictures?: Array<SaveFile>,
             modelId?: string,
         }
     ) {
@@ -277,7 +264,7 @@ export default class VehicleWriteRepository {
                                 async (picture) => {
 
                                     const {
-                                        key,
+                                        uniqueName,
                                         mimeType,
                                         metadata,
                                         eTag,
@@ -287,7 +274,7 @@ export default class VehicleWriteRepository {
                                     return await tx.file.create(
                                         {
                                             data: {
-                                                key,
+                                                key: uniqueName,
                                                 eTag,
                                                 mimeType,
                                                 size: size.toString(),

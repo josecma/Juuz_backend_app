@@ -55,7 +55,6 @@ export default class GetTrackingChannelUseCase {
                 throw new NotFoundDomainException(
                     {
                         message: `user with id:${userId} not found`,
-                        source: `${GetTrackingChannelUseCase.name}`,
                     }
                 );
             };

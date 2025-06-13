@@ -1,33 +1,31 @@
 import {
     BadRequestException,
     Injectable,
-    InternalServerErrorException,
-    NotFoundException,
-    Logger,
-    UnauthorizedException,
+    Logger
 } from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
-import { PrismaGenericService } from 'src/_shared/infrastructure/generic/prismaService.generic';
 import {
     $Enums,
     DescriptionMessageEnum,
+    NegotiationStatus,
     OrderStatusEnum,
     Prisma,
     TypePointEnum,
-    NegotiationStatus,
+    VehicleOrder
 } from '@prisma/client';
-import { OrderEntity } from '../domain/order.entity';
-import { AblyService } from 'src/_shared/providers/ably/application/ably.service';
+import { PrismaService } from 'nestjs-prisma';
 import { AblyAction, AblyStatus } from 'src/_shared/domain/enum/ably.enum';
+import { PrismaGenericService } from 'src/_shared/infrastructure/generic/prismaService.generic';
+import { AblyService } from 'src/_shared/providers/ably/application/ably.service';
+import { MassagesService } from 'src/appCore/messages/application/messages.service';
 import { PointsService } from 'src/appCore/points/application/points.service';
 import { PointDto } from 'src/appCore/points/domain/point.dtos';
-import { DriverAcceptOrderFilterDto } from '../domain/driverAcceptOrderFilterDto.dto';
-import { UpdateReferedOrderDto } from '../domain/order.dtos';
-import { VehicleOrderDto } from '../domain/vehicleOrder.dto';
-import { MassagesService } from 'src/appCore/messages/application/messages.service';
+import { Order } from 'src/appCore/points/domain/types';
 import { S3Service } from 'src/s3/aplication/s3.service';
 import { toCamelCase } from 'src/utils/to.camel.case';
-import { Order } from 'src/appCore/points/domain/types';
+import { DriverAcceptOrderFilterDto } from '../domain/driverAcceptOrderFilterDto.dto';
+import { UpdateReferedOrderDto } from '../domain/order.dtos';
+import { OrderEntity } from '../domain/order.entity';
+import { VehicleOrderDto } from '../domain/vehicleOrder.dto';
 
 @Injectable()
 export class OrdersService extends PrismaGenericService<
@@ -64,17 +62,17 @@ export class OrdersService extends PrismaGenericService<
         phoneSecond: true,
         firstNameSecond: true,
         lastNameSecond: true,
-        photos: {
-            select: {
-                id: true,
-                name: true,
-            },
-        },
+        // photos: {
+        //     select: {
+        //         id: true,
+        //         name: true,
+        //     },
+        // },
         information: true,
         reason: true,
-        pickUpDate: true,
+        pickUpAt: true,
         pricePerMile: true,
-        deliveryDate: true,
+        deliveryAt: true,
         carCount: true,
         aditionalInfo: true,
         paymentMethod: true,
@@ -103,16 +101,16 @@ export class OrdersService extends PrismaGenericService<
         },
         price: true,
         subStatus: true,
-        subService: {
-            select: {
-                name: true,
-                Service: {
-                    select: {
-                        name: true,
-                    },
-                },
-            },
-        },
+        // subService: {
+        //     select: {
+        //         name: true,
+        //         Service: {
+        //             select: {
+        //                 name: true,
+        //             },
+        //         },
+        //     },
+        // },
         VehicleOrder: {
             select: {
                 id: true,
@@ -123,22 +121,22 @@ export class OrdersService extends PrismaGenericService<
                 stateProvince: true,
                 state: true,
                 year: true,
-                vehicleType: true,
+                // vehicleType: true,
                 additionalVehicleInformation: true,
                 trailerType: true,
                 wideLoad: true,
-                model: {
-                    select: {
-                        id: true,
-                        name: true,
-                        brand: {
-                            select: {
-                                id: true,
-                                name: true,
-                            },
-                        },
-                    },
-                },
+                // model: {
+                //     select: {
+                //         id: true,
+                //         name: true,
+                //         brand: {
+                //             select: {
+                //                 id: true,
+                //                 name: true,
+                //             },
+                //         },
+                //     },
+                // },
             },
         },
         Negotiation: true,
@@ -244,122 +242,129 @@ export class OrdersService extends PrismaGenericService<
     }
 
     async createOrder(
-        body, //: OrderDto | OrderApkDto,
+        body: any, //: OrderDto | OrderApkDto,
         ownerId: string,
-        companyId: string
-    ): Promise<OrderEntity> {
-        body['status'] = $Enums.OrderStatusEnum.PENDING;
-        body['subStatus'] = $Enums.OrderSubStatus.UPCOMING;
+        // companyId: string
+    )
+    // : Promise<OrderEntity> 
+    {
+        console.log(body);
 
-        const { service, photoIds, vehicleOrders, ...data } = body;
-        if (data.email === null && data.phone === null) {
-            throw new BadRequestException(
-                'You must provide exactly one of the fields: phone or email.'
-            );
-        }
+        // body['status'] = $Enums.OrderStatusEnum.PENDING;
+        // body['subStatus'] = $Enums.OrderSubStatus.UPCOMING;
+
+        // const { service, photoIds, vehicleOrders, ...data } = body;
+        // if (data.email === null && data.phone === null) {
+        //     throw new BadRequestException(
+        //         'You must provide exactly one of the fields: phone or email.'
+        //     );
+        // }
         // body.departure.driverId = null;
         // body.destination.driverId = null;
-        const departureId = await this.createPoint(
-            body.departure,
-            ownerId,
-            TypePointEnum.DEPARTURE
-        );
+        // const departureId = await this.createPoint(
+        //     body.departure,
+        //     ownerId,
+        //     TypePointEnum.DEPARTURE
+        // );
 
-        const destinationId = await this.createPoint(
-            body.destination,
-            ownerId,
-            TypePointEnum.DESTINATION
-        );
+        // const destinationId = await this.createPoint(
+        //     body.destination,
+        //     ownerId,
+        //     TypePointEnum.DESTINATION
+        // );
 
-        const today = new Date();
-        const orderData: Prisma.OrderCreateArgs = {
-            data: {
-                photos: {
-                    connect: photoIds ? photoIds.map((id) => ({ id })) : undefined,
-                },
-                serviceId: body.serviceId.toString(),
-                expirationTime: new Date(today.setDate(today.getDate() + 7)),
-                subServiceId: body.subServiceId.toString(),
-                status: body.status,
-                subStatus: body.subStatus,
-                carCount: vehicleOrders.length,
-                paymentMethod: body.paymentMethod,
-                price: body.price,
-                note: body.note,
-                ownerId: ownerId,
-                userId: ownerId,
-                departureId: departureId,
-                destinationId: destinationId,
-                email: data.email,
-                phone: data.phone,
-                milles: data.milles,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                emailSecond: data.emailSecond,
-                phoneSecond: data.phoneSecond,
-                firstNameSecond: data.firstNameSecond,
-                lastNameSecond: data.lastNameSecond,
-                VehicleOrder: {
-                    create: vehicleOrders.map((order: VehicleOrderDto) => ({
-                        qty: order.qty,
-                        year: order.year,
-                        vehicleColor: order.vehicleColor,
-                        licensePlate: order.licensePlate,
-                        lastNumber: order.lastNumber,
-                        stateProvince: order.stateProvince,
-                        model: {
-                            connect: {
-                                id: order.modelId.toString(),
-                            },
-                        },
-                        ownerId: ownerId,
-                        state: order.state,
-                        isTheKeysWithTheVehicle: order.isTheKeysWithTheVehicle,
-                        additionalVehicleInformation: order.additionalVehicleInformation,
-                        trailerType: order.trailerType,
-                        wideLoad: order.wideLoad,
-                        vehicleType: order.vehicleType,
-                    })),
-                },
-                companyId: companyId,
-            },
-            select: this.select,
-        };
-        if (data.pickUpDate) {
-            orderData.data.deliveryDate = data.deliveryDate;
-            orderData.data.pickUpDate = data.deliveryDate;
-        }
-        if (body.isAssistanceRequestForNow) {
-            if (body.pickUpDate || body.deliveryDate)
-                throw new BadRequestException(
-                    'If it is fast assistance, pickUpDate and deliveryDate cannot be passed'
-                );
-            orderData.data['isAssistanceRequestForNow'] =
-                body.isAssistanceRequestForNow;
-        }
+        // const today = new Date();
+        // const orderData: Prisma.OrderCreateArgs = {
+        //     data: {
+        //         // photos: {
+        //         //     connect: photoIds ? photoIds.map((id) => ({ id })) : undefined,
+        //         // },
+        //         serviceId: body.serviceId?.toString(),
+        //         expirationTime: new Date(today.setDate(today.getDate() + 7)),
+        //         subServiceId: body.subServiceId?.toString(),
+        //         status: body.status,
+        //         subStatus: body.subStatus,
+        //         carCount: vehicleOrders.length,
+        //         paymentMethod: body.paymentMethod,
+        //         price: body.price,
+        //         note: body.note,
+        //         ownerId: ownerId,
+        //         userId: ownerId,
+        //         departureId: departureId,
+        //         destinationId: destinationId,
+        //         email: data.email,
+        //         phone: data.phone,
+        //         milles: data.milles,
+        //         firstName: data.firstName,
+        //         lastName: data.lastName,
+        //         emailSecond: data.emailSecond,
+        //         phoneSecond: data.phoneSecond,
+        //         firstNameSecond: data.firstNameSecond,
+        //         lastNameSecond: data.lastNameSecond,
+        //         VehicleOrder: {
+        //             create: vehicleOrders.map(
+        //                 (order: VehicleOrderDto) => (
+        //                     {
+        //                         qty: order.qty,
+        //                         year: order.year,
+        //                         vehicleColor: order.vehicleColor,
+        //                         licensePlate: order.licensePlate,
+        //                         lastNumber: order.lastNumber,
+        //                         stateProvince: order.stateProvince,
+        //                         vehicleMakeModel: {
+        //                             connect: {
+        //                                 id: order.modelId.toString(),
+        //                             },
+        //                         },
+        //                         ownerId: ownerId,
+        //                         state: order.state,
+        //                         isTheKeysWithTheVehicle: order.isTheKeysWithTheVehicle,
+        //                         additionalVehicleInformation: order.additionalVehicleInformation,
+        //                         trailerType: order.trailerType,
+        //                         wideLoad: order.wideLoad,
+        //                         vehicleType: order.vehicleType,
+        //                     } as unknown as VehicleOrder
+        //                 )
+        //             ),
+        //         },
+        //     },
+        //     select: this.select,
+        // };
+        // if (data.pickUpDate) {
+        //     orderData.data.deliveryAt = data.deliveryDate;
+        //     orderData.data.pickUpAt = data.deliveryDate;
+        // }
+        // if (body.isAssistanceRequestForNow) {
+        //     if (body.pickUpDate || body.deliveryDate)
+        //         throw new BadRequestException(
+        //             'If it is fast assistance, pickUpDate and deliveryDate cannot be passed'
+        //         );
+        //     orderData.data['isAssistanceRequestForNow'] =
+        //         body.isAssistanceRequestForNow;
+        // }
 
-        const result: any = await this.create(orderData);
+        // const result: any = await this.create(orderData);
 
-        await this.pointsService.updatePoint(departureId, { orderId: result.id });
-        await this.pointsService.updatePoint(destinationId, { orderId: result.id });
+        // await this.pointsService.updatePoint(departureId, { orderId: result.id });
+        // await this.pointsService.updatePoint(destinationId, { orderId: result.id });
 
-        await this.findDriverIdsNearby(
-            data.departure.coords.latitude,
-            data.departure.coords.longitude,
-            5,
-            // service.serviceName,
-            // service.subServiceName,
-            null,
-            null,
-            result.id
-        );
-        result['departure'] = await this.pointsService.findOne(result.departureId);
-        result['destination'] = await this.pointsService.findOne(
-            result.destinationId
-        );
-        delete result.departureId;
-        result.destinationId;
-        return result;
+        // await this.findDriverIdsNearby(
+        //     data.departure.coords.latitude,
+        //     data.departure.coords.longitude,
+        //     5,
+        //     // service.serviceName,
+        //     // service.subServiceName,
+        //     null,
+        //     null,
+        //     result.id
+        // );
+        // result['departure'] = await this.pointsService.findOne(result.departureId);
+        // result['destination'] = await this.pointsService.findOne(
+        //     result.destinationId
+        // );
+        // delete result.departureId;
+        // result.destinationId;
+        // return result;
     }
 
     async findDriverIdsNearby(
@@ -532,9 +537,9 @@ export class OrdersService extends PrismaGenericService<
                 //     ownerId: user.id,
                 //   },
                 // },
-                subStatus: $Enums.OrderSubStatus.ASSIGNED,
+                subStatus: "ASSIGNED",
                 driverId: filter.driverId,
-                companyId: companyId,
+                companyId: order.Negotiation[0].companyId,
                 price:
                     order.Negotiation[0].lastNegotiaton ===
                         $Enums.LastNegotiatonEnums.CARRIER
@@ -600,8 +605,8 @@ export class OrdersService extends PrismaGenericService<
             },
             where: userFilter.where,
             data: {
-                status: $Enums.OrderStatusEnum.HISTORY,
-                subStatus: $Enums.OrderSubStatus.COMPLETE,
+                status: "HISTORY",
+                subStatus: "COMPLETE",
             },
         };
         const order: OrderEntity = await this.update(userFilter, userUpdate);
