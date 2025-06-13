@@ -19,7 +19,7 @@ export default class OrderShipperWriteRepository {
 
     public async save(
         params: {
-            shipperId: string,
+            ownerId: string,
             price: number,
             miles: number,
             serviceId?: string,
@@ -54,7 +54,7 @@ export default class OrderShipperWriteRepository {
             departure,
             destination,
             items: orderItems,
-            shipperId,
+            ownerId,
             ...OrderRest
         } = params;
 
@@ -70,9 +70,9 @@ export default class OrderShipperWriteRepository {
 
                             async (orderItem) => {
 
-                                const { item, ...orderItemRest } = orderItem;
+                                const { content, ...orderItemRest } = orderItem;
 
-                                const { pictures, ...itemRest } = item;
+                                const { pictures, ...contentRest } = content;
 
                                 const savedFiles = await tx.file.createManyAndReturn(
                                     {
@@ -80,11 +80,12 @@ export default class OrderShipperWriteRepository {
 
                                             (pic) => {
 
-                                                const { uniqueName, size, ...picRest } = pic;
+                                                const { uniqueName, size, mimeType, ...picRest } = pic;
 
                                                 return {
                                                     ...picRest,
                                                     key: uniqueName,
+                                                    mimeType,
                                                     size: size.toString()
                                                 };
                                             }
@@ -96,7 +97,7 @@ export default class OrderShipperWriteRepository {
                                 return {
                                     ...orderItemRest,
                                     item: {
-                                        ...itemRest,
+                                        ...contentRest,
                                         pictureIds: savedFiles.map(f => f.id),
                                     }
                                 };
@@ -134,9 +135,8 @@ export default class OrderShipperWriteRepository {
                                     }
                                 },
                                 items: mappedOrderItems,
-                                ownerId: shipperId,
-                                shipperId,
-                                userId: shipperId,
+                                ownerId,
+                                userId: ownerId,
                             }
                         }
                     );

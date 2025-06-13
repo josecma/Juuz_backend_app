@@ -2,7 +2,7 @@ import { Address } from "src/modules/shared/src/domain/types/address";
 import { OrderItem } from "./order.item";
 
 export type PostOrder = {
-    shipperId: string,
+    ownerId: string,
     price: number,
     miles: number,
     serviceId?: string,

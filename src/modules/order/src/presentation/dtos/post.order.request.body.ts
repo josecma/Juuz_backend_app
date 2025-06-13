@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, ValidateNested } from "class-validator";
 import Address from "src/modules/shared/src/presentation/dtos/address";
-import OrderVehicleRequestBody from "./order.vehicle.request.body";
+import OrderItemRequestBody from "./order.item.request.body";
 
 export default class PostOrderRequestBody {
 
@@ -80,7 +80,7 @@ export default class PostOrderRequestBody {
             each: true
         }
     )
-    @Type(() => OrderVehicleRequestBody)
-    items: Array<OrderVehicleRequestBody>;
+    @Type(() => OrderItemRequestBody)
+    items: Array<OrderItemRequestBody>;
 
 };

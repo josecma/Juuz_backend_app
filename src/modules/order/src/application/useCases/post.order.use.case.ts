@@ -27,7 +27,7 @@ export default class PostOrderUseCase {
     ) {
 
         const {
-            shipperId,
+            ownerId,
             items,
             pricePerMile,
             price,
@@ -41,7 +41,7 @@ export default class PostOrderUseCase {
 
             const findUserById = await this.findUserByIdUseCase.execute(
                 {
-                    userId: shipperId
+                    userId: ownerId
                 }
             );
 
@@ -66,7 +66,7 @@ export default class PostOrderUseCase {
 
                             const vehicleItem = (<OrderItem<VehicleItem>>i);
 
-                            const uploadedPictures = await this.s3Adapter.uploadFiles(vehicleItem.item.pictures);
+                            const uploadedPictures = await this.s3Adapter.uploadFiles(vehicleItem.content.pictures);
 
                             uploadedPictures.forEach(
 
@@ -78,7 +78,7 @@ export default class PostOrderUseCase {
 
                             );
 
-                            const picturesInfo = vehicleItem.item.pictures.map(
+                            const picturesInfo = vehicleItem.content.pictures.map(
 
                                 (pic) => {
 
@@ -87,7 +87,7 @@ export default class PostOrderUseCase {
                                     return {
                                         ...picRest,
                                         eTag: uploadedPictures.get(uniqueName),
-                                        key: uniqueName,
+                                        uniqueName,
                                         size: buffer.length,
                                     }
 
@@ -95,13 +95,13 @@ export default class PostOrderUseCase {
 
                             );
 
-                            const { item, ...orderItemRest } = (<OrderItem<VehicleItem>>i);
+                            const { content, ...orderItemRest } = (<OrderItem<VehicleItem>>i);
 
-                            const { pictures, ...itemRest } = item;
+                            const { pictures, ...itemRest } = content;
 
                             orderItem = {
                                 ...orderItemRest,
-                                item: {
+                                content: {
                                     ...itemRest,
                                     pictures: picturesInfo,
                                 }
@@ -109,9 +109,10 @@ export default class PostOrderUseCase {
 
                         };
 
-                        orderItem.id = UUIDAdapter.get();
-
-                        return orderItem;
+                        return {
+                            ...orderItem,
+                            id: UUIDAdapter.get()
+                        };
 
                     }
 
@@ -121,7 +122,7 @@ export default class PostOrderUseCase {
 
             const postOrderResponse = await this.orderShipperWriteRepository.save(
                 {
-                    shipperId,
+                    ownerId,
                     ...orderRest,
                     status: OrderStatusEnum.PENDING,
                     subStatus: OrderSubStatusEnum.UPCOMING,

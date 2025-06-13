@@ -68,10 +68,9 @@ export class OrderEntity {
 
     @ApiProperty({
         description: 'Payment Method',
-        example: $Enums.PaymentMethodEnum.CASH,
-        enum: $Enums.PaymentMethodEnum,
+        example: "CASH",
     })
-    paymentMethod: $Enums.PaymentMethodEnum;
+    paymentMethod: string;
 
     @ApiProperty({
         example: 'Order 1',

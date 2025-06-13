@@ -2,13 +2,11 @@ import { Body, Controller, Post, Req, Res, UseInterceptors } from "@nestjs/commo
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
-import { Public } from "src/modules/auth/src/presentation/decorators/public.route.decorator";
 import Request from "src/modules/shared/src/types/types";
 import PostOrderUseCase from "../../application/useCases/post.order.use.case";
 import PostOrderRequestBody from "../dtos/post.order.request.body";
 import PostOrderFormDataInterceptor from "../interceptors/post.order.form.data.interceptor";
 
-@Public()
 @ApiTags("orders:v2")
 @Controller(
     {
@@ -33,21 +31,21 @@ export default class OrderController {
         @Res() res: Response,
     ) {
 
-        const shipperId = req.user.id;
+        const ownerId = req.user.id;
 
         const { items, ...postOrderRest } = body;
 
         try {
 
-            this.postOrderUseCase.execute(
+            const postOrderResponse = await this.postOrderUseCase.execute(
                 {
-                    shipperId,
+                    ownerId,
                     items,
                     ...postOrderRest
                 }
             );
 
-            res.status(201).json(body);
+            res.status(201).json(postOrderResponse);
 
         } catch (error) {
 

@@ -243,12 +243,10 @@ export class OrderDto {
 
   @ApiProperty({
     description: 'Payment Method',
-    example: $Enums.PaymentMethodEnum.CASH,
-    enum: $Enums.PaymentMethodEnum,
+    example: "CASH",
   })
   @IsNotEmpty()
-  @IsEnum($Enums.PaymentMethodEnum, { message: 'Payment Method' })
-  paymentMethod: $Enums.PaymentMethodEnum;
+  paymentMethod: string;
 
   @ApiProperty({
     type: PointDto,
@@ -381,12 +379,10 @@ export class UpdateOrderDto {
 
   @ApiProperty({
     description: 'Payment Method',
-    example: $Enums.PaymentMethodEnum.CASH,
-    enum: $Enums.PaymentMethodEnum,
+    example: "CASH",
   })
   @IsOptional()
-  @IsEnum($Enums.PaymentMethodEnum, { message: 'Payment Method' })
-  paymentMethod: $Enums.PaymentMethodEnum;
+  paymentMethod: string;
 
   @ApiProperty({
     description: 'Price.',

@@ -70,10 +70,10 @@ export class MassagesService extends PrismaGenericService<
         id: true,
         userId: true,
         status: true,
-        milles: true,
+        miles: true,
         email: true,
         note: true,
-        phone: true,
+        phoneNumber: true,
         // photos: {
         //     select: {
         //         id: true,

@@ -2,7 +2,9 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import { Request } from 'express';
 import { extname } from 'path';
 import { Observable } from 'rxjs';
+import { OrderItemTypeEnum } from '../../domain/enums/order.item.type.enum';
 import { safeParser } from '../parsers/safe.parser';
+import UUIDAdapter from 'src/modules/shared/src/infrastructure/adapters/uuid.adapter';
 
 @Injectable()
 export default class PostOrderFormDataInterceptor implements NestInterceptor {
@@ -79,18 +81,23 @@ export default class PostOrderFormDataInterceptor implements NestInterceptor {
             deliveryAt: safeParser.date(deliveryAt),
             departure: processAddress(departure),
             destination: processAddress(destination),
-            items: Array.isArray(items) ? items.map(item => ({
-                year: safeParser.int(item.year),
-                modelId: safeParser.string(item.modelId),
-                isTheKeysWithTheVehicle: safeParser.bool(item.isTheKeysWithTheVehicle),
-                type: safeParser.string(item.type),
-                trailerType: safeParser.string(item.trailerType),
-                color: safeParser.string(item.color),
-                wideLoad: safeParser.bool(item.wideLoad),
-                status: safeParser.string(item.status),
-                information: safeParser.string(item.information),
-                pictures: []
-            })) : []
+            items: Array.isArray(items) ? items.map(item => (
+                {
+                    type: OrderItemTypeEnum.VEHICLE,
+                    content: {
+                        year: safeParser.int(item.year),
+                        modelId: safeParser.string(item.modelId),
+                        isTheKeysWithTheVehicle: safeParser.bool(item.isTheKeysWithTheVehicle),
+                        type: safeParser.string(item.type),
+                        trailerType: safeParser.string(item.trailerType),
+                        color: safeParser.string(item.color),
+                        wideLoad: safeParser.bool(item.wideLoad),
+                        status: safeParser.string(item.status),
+                        information: safeParser.string(item.information),
+                        pictures: []
+                    }
+                }
+            )) : []
         };
 
         const files: { [key: string]: any } = {};
@@ -105,7 +112,7 @@ export default class PostOrderFormDataInterceptor implements NestInterceptor {
 
                     const [_, index] = match;
 
-                    const { originalname, buffer, ...fileRest } = req.files[key];
+                    const { originalname, buffer, mimetype, fieldname, encoding, ...fileRest } = req.files[key];
 
                     if (!Buffer.isBuffer(buffer)) {
 
@@ -115,14 +122,14 @@ export default class PostOrderFormDataInterceptor implements NestInterceptor {
 
                     const extName = extname(originalname);
 
-                    const newName = originalname.replace(extName, `-${Date.now()}`);
+                    const newName = originalname.replace(extName, `${UUIDAdapter.get()}-${Date.now()}`);
 
                     const uniqueName = `${newName}${extName}`;
 
-                    postOrder.items[index].pictures.push(
+                    postOrder.items[index].content.pictures.push(
                         {
                             ...fileRest,
-                            originalname,
+                            mimeType: mimetype,
                             buffer,
                             uniqueName,
                         }
