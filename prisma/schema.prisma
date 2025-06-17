@@ -188,9 +188,13 @@ model UserNotificationToken {
 // }
 
 model Channel {
-  id    String        @id @default(uuid())
-  name  String        @unique()
-  users UserChannel[]
+  id      String  @id @default(uuid())
+  name    String  @unique()
+  type    String?
+  details Json?
+
+  users     UserChannel[]
+  companies CompanyChannel[]
 
   @@index([name])
   @@map("channels")
@@ -207,6 +211,16 @@ model UserChannel {
   @@map("user_channels")
 }
 
+model CompanyChannel {
+  channelId   String   @map("channel_id")
+  channel     Channel  @relation(fields: [channelId], references: [id])
+  companyId   String   @map("company_id")
+  permissions String[]
+
+  @@id([channelId, companyId])
+  @@map("company_channels")
+}
+
 model TrackingChannel {
   channelId     String   @map("channel_id")
   stakeholderId String   @map("stakeholder_id")
@@ -219,7 +233,7 @@ model TrackingChannel {
 model Business {
   id           String                @id @default(uuid())
   status       String
-  bids         StakeholderBid[]      @relation(name: "business_bid")
+  offers       StakeholderOffer[]    @relation(name: "business_offer")
   stakeholders BusinessStakeholder[] @relation(name: "business_stakeholder")
   objects      BusinessObject[]      @relation(name: "business_object")
 
@@ -234,8 +248,7 @@ model BusinessObject {
   type       String
   details    Json?
 
-  business Business         @relation(name: "business_object", fields: [businessId], references: [id])
-  bids     StakeholderBid[] @relation(name: "business_object_bid")
+  business Business @relation(name: "business_object", fields: [businessId], references: [id])
 
   @@index([businessId])
   @@index([objectId, businessId])
@@ -243,40 +256,42 @@ model BusinessObject {
 }
 
 model BusinessStakeholder {
-  id         String @id @default(uuid())
-  role       String
-  businessId String @map("business_id")
-  type       String
-  details    Json?
+  id            String @id @default(uuid())
+  role          String
+  status        String
+  stakeholderId String @map("stakeholder_id")
+  businessId    String @map("business_id")
+  type          String
+  details       Json?
 
-  bids     StakeholderBid[] @relation(name: "stakeholder_bid")
-  business Business         @relation(name: "business_stakeholder", fields: [businessId], references: [id])
+  offers   StakeholderOffer[] @relation(name: "stakeholder_offer")
+  business Business           @relation(name: "business_stakeholder", fields: [businessId], references: [id], onDelete: Cascade)
 
-  @@unique([businessId, role])
+  @@unique([businessId, role, stakeholderId])
   @@index([role])
-  @@index([businessId, role])
+  @@index([stakeholderId])
+  @@index([businessId, role, stakeholderId])
   @@map("business_stakeholders")
 }
 
-model StakeholderBid {
-  id               String @id @default(uuid())
-  bidderId         String @map("bidder_id")
-  businessObjectId String @map("business_object_id")
-  businessId       String @map("business_id")
-  type             String
-  details          Json   @map("offer_details")
+model StakeholderOffer {
+  id         String @id @default(uuid())
+  bidderId   String @map("bidder_id")
+  businessId String @map("business_id")
+  status     String
+  type       String
+  details    Json   @map("details")
 
-  biddingAt DateTime @default(now()) @map("bidding_at")
+  offerAt DateTime @default(now()) @map("offer_at")
 
-  stakeholder    BusinessStakeholder @relation(name: "stakeholder_bid", fields: [bidderId], references: [id])
-  business       Business            @relation(name: "business_bid", fields: [businessId], references: [id])
-  businessObject BusinessObject      @relation(name: "business_object_bid", fields: [businessObjectId], references: [id])
+  stakeholder BusinessStakeholder @relation(name: "stakeholder_offer", fields: [bidderId], references: [id])
+  business    Business            @relation(name: "business_offer", fields: [businessId], references: [id])
 
-  @@index([biddingAt])
+  @@index([offerAt])
   @@index([bidderId])
   @@index([businessId])
-  @@index([businessObjectId, businessId, bidderId])
-  @@map("stakeholder_bids")
+  @@index([businessId, bidderId])
+  @@map("stakeholder_offers")
 }
 
 model Criterion {
@@ -927,7 +942,7 @@ model Order {
   email                     String?
   reason                    String?
   // photos                    Photo[]
-  items                     Json
+  items                     Json[]
   phoneNumber               String?        @map("phone_number")
   firstName                 String?        @map("first_name")
   lastName                  String?        @map("last_name")

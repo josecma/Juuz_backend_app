@@ -1,5 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
-import BadRequestDomainException from "src/modules/shared/src/domain/exceptions/bad.request.domain.exception";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import NotFoundDomainException from "src/modules/shared/src/domain/exceptions/not.found.domain.exception";
 import BuildChannelNameService from "src/modules/shared/src/domain/services/build.channel.name.service";
 import AblyAdapter from "src/modules/shared/src/infrastructure/adapters/ably.adapter";
@@ -8,7 +7,9 @@ import ChannelWriteRepository from "src/modules/shared/src/infrastructure/channe
 import UserReadRepository from "src/modules/user/src/infrastructure/repositories/user.read.repository";
 
 @Injectable({})
-export default class GetPrivateUserChannelByUserIdUseCase {
+export default class GetUserPrivateChannelUseCase {
+
+    private readonly logger = new Logger(GetUserPrivateChannelUseCase.name);
 
     public constructor(
         @Inject(UserReadRepository)
@@ -22,23 +23,10 @@ export default class GetPrivateUserChannelByUserIdUseCase {
     ) { };
 
     public async execute(
-        params: {
-            userId: string;
-        }
+        userId: string
     ) {
 
-        const { userId } = params;
-
         try {
-
-            if (!userId) {
-                throw new BadRequestDomainException(
-                    {
-                        message: "user id is required",
-                        source: `${GetPrivateUserChannelByUserIdUseCase.name}`,
-                    }
-                );
-            };
 
             const exist = await this.userReadRepository.exist(
                 userId
@@ -48,24 +36,21 @@ export default class GetPrivateUserChannelByUserIdUseCase {
 
                 throw new NotFoundDomainException(
                     {
-                        message: `user with id:${userId} not found`,
+                        message: `user not found`,
                     }
                 );
 
             };
 
-            const privateUserChannels = await this.channelReadRepository.findUserChannelBy(
-                {
-                    userId,
-                    subStr: "private"
-                }
+            let privateUserChannel = await this.channelReadRepository.findUserPrivateChannel(
+                userId
             );
 
-            if (privateUserChannels.length === 0) {
+            if (privateUserChannel == null) {
 
-                const newChannelName = BuildChannelNameService.private().uuid().getBuiltChannelName();
+                const newChannelName = BuildChannelNameService.user().private().uuid().getBuiltChannelName();
 
-                await this.channelWriteRepository.save(
+                privateUserChannel = await this.channelWriteRepository.save(
                     {
                         userId,
                         name: newChannelName,
@@ -94,16 +79,18 @@ export default class GetPrivateUserChannelByUserIdUseCase {
             );
 
             return {
-                msg: "channel successfully recovered",
-                content: {
-                    token: userTokenWithChannels.token,
-                    channels: userChannels.map((uCh) => { return { name: uCh.name, items: uCh.items } })
-                },
+                token: userTokenWithChannels.token,
+                privateUserChannel,
             };
 
         } catch (error) {
 
-            throw error;
+            this.logger.error(
+                {
+                    source: `${GetUserPrivateChannelUseCase.name}`,
+                    message: `err getting user private channel: ${error.message}`
+                }
+            );
 
         };
 

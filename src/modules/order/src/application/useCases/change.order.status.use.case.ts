@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import GetPrivateUserChannelByUserIdUseCase from "src/modules/shared/src/application/useCases/get.private.user.channel.by.user.id.use.case";
+import GetPrivateUserChannelByUserIdUseCase from "src/modules/shared/src/application/useCases/get.user.private.channel.use.case";
 import AblyAdapter from "src/modules/shared/src/infrastructure/adapters/ably.adapter";
 import UpdateOrderUseCase from "./update.order.use.case";
 

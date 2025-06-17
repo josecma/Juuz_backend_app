@@ -20,4 +20,19 @@ export default class ChannelMapper {
         }
     };
 
+    static toV2(
+        orm: Prisma.ChannelGetPayload<{}>
+    ) {
+
+        const { id, type, name, details } = orm;
+
+        return {
+            id,
+            name,
+            type,
+            details: details as Record<string, unknown>,
+        };
+
+    };
+
 };

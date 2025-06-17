@@ -1,11 +1,9 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Address } from "src/modules/shared/src/domain/types/address";
-import { SaveFile } from "src/modules/shared/src/domain/types/save.file";
 import { OrderStatusEnum } from "../../domain/enums/order.status.enum";
 import { OrderSubStatusEnum } from "../../domain/enums/order.sub.status.enum";
 import { OrderItem } from "../../domain/types/order.item";
-import { SaveVehicleItem } from "../../domain/types/save.vehicle.item";
 
 @Injectable()
 export default class OrderShipperWriteRepository {
@@ -53,7 +51,7 @@ export default class OrderShipperWriteRepository {
         const {
             departure,
             destination,
-            items: orderItems,
+            items,
             ownerId,
             ...OrderRest
         } = params;
@@ -64,49 +62,49 @@ export default class OrderShipperWriteRepository {
 
                 async (tx) => {
 
-                    const mappedOrderItems = await Promise.all(
+                    // const mappedOrderItems = await Promise.all(
 
-                        (<OrderItem<SaveVehicleItem>[]>orderItems).map(
+                    //     (<OrderItem<SaveVehicleItem>[]>orderItems).map(
 
-                            async (orderItem) => {
+                    //         async (orderItem) => {
 
-                                const { content, ...orderItemRest } = orderItem;
+                    //             const { content, ...orderItemRest } = orderItem;
 
-                                const { pictures, ...contentRest } = content;
+                    //             const { pictures, ...contentRest } = content;
 
-                                const savedFiles = await tx.file.createManyAndReturn(
-                                    {
-                                        data: (<SaveFile[]>pictures).map(
+                    //             const savedFiles = await tx.file.createManyAndReturn(
+                    //                 {
+                    //                     data: (<SaveFile[]>pictures).map(
 
-                                            (pic) => {
+                    //                         (pic) => {
 
-                                                const { uniqueName, size, mimeType, ...picRest } = pic;
+                    //                             const { uniqueName, size, mimeType, ...picRest } = pic;
 
-                                                return {
-                                                    ...picRest,
-                                                    key: uniqueName,
-                                                    mimeType,
-                                                    size: size.toString()
-                                                };
-                                            }
+                    //                             return {
+                    //                                 ...picRest,
+                    //                                 key: uniqueName,
+                    //                                 mimeType,
+                    //                                 size: size.toString()
+                    //                             };
+                    //                         }
 
-                                        )
-                                    }
-                                );
+                    //                     )
+                    //                 }
+                    //             );
 
-                                return {
-                                    ...orderItemRest,
-                                    item: {
-                                        ...contentRest,
-                                        pictureIds: savedFiles.map(f => f.id),
-                                    }
-                                };
+                    //             return {
+                    //                 ...orderItemRest,
+                    //                 item: {
+                    //                     ...contentRest,
+                    //                     pictureIds: savedFiles.map(f => f.id),
+                    //                 }
+                    //             };
 
-                            }
+                    //         }
 
-                        )
+                    //     )
 
-                    );
+                    // );
 
                     const createDepartureAddress = await tx.address.create(
                         {
@@ -134,7 +132,7 @@ export default class OrderShipperWriteRepository {
                                         id: createDestinationAddress.id
                                     }
                                 },
-                                items: mappedOrderItems,
+                                items,
                                 ownerId,
                                 userId: ownerId,
                             }
@@ -150,8 +148,8 @@ export default class OrderShipperWriteRepository {
 
             this.logger.error(
                 {
-                    source: `${OrderShipperWriteRepository.name}`,
-                    message: error.message,
+                    source: `${OrderShipperWriteRepository.name}.save`,
+                    message: `err posting order: ${error.message}`,
                 }
             );
 

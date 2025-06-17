@@ -1,6 +1,7 @@
 import { BaseJSON } from "../shared";
 
 export default abstract class Base {
+
     id?: string;
 
     protected constructor(
@@ -11,7 +12,8 @@ export default abstract class Base {
     ) {
 
         const {
-            id } = params;
+            id
+        } = params;
 
         this.id = id;
 

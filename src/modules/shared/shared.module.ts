@@ -4,7 +4,7 @@ import UserModule from "../user/user.module";
 import IEventDispatcher from "./src/application/contracts/i.event.dispatcher";
 import IEventHandler from "./src/application/contracts/i.event.handler";
 import FileDeletedHandler from "./src/application/eventHandlers/file.deleted.handler";
-import GetPrivateUserChannelByUserIdUseCase from "./src/application/useCases/get.private.user.channel.by.user.id.use.case";
+import GetPrivateUserChannelByUserIdUseCase from "./src/application/useCases/get.user.private.channel.use.case";
 import FileDeletedEvent from "./src/domain/events/file.deleted.event";
 import AblyAdapter from "./src/infrastructure/adapters/ably.adapter";
 import HandlebarsAdapter from "./src/infrastructure/adapters/handlebars.adapter";

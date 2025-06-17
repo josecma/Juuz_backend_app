@@ -24,12 +24,7 @@ export default class AblyAdapter {
             memberId: string;
             channels: { [x: string]: string[]; };
         }
-    ): Promise<
-        {
-            token: string;
-            channels: string[];
-            memberId: string;
-        }> {
+    ) {
 
         const { memberId, channels } = params;
 
@@ -50,9 +45,7 @@ export default class AblyAdapter {
             return {
                 token: tokenDetails.token,
                 channels: Object.entries(channels).map(([k, v]) => k),
-                memberId,
             };
-
 
         } catch (error) {
 

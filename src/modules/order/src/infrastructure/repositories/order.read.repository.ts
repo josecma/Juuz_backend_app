@@ -1,10 +1,14 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { UserRoleEnum } from "src/modules/user/src/domain/enums/user.role.enum";
 import { toCamelCase } from "src/utils/to.camel.case";
+import OrderItemMapper from "../mappers/order.item.mapper";
+import OrderMapper from "../mappers/order.mapper";
 
 @Injectable({})
 export default class OrderReadRepository {
+
+    private readonly logger = new Logger(OrderReadRepository.name);
 
     public constructor(
         @Inject(PrismaClient)
@@ -225,19 +229,56 @@ export default class OrderReadRepository {
 
         try {
 
-            const res = await this.client.order.findUnique(
+            const findUniqueResponse = await this.client.order.findUnique(
                 {
                     where: {
                         id: orderId,
+                    },
+                    include: {
+                        departure1: true,
+                        destination1: true,
                     }
                 }
             );
 
-            return res;
+            return findUniqueResponse ? OrderMapper.to(findUniqueResponse) : null;
 
         } catch (error) {
 
             throw error;
+
+        };
+
+    };
+
+    public async findCompanyOrders(
+        companyId: string
+    ) {
+
+        try {
+
+            const companyOrders = await this.client.order.findMany(
+                {
+                    where: {
+                        companyId,
+                    },
+                    include: {
+                        departure1: true,
+                        destination1: true,
+                    }
+                }
+            );
+
+            return companyOrders;
+
+        } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${OrderReadRepository.name}.findCompanyOrders`,
+                    message: `err finding company orders: ${error.message}`
+                }
+            );
 
         };
 

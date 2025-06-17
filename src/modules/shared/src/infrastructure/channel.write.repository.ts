@@ -1,9 +1,12 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { Prisma, PrismaClient } from "@prisma/client";
+import ChannelMapper from "./mappers/channel.mapper";
 import UserChannelMapper from "./mappers/user.channel.mapper";
 
 @Injectable({})
 export default class ChannelWriteRepository {
+
+    private readonly logger = new Logger(ChannelWriteRepository.name);
 
     public constructor(
         @Inject()
@@ -101,6 +104,47 @@ export default class ChannelWriteRepository {
         } catch (error) {
 
             throw error;
+
+        };
+
+    };
+
+    public async saveV2(
+        params: {
+            name: string,
+            type: string,
+            details: Record<string, unknown>,
+        }
+    ) {
+
+        const {
+            type,
+            details,
+            name
+        } = params;
+
+        try {
+
+            const saveChannelResponse = await this.client.channel.create(
+                {
+                    data: {
+                        name,
+                        type,
+                        details: details as Prisma.JsonValue,
+                    }
+                }
+            );
+
+            return ChannelMapper.toV2(saveChannelResponse);
+
+        } catch (error) {
+
+            this.logger.error(
+                {
+                    source: `${ChannelWriteRepository.name}.saveV2`,
+                    message: `err saving channel: ${error.message}`
+                }
+            );
 
         };
 

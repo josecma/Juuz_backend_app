@@ -12,6 +12,22 @@ export default class BuildChannelNameService {
 
     };
 
+    static user(): typeof BuildChannelNameService {
+
+        this._builtChannelName = `${this._builtChannelName}:user`;
+
+        return this;
+
+    };
+
+    static company(): typeof BuildChannelNameService {
+
+        this._builtChannelName = `${this._builtChannelName}:company`;
+
+        return this;
+
+    };
+
     static private(): typeof BuildChannelNameService {
 
         this._builtChannelName = `${this._builtChannelName}:private`;

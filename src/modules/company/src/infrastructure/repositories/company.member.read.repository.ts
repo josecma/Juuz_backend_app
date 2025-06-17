@@ -96,4 +96,49 @@ export default class CompanyMemberReadRepository {
 
     };
 
+    // public async findMember(
+    //     params: {
+    //         memberId: string,
+    //         roleId: string,
+    //         companyId: string,
+    //     }
+    // ) {
+
+    //     const {
+    //         memberId,
+    //         roleId,
+    //         companyId,
+    //     } = params;
+
+    //     try {
+
+    //         const findCompanyMemberResponse = await this.client.companyMember.findUnique(
+    //             {
+    //                 where: {
+    //                     memberId_companyId_roleId: {
+    //                         memberId,
+    //                         roleId,
+    //                         companyId,
+    //                     }
+    //                 },
+    //             }
+    //         );
+
+    //         return findCompanyMemberResponse;
+
+    //     } catch (error) {
+
+    //         this.logger.error(
+    //             {
+    //                 source: `${CompanyMemberReadRepository.name}`,
+    //                 message: error.message,
+    //             }
+    //         );
+
+    //         throw error;
+
+    //     };
+
+    // };
+
 };

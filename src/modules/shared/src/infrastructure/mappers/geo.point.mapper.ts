@@ -7,7 +7,7 @@ export default class GeoPointMapper {
     ) {
 
         return orm as {
-            type: "POINT";
+            type: 'POINT';
             coordinates: {
                 latitude: number,
                 longitude: number,

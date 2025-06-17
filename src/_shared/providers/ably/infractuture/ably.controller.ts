@@ -1,7 +1,7 @@
 import { BadRequestException, Controller, Inject, InternalServerErrorException, Post, Request } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { RequestUserId } from 'src/_shared/domain/requestId';
-import GetPrivateUserChannelByUserIdUseCase from 'src/modules/shared/src/application/useCases/get.private.user.channel.by.user.id.use.case';
+import GetPrivateUserChannelByUserIdUseCase from 'src/modules/shared/src/application/useCases/get.user.private.channel.use.case';
 import BadRequestDomainException from 'src/modules/shared/src/domain/exceptions/bad.request.domain.exception';
 
 @ApiTags('Ably')
