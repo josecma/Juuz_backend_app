@@ -1,10 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import IEventHandler from "src/modules/shared/src/application/contracts/i.event.handler";
-import GetCompanyPrivateChannelUseCase from "src/modules/shared/src/application/useCases/get.company.private.channel.use.case";
-import GetUserPrivateChannelUseCase from "src/modules/shared/src/application/useCases/get.user.private.channel.use.case";
-import AblyAdapter from "src/modules/shared/src/infrastructure/adapters/ably.adapter";
 import StakeholderStatusChangedEvent from "../../domain/events/stakeholder.status.changed.event";
-
+import NotifyBusinessStakeholdersUseCase from "../useCases/notify.business.stakeholders.use.case";
 
 @Injectable({})
 export default class StakeholderStatusChangedEventHandler implements IEventHandler<StakeholderStatusChangedEvent> {
@@ -12,9 +9,7 @@ export default class StakeholderStatusChangedEventHandler implements IEventHandl
     private readonly logger = new Logger(StakeholderStatusChangedEventHandler.name);
 
     public constructor(
-        private readonly ablyAdapter: AblyAdapter,
-        private readonly getUserPrivateChannelUseCase: GetUserPrivateChannelUseCase,
-        private readonly getCompanyPrivateChannelUseCase: GetCompanyPrivateChannelUseCase,
+        private readonly notifyBusinessStakeholdersUseCase: NotifyBusinessStakeholdersUseCase,
     ) { };
 
     public async handle(
@@ -25,61 +20,33 @@ export default class StakeholderStatusChangedEventHandler implements IEventHandl
             changedBy,
             stakeholders,
             businessId,
+            status,
         } = event;
 
         try {
 
-            await Promise.all(
-                stakeholders
-                    .filter(s => s.id != changedBy)
-                    .map(
-
-                        async s => {
-
-                            let channel: string;
-
-                            switch (s.type) {
-
-                                case 'company':
-
-                                    channel = (await this.getCompanyPrivateChannelUseCase.execute(s.id)).channel[0];
-
-                                    break;
-
-                                case 'user':
-
-                                    channel = (await this.getUserPrivateChannelUseCase.execute(s.id)).privateUserChannel[0];
-
-                                    break;
-
-                                default:
-                                    break;
-
-                            }
-
-                            await this.ablyAdapter.publishMessage(
-                                channel,
-                                {
-                                    changedBy
-                                },
-                                'status'
-                            );
-
-                        }
-
-                    )
-            )
+            await this.notifyBusinessStakeholdersUseCase.execute(
+                {
+                    stakeholders: stakeholders.filter(s => s.id !== changedBy),
+                    message: {
+                        businessId,
+                        stakeholderId: changedBy,
+                        status,
+                    },
+                    name: 'StakeholderStatusChangedEvent'
+                }
+            );
 
         } catch (error) {
 
             this.logger.error(
                 {
                     source: `${StakeholderStatusChangedEventHandler.name}`,
-                    message: `err notifying stakeholder counterparts: ${error.message}`,
+                    message: `err handling StakeholderStatusChangedEvent: ${error.message}`,
                 }
             );
 
-        }
+        };
 
     };
 

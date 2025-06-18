@@ -1,7 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import DoesCompanyExistService from "src/modules/company/src/domain/services/does.company.exist.service";
 import { CompanyPrivateChannelDetails } from "src/modules/company/src/domain/types/company.private.channel.details";
-import CompanyReadRepository from "src/modules/company/src/infrastructure/repositories/company.read.repository";
 import NotFoundDomainException from "src/modules/shared/src/domain/exceptions/not.found.domain.exception";
 import BuildChannelNameService from "src/modules/shared/src/domain/services/build.channel.name.service";
 import AblyAdapter from "src/modules/shared/src/infrastructure/adapters/ably.adapter";
@@ -14,7 +13,6 @@ export default class GetCompanyPrivateChannelUseCase {
     private readonly logger = new Logger(GetCompanyPrivateChannelUseCase.name);
 
     public constructor(
-        private readonly companyReadRepository: CompanyReadRepository,
         private readonly doesCompanyExistService: DoesCompanyExistService,
         private readonly ablyAdapter: AblyAdapter,
         private readonly channelWriteRepository: ChannelWriteRepository,

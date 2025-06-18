@@ -70,7 +70,7 @@ export default class OpenBusinessUseCase {
 
             business = await this.negotiationReadRepository.findBusiness(
                 {
-                    status: "open",
+                    status: 'OPEN',
                     stakeholderIds: stakeholders.map(
                         s => s.id
                     ),
@@ -84,7 +84,7 @@ export default class OpenBusinessUseCase {
 
                 business = await this.negotiationWriteRepository.saveBusiness(
                     {
-                        status: "open",
+                        status: 'OPEN',
                         objects,
                         stakeholders,
                     }
